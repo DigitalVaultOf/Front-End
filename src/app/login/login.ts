@@ -16,23 +16,14 @@ export class Login {
   password = '';
 
   constructor(
-    private http: HttpClient,
     private auth: Auth,
     private router: Router
   ){}
 
   login() {
-    this.http
-      .post<any>('https://localhost:7178/auth/api/Auth/login', {
-        accountNumber: this.accountNumber,
-        password: this.password,
-      })
-      .subscribe({
-        next: (res) => {
-          this.auth.login(res.data.token);
-          this.router.navigate(['/']);
-        },
-        error: () => alert('Falha no login.'),
-      });
+    this.auth.login(this.accountNumber, this.password).subscribe({
+      next: () => this.router.navigate(['/']),
+      error: () => alert('Credenciais inválidas'),
+    });
   }
 }

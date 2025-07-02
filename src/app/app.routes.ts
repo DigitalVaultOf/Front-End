@@ -3,13 +3,13 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { Deposito } from './deposito/deposito';
 import { App } from './app';
+import { authGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
-  { path: 'login', component: Login },
-  { path: '', component: App},
-  { path: 'deposit', component: Deposito },
-];
-
+    { path: '', component: Login },
+    { path: 'login', component: Login },
+    { path: 'deposit', component: Deposito, canActivate: [authGuard] },
+]
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
