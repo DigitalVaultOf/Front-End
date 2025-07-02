@@ -12,6 +12,9 @@ import { Router } from '@angular/router';
   styleUrl: './login.scss'
 })
 export class Login {
+    goTo(path: string) {
+    this.router.navigate([path]);
+  }
   accountNumber = '';
   password = '';
 

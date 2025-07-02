@@ -4,7 +4,9 @@
 
     <form (ngSubmit)="login()">
       <div class="mb-4">
-        <label for="account" class="block text-sm font-medium text-gray-700">Conta</label>
+        <label for="account" class="block text-sm font-medium text-gray-700"
+          >Conta</label
+        >
         <input
           type="text"
           id="account"
@@ -18,7 +20,9 @@
       </div>
 
       <div class="mb-6">
-        <label for="senha" class="block text-sm font-medium text-gray-700">Senha</label>
+        <label for="senha" class="block text-sm font-medium text-gray-700"
+          >Senha</label
+        >
         <input
           type="password"
           id="senha"
@@ -31,16 +35,19 @@
         />
       </div>
 
-      <button
-        type="submit"
-        class="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition-colors"
+      <a (click)="goTo('home')">
+        <button
+          type="submit"
+          class="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition-colors"
+        >
+          Entrar
+        </button></a
       >
-        Entrar
-      </button>
     </form>
 
     <p class="mt-4 text-sm text-center text-gray-600">
-      Esqueceu a senha? <a href="#" class="text-blue-600 hover:underline">Recuperar</a>
+      Esqueceu a senha?
+      <a href="#" class="text-blue-600 hover:underline">Recuperar</a>
     </p>
   </div>
 </div>
