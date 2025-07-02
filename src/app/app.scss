@@ -1,0 +1,74 @@
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #f5f6fa;
+  color: #333;
+}
+header {
+  background-color: #1667d7;
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+nav a {
+  color: white;
+  margin-left: 2rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+main {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.saldo-card {
+  background-color: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+.saldo-card h2 {
+  margin-top: 0;
+  color: #44bd32;
+}
+.actions {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.action {
+  flex: 1;
+  min-width: 200px;
+  background-color: white;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.action:hover {
+  transform: translateY(-5px);
+}
+.action img {
+  width: 40px;
+  margin-bottom: 0.5rem;
+}
+.card-info {
+  margin-top: 2rem;
+  background-color: #1667d7;
+  color: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.card-info h3 {
+  margin-top: 0;
+}
