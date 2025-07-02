@@ -1,0 +1,53 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+  <div class="bg-white shadow-xl rounded-2xl w-full max-w-md p-8">
+    <h2 class="text-2xl font-bold text-center text-blue-700 mb-6">Login</h2>
+
+    <form (ngSubmit)="login()">
+      <div class="mb-4">
+        <label for="account" class="block text-sm font-medium text-gray-700"
+          >Conta</label
+        >
+        <input
+          type="text"
+          id="account"
+          name="account"
+          [(ngModel)]="accountNumber"
+          class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
+          placeholder="Número da Conta"
+          required
+          minlength="6"
+        />
+      </div>
+
+      <div class="mb-6">
+        <label for="senha" class="block text-sm font-medium text-gray-700"
+          >Senha</label
+        >
+        <input
+          type="password"
+          id="senha"
+          name="senha"
+          [(ngModel)]="password"
+          class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
+          placeholder="********"
+          required
+          minlength="6"
+        />
+      </div>
+
+      <a (click)="goTo('home')">
+        <button
+          type="submit"
+          class="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition-colors"
+        >
+          Entrar
+        </button></a
+      >
+    </form>
+
+    <p class="mt-4 text-sm text-center text-gray-600">
+      Esqueceu a senha?
+      <a href="#" class="text-blue-600 hover:underline">Recuperar</a>
+    </p>
+  </div>
+</div>
