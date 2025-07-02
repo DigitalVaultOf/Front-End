@@ -1,32 +1,39 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Auth } from '../services/auth';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, ReactiveFormsModule,FormsModule],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './login.html',
-  styleUrl: './login.scss'
+  styleUrls: ['./login.scss']
 })
 export class Login {
-    goTo(path: string) {
-    this.router.navigate([path]);
-  }
   accountNumber = '';
   password = '';
 
   constructor(
     private auth: Auth,
     private router: Router
-  ){}
+  ) {}
 
   login() {
     this.auth.login(this.accountNumber, this.password).subscribe({
-      next: () => this.router.navigate(['/']),
-      error: () => alert('Credenciais inválidas'),
+      next: () => {
+        // Se login OK, redireciona para home (rota protegida)
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        alert('Credenciais inválidas');
+        console.error('Erro no login:', err);
+      }
     });
+  }
+
+  goTo(path: string) {
+    this.router.navigate([path]);
   }
 }
