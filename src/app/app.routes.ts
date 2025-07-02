@@ -4,6 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { Deposito } from './deposito/deposito';
 import { App } from './app';
 import { Home } from './home/home';
+import { authGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
     { path: '', component: Login },

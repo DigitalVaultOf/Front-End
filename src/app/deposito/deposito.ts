@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { OverlayRef } from '@angular/cdk/overlay';
+import { Component, Inject, Input } from '@angular/core';
 
 @Component({
   selector: 'app-deposito',
@@ -8,5 +9,12 @@ import { Component } from '@angular/core';
   styleUrl: './deposito.scss'
 })
 export class Deposito {
+  @Input() deposito: any;
 
+  constructor(@Inject(OverlayRef) private overlayRef: OverlayRef) {}
+
+  closeModal() {
+  console.log('Fechando modal...');
+  this.overlayRef.dispose();
+  }
 }

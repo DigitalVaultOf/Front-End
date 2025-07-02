@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Overlay, OverlayRef, OverlayModule } from '@angular/cdk/overlay';
 import { ComponentPortal, PortalModule } from '@angular/cdk/portal';
 import { Withdraw } from './withdraw/withdraw';
+import { Deposito } from './deposito/deposito';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +18,8 @@ export class App {
   private overlayRef?: OverlayRef;
 
   Withdraw = Withdraw;
-
+  Deposito = Deposito;
+  
   constructor(private overlay: Overlay, private router: Router) {}
 
   goTo(path: string) {
