@@ -9,13 +9,12 @@
     <a href="#">Todas as funções</a>
   </nav>
 </header>
-@if (showContent) {
 <main>
   <section class="saldo-card">
     <h2>Saldo Atual: R$ 12.345,67</h2>
     <p>Última atualização: 01/07/2025 13:00</p>
   </section>
-
+  @if (showContent) {
   <section class="actions">
     <div class="action">
       <img
@@ -45,14 +44,13 @@
       <p>Todas as funções</p>
     </div>
   </section>
-
   <section class="card-info">
     <h3>Cartão de Crédito</h3>
     <p>Limite disponível: R$ 4.000,00</p>
     <p>Fatura atual: R$ 1.234,56</p>
     <p>Vencimento: 10/07/2025</p>
   </section>
+  } @else {
+  <router-outlet></router-outlet>
+  }
 </main>
-} @else {
-<router-outlet></router-outlet>
-}
