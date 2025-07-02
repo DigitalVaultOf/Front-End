@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { Deposito } from './deposito/deposito';
 import { App } from './app';
-import { authGuard } from './guards/auth-guard';
+import { Home } from './home/home';
 
 export const routes: Routes = [
     { path: '', component: Login },
