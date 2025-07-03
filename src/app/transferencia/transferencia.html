@@ -1,0 +1,27 @@
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40"></div>
+  
+    <div class="fixed z-50 bg-white rounded-lg shadow-lg w-96 p-6 flex flex-col space-y-4">
+      <h2 class="text-xl font-semibold text-gray-800">Qual o valor de transferência?</h2>
+      <input
+        type="number"
+        placeholder="Digite o valor"
+        class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+      <h2 class="text-xl font-semibold text-gray-800">Para quem você quer transferir?</h2>
+      <input
+        placeholder="Número da conta"
+        class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+      <button
+        class="bg-indigo-600 text-white rounded-md py-2 font-semibold hover:bg-indigo-700 transition"
+      >
+        Sacar
+      </button>
+  
+      <button (click)="closeModal()">
+        Cancelar
+      </button>
+    </div>
+  </body>
+  

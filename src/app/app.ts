@@ -5,6 +5,7 @@ import { Overlay, OverlayRef, OverlayModule } from '@angular/cdk/overlay';
 import { ComponentPortal, PortalModule } from '@angular/cdk/portal';
 import { Withdraw } from './withdraw/withdraw';
 import { Deposito } from './deposito/deposito';
+import { Transferencia } from './transferencia/transferencia';
 
 @Component({
   selector: 'app-root',
@@ -19,6 +20,7 @@ export class App {
 
   Withdraw = Withdraw;
   Deposito = Deposito;
+  Transferencia = Transferencia;
   
   constructor(private overlay: Overlay, private router: Router) {}
 
