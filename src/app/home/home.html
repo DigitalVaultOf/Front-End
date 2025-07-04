@@ -17,24 +17,25 @@
   @if (showContent) {
   <section class="actions">
     <div class="action">
-      <img
-        src="https://img.icons8.com/fluency/48/money-transfer.png"
-        alt="Transferência"
-      />
-      <p>Transferência</p>
+        <a (click)="openModal(Transferencia)">
+          <img
+            src="https://img.icons8.com/fluency/48/money-transfer.png"
+            alt="Transferência"
+        />
+        <p>Transferência</p>
+        </a>
     </div>
     <div class="action">
-        <a (click)="goTo('deposit')">
-          <img
-            src="https://img.icons8.com/fluency/48/deposit.png"
-            alt="Depósito"
-          />
+        <a (click)="openModal(Deposito)">
+          <img src="https://img.icons8.com/fluency/48/deposit.png" alt="Depósito"/>
           <p>Depósito</p>
         </a>
     </div>
     <div class="action">
-      <img src="https://img.icons8.com/fluency/48/atm.png" alt="Saque" />
-      <p>Saque</p>
+          <a (click)="openModal(Withdraw)">
+            <img src="https://img.icons8.com/fluency/48/atm.png" alt="Saque" />
+            <p>Saque</p>
+          </a>
     </div>
     <div class="action">
       <img
