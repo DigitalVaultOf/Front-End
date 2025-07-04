@@ -7,6 +7,7 @@ import { Deposito } from '../deposito/deposito';
 import { Withdraw } from '../withdraw/withdraw';
 import { Overlay, OverlayModule, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal, PortalModule } from '@angular/cdk/portal';
+import { Auth } from '../services/auth';
 
 @Component({
   selector: 'app-root',
@@ -25,11 +26,18 @@ export class Home {
   Deposito = Deposito;
   Withdraw = Withdraw;
   
-  constructor(private overlay: Overlay, private router: Router) {}
+  constructor(private overlay: Overlay, private router: Router, private auth: Auth) {}
 
   goTo(path: string) {
     this.showContent = false;
     this.router.navigate(["/home/",path]);
+  }
+
+  logout() {
+    if (confirm('Deseja realmente sair?')) {
+      this.auth.logout();
+      this.router.navigate(['/login']);
+    }
   }
 
   openModal(component: Type<any>) {
