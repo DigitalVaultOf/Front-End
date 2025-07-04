@@ -25,7 +25,7 @@ export class Login {
 
   login() {
     this.auth.login(this.accountNumber, this.password).subscribe({
-      next: () => this.router.navigate(['/']),
+      next: () => this.router.navigate(['/home']),
       error: () => alert('Credenciais inválidas'),
     });
   }

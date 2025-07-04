@@ -15,36 +15,37 @@ export class UserRegistration implements OnInit {
   protected registrationForm!: FormGroup;
   showContent = true;
 
-  constructor(private router: Router, private fb: FormBuilder) {} // Injete FormBuilder
+  constructor(private router: Router, private fb: FormBuilder) 
+    {
+
+    } // Injete FormBuilder
 
   ngOnInit(): void {
-    // Inicialize seu formulário reativo aqui
     this.registrationForm = this.fb.group({
-      name: ['', Validators.required], // Campo para o nome
-      cpf: ['', [Validators.required, Validators.pattern(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)]], // Campo para o CPF
-      password: ['', [Validators.required, Validators.minLength(6)]], // Campo para a senha
-      confirmPassword: ['', Validators.required] // Campo para confirmar a senha
+      name: ['', Validators.required], // Campo para o nome que usa o validador 'required' para que seja obrigatório o preenchimento
+      cpf: ['', [Validators.required, Validators.pattern(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', Validators.required]
     }, { validators: this.passwordMatchValidator }); // Adicione o validador customizado
   }
 
-  // Validador customizado para verificar se as senhas coincidem
   passwordMatchValidator: ValidatorFn = (control: AbstractControl): { [key: string]: boolean } | null => {
     const password = control.get('password');
     const confirmPassword = control.get('confirmPassword');
 
-    if (password && confirmPassword && password.value !== confirmPassword.value) {
-      // Define um erro no controle de confirmPassword se não coincidir
+    if (password && confirmPassword && password.value !== confirmPassword.value) {//é instanciado o password e confirmPassword, para que posssa ser verificado se os valores não são nulos, sendo assim elses são aplicados no inicio do 
+
       confirmPassword.setErrors({ passwordMismatch: true });
       return { passwordMismatch: true };
+
     } else if (confirmPassword && confirmPassword.hasError('passwordMismatch')) {
-      // Limpa o erro se as senhas agora coincidem
       confirmPassword.setErrors(null);
     }
     return null;
   };
   
 
-  // Função auxiliar para marcar todos os controles do formulário como 'touched'
+  // Função auxiliar para marcar todos os controles do formulário como 'touched', se o usuário interagir com o formulário, irá aparecer os "erros", caso não tenha sido preenchido corretamente
   private markAllAsTouched(formGroup: FormGroup): void {
     Object.values(formGroup.controls).forEach(control => {
       control.markAsTouched();
@@ -52,5 +53,15 @@ export class UserRegistration implements OnInit {
         this.markAllAsTouched(control);
       }
     });
+  }
+
+//depois tenho que fazer a ógica certa do cadastro
+  cadastro() {
+    //if (this.registrationForm.valid) {  
+      this.router.navigate(['/login']); // Redireciona para a página de login após o cadastro
+   // } else {
+    //   this.markAllAsTouched(this.registrationForm); // Marca todos os campos como 'touched' para exibir erros de validação
+    //   alert('Por favor, preencha todos os campos corretamente.');
+    // }
   }
 }
