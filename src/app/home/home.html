@@ -2,7 +2,38 @@
   <h1>Banco Web</h1>
   <nav>
     <a href="/home">Home</a>
-    <a (click)="logout()" style="cursor: pointer;">Logout</a>
+
+    <div class="dropdown-container">
+      <a (click)="toggleDropdown($event)" class="dropdown-toggle">
+        <fa-icon [icon]="faCog"></fa-icon>
+        <span> Configurações ▼</span>
+      </a>
+
+      @if (isDropdownOpen) {
+      <div class="dropdown-menu">
+
+        <a class="dropdown-item" (click)="openModal(EditarConta)">
+          <fa-icon [icon]="faEdit"></fa-icon>
+          <span>Editar Conta</span>
+          <fa-icon class="item-chevron" [icon]="faChevronRight"></fa-icon>
+        </a>
+        <a class="dropdown-item-excluir" (click)="excluirConta()">
+          <fa-icon [icon]="faTrash"></fa-icon>
+          <span>Excluir Conta</span>
+          <fa-icon class="item-chevron" [icon]="faChevronRight"></fa-icon>
+        </a>
+
+        <a class="dropdown-item" (click)="logout()">
+          <fa-icon [icon]="faSignOutAlt"></fa-icon>
+          <span>Sair</span>
+          <fa-icon class="item-chevron" [icon]="faChevronRight"></fa-icon>
+        </a>
+
+        
+
+      </div>
+      }
+    </div>
   </nav>
 </header>
 <main>
@@ -13,25 +44,28 @@
   @if (showContent) {
   <section class="actions">
     <div class="action">
-        <a (click)="openModal(Transferencia)">
-          <img
-            src="https://img.icons8.com/fluency/48/money-transfer.png"
-            alt="Transferência"
+      <a (click)="openModal(Transferencia)">
+        <img
+          src="https://img.icons8.com/fluency/48/money-transfer.png"
+          alt="Transferência"
         />
         <p>Transferência</p>
-        </a>
+      </a>
     </div>
     <div class="action">
-        <a (click)="openModal(Deposito)">
-          <img  src="https://img.icons8.com/fluency/48/deposit.png" alt="Depósito"/>
-          <p>Depósito</p>
-        </a>
+      <a (click)="openModal(Deposito)">
+        <img
+          src="https://img.icons8.com/fluency/48/deposit.png"
+          alt="Depósito"
+        />
+        <p>Depósito</p>
+      </a>
     </div>
     <div class="action">
-          <a (click)="openModal(Withdraw)">
-            <img src="https://img.icons8.com/fluency/48/atm.png" alt="Saque" />
-            <p>Saque</p>
-          </a>
+      <a (click)="openModal(Withdraw)">
+        <img src="https://img.icons8.com/fluency/48/atm.png" alt="Saque" />
+        <p>Saque</p>
+      </a>
     </div>
     <div class="action">
       <img
@@ -47,8 +81,7 @@
     <p>Fatura atual: R$ 1.234,56</p>
     <p>Vencimento: 10/07/2025</p>
   </section>
-  } 
-   @else {
+  } @else {
   <router-outlet></router-outlet>
   }
 </main>
