@@ -1,22 +1,32 @@
-import { Component, Inject, Input } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OverlayRef } from '@angular/cdk/overlay';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-withdraw',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './withdraw.html',
   styleUrls: ['./withdraw.scss'],
 })
 export class Withdraw {
-  @Input() withdraw: any;
+  valor: number = 0;
 
-  constructor(@Inject(OverlayRef) private overlayRef: OverlayRef) {}
+  constructor(
+    @Inject(OverlayRef) private overlayRef: OverlayRef,
+    private http: HttpClient
+  ) {}
 
   closeModal() {
-  console.log('Fechando modal...');
-  this.overlayRef.dispose();
-}
+    this.overlayRef.dispose();
+  }
 
+  sacar() {
+    this.http.post('https://localhost:7178/user/api/Movimentation/whitdraw', { value: this.valor }).subscribe(res => {
+      console.log('Saque enviado', res);
+      this.closeModal();
+    });
+  }  
 }
