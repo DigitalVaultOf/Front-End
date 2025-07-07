@@ -1,44 +1,41 @@
 <header>
   <h1>Banco Web</h1>
   <nav>
-    <a href="/home">Home</a>
-    <a (click)="logout()" style="cursor: pointer;">Logout</a>
+    <button class="hamburger" (click)="toggleMenu()">☰</button>
+    <nav class="menu" [class.open]="menuOpen"></nav>
+    <a (click)="logout()" style="cursor: pointer">Logout</a>
   </nav>
 </header>
 <main>
   <section class="saldo-card">
-    <h2>Saldo Atual: R$ 12.345,67</h2>
+    <h2>Saldo Atual:{{ accountData?.balance | currency : "BRL" }}</h2>
     <p>Última atualização: 01/07/2025 13:00</p>
   </section>
   @if (showContent) {
   <section class="actions">
     <div class="action">
-        <a (click)="openModal(Transferencia)">
-          <img
-            src="https://img.icons8.com/fluency/48/money-transfer.png"
-            alt="Transferência"
+      <a (click)="openModal(Transferencia)">
+        <img
+          src="https://img.icons8.com/fluency/48/money-transfer.png"
+          alt="Transferência"
         />
         <p>Transferência</p>
-        </a>
+      </a>
     </div>
     <div class="action">
-        <a (click)="openModal(Deposito)">
-          <img  src="https://img.icons8.com/fluency/48/deposit.png" alt="Depósito"/>
-          <p>Depósito</p>
-        </a>
+      <a (click)="openModal(Deposito)">
+        <img
+          src="https://img.icons8.com/fluency/48/deposit.png"
+          alt="Depósito"
+        />
+        <p>Depósito</p>
+      </a>
     </div>
     <div class="action">
-          <a (click)="openModal(Withdraw)">
-            <img src="https://img.icons8.com/fluency/48/atm.png" alt="Saque" />
-            <p>Saque</p>
-          </a>
-    </div>
-    <div class="action">
-      <img
-        src="https://img.icons8.com/fluency/48/services.png"
-        alt="Todas as funções"
-      />
-      <p>Todas as funções</p>
+      <a (click)="openModal(Withdraw)">
+        <img src="https://img.icons8.com/fluency/48/atm.png" alt="Saque" />
+        <p>Saque</p>
+      </a>
     </div>
   </section>
   <section class="card-info">
@@ -47,8 +44,7 @@
     <p>Fatura atual: R$ 1.234,56</p>
     <p>Vencimento: 10/07/2025</p>
   </section>
-  } 
-   @else {
+  } @else {
   <router-outlet></router-outlet>
   }
 </main>

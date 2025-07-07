@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Injector, Type } from '@angular/core';
+import { Component, Injector, OnInit, Type } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Router } from '@angular/router';
 import { Transferencia } from '../transferencia/transferencia';
@@ -8,6 +8,9 @@ import { Withdraw } from '../withdraw/withdraw';
 import { Overlay, OverlayModule, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal, PortalModule } from '@angular/cdk/portal';
 import { Auth } from '../services/auth';
+import { interval, Subscription, switchMap } from 'rxjs';
+import { User, UserI } from '../services/user';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +19,15 @@ import { Auth } from '../services/auth';
   templateUrl: './home.html',
   styleUrls: ['./home.scss'],
 })
-export class Home {
+export class Home implements OnInit {
+  menuOpen = false;
+
+  toggleMenu() {
+    this.menuOpen = !this.menuOpen;
+  }
+  accountData: UserI['data'] | null = null;
+  message: string = '';
+  error: string = '';
   protected title = 'Front-End-Net';
   showContent = true;
 
@@ -25,12 +36,42 @@ export class Home {
   Transferencia = Transferencia;
   Deposito = Deposito;
   Withdraw = Withdraw;
-  
-  constructor(private overlay: Overlay, private router: Router, private auth: Auth) {}
 
-  goTo(path: string) {
-    this.showContent = false;
-    this.router.navigate(["/home/",path]);
+  constructor(
+    private overlay: Overlay,
+    private router: Router,
+    private auth: Auth,
+    private user: User,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  updateSubscription!: Subscription;
+
+  ngOnInit() {
+    this.loadAccount();
+
+    this.updateSubscription = interval(1000)
+      .pipe(switchMap(() => this.user.getUser()))
+      .subscribe({
+        next: (response) => {
+          this.accountData = response.data;
+          this.cdr.detectChanges();
+          this.message = response.message;
+        },
+        error: (err) => {
+          console.error(err);
+          this.error = 'Erro ao atualizar os dados.';
+        },
+      });
+  }
+
+  loadAccount() {
+    this.user.getUser().subscribe({
+      next: (response) => {
+        this.accountData = response.data;
+        this.message = response.message;
+      },
+    });
   }
 
   logout() {
@@ -45,7 +86,8 @@ export class Home {
 
     this.overlayRef = this.overlay.create({
       hasBackdrop: true,
-      positionStrategy: this.overlay.position()
+      positionStrategy: this.overlay
+        .position()
         .global()
         .centerHorizontally()
         .centerVertically(),
