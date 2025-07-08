@@ -15,7 +15,7 @@ export class Login {
     goTo(path: string) {
     this.router.navigate([path]);
   }
-  accountNumber = '';
+  loginInput = '';
   password = '';
 
   constructor(
@@ -24,7 +24,18 @@ export class Login {
   ){}
 
   login() {
-    this.auth.login(this.accountNumber, this.password).subscribe({
+    const trimmed = this.loginInput.trim();
+    const payload: any = { password: this.password };
+  
+    if (trimmed.includes('@')) {
+      payload.email = trimmed;
+    } else if (/^\d{11}$/.test(trimmed.replace(/\D/g, ''))) {
+      payload.cpf = trimmed.replace(/\D/g, '');
+    } else {
+      payload.accountNumber = trimmed;
+    }
+  
+    this.auth.login(payload).subscribe({
       next: () => this.router.navigate(['/home']),
       error: () => alert('Credenciais inválidas'),
     });
