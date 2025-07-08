@@ -66,9 +66,56 @@ main {
   background-color: #1667d7;
   color: white;
   border-radius: 10px;
-  padding: 1.5rem;
+  padding: 1.5rem 2rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  font-size: 0.95rem;
 }
-.card-info h3 {
-  margin-top: 0;
+
+.card-info button {
+  background-color: #44bd32;
+  margin-right: 1rem;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 1rem;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
 }
+
+.card-info button:hover {
+  background-color: #3a9a28;
+}
+
+.card-info ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  border-top: 1px solid rgba(255,255,255,0.3);
+}
+
+.card-info ul li {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+/* Scrollbar para a lista */
+.card-info ul::-webkit-scrollbar {
+  width: 8px;
+}
+
+.card-info ul::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.card-info ul::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+

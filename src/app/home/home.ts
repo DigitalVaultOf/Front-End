@@ -10,6 +10,7 @@ import { ComponentPortal, PortalModule } from '@angular/cdk/portal';
 import { Auth } from '../services/auth';
 import { interval, Subscription, switchMap } from 'rxjs';
 import { User, UserI } from '../services/user';
+import { Estrato, Movimentacao } from '../services/estrato';
 import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
@@ -25,6 +26,7 @@ export class Home implements OnInit {
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
   }
+  valores: Movimentacao[] = [];
   accountData: UserI['data'] | null = null;
   message: string = '';
   error: string = '';
@@ -42,7 +44,8 @@ export class Home implements OnInit {
     private router: Router,
     private auth: Auth,
     private user: User,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private extrato: Estrato
   ) {}
 
   updateSubscription!: Subscription;
@@ -63,6 +66,29 @@ export class Home implements OnInit {
           this.error = 'Erro ao atualizar os dados.';
         },
       });
+  }
+
+  history() {
+    this.extrato.getHistory().subscribe({
+      next: (res) => {
+        this.valores = res.data; // Atribui array de objetos à variável valores
+      },
+      error: (err) => console.error('Erro ao carregar valores:', err),
+    });
+  }
+
+  carregarMovimentacoesSemana() {
+    this.extrato.getMovimentacoesUltimaSemana().subscribe({
+      next: (res) => (this.valores = res.data),
+      error: (err) => console.error('Erro ao carregar semana:', err),
+    });
+  }
+
+  carregarMovimentacoesMes() {
+    this.extrato.carregarMovimentacoesMes().subscribe({
+      next: (res) => (this.valores = res.data),
+      error: (err) => console.error('Erro ao carregar mês:', err),
+    });
   }
 
   loadAccount() {
