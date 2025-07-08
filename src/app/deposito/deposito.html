@@ -6,10 +6,12 @@
       <input
         type="number"
         placeholder="Digite o valor"
+        [(ngModel)]="valorDeposito"
         class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
       />
       <button
         class="bg-indigo-600 text-white rounded-md py-2 font-semibold hover:bg-indigo-700 transition"
+        (click)="confirmarDeposito()"
       >
         Depositar
       </button>
