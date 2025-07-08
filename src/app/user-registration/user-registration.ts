@@ -1,51 +1,52 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core'; // Importe OnInit
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidatorFn } from '@angular/forms'; // Importe FormBuilder, FormGroup, Validators, AbstractControl, ValidatorFn
+import { Component, OnInit } from '@angular/core';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
 import { Router } from '@angular/router';
+import { provideNgxMask } from 'ngx-mask'; // Importação correta para componentes standalone
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-user-registration',
   templateUrl: './user-registration.html',
   styleUrls: ['./user-registration.scss'],
-  standalone: true, 
-  imports: [CommonModule, ReactiveFormsModule, FormsModule] 
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, HttpClientModule],
+  providers: [provideNgxMask()], // Onde NgxMask é fornecido para o componente
 })
-export class UserRegistration implements OnInit { 
+export class UserRegistration implements OnInit {
   protected title = 'User-Registration-Net';
   protected registrationForm!: FormGroup;
+  cpfMask = '';
   showContent = true;
 
-  constructor(private router: Router, private fb: FormBuilder) 
+  constructor(private router: Router, private fb: FormBuilder)
     {
 
-    } // Injete FormBuilder
+    }
 
   ngOnInit(): void {
     this.registrationForm = this.fb.group({
-      name: ['', Validators.required], // Campo para o nome que usa o validador 'required' para que seja obrigatório o preenchimento
+      name: ['', Validators.required],
       cpf: ['', [Validators.required, Validators.pattern(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required]
-    }, { validators: this.passwordMatchValidator }); // Adicione o validador customizado
+    }, { validators: this.passwordMatchValidator });
   }
 
   passwordMatchValidator: ValidatorFn = (control: AbstractControl): { [key: string]: boolean } | null => {
     const password = control.get('password');
     const confirmPassword = control.get('confirmPassword');
 
-    if (password && confirmPassword && password.value !== confirmPassword.value) {//é instanciado o password e confirmPassword, para que posssa ser verificado se os valores não são nulos, sendo assim elses são aplicados no inicio do 
-
+    if (password && confirmPassword && password.value !== confirmPassword.value) {
       confirmPassword.setErrors({ passwordMismatch: true });
       return { passwordMismatch: true };
-
     } else if (confirmPassword && confirmPassword.hasError('passwordMismatch')) {
       confirmPassword.setErrors(null);
     }
     return null;
   };
-  
 
-  // Função auxiliar para marcar todos os controles do formulário como 'touched', se o usuário interagir com o formulário, irá aparecer os "erros", caso não tenha sido preenchido corretamente
+
   private markAllAsTouched(formGroup: FormGroup): void {
     Object.values(formGroup.controls).forEach(control => {
       control.markAsTouched();
@@ -55,13 +56,14 @@ export class UserRegistration implements OnInit {
     });
   }
 
-//depois tenho que fazer a ógica certa do cadastro
   cadastro() {
-    //if (this.registrationForm.valid) {  
-      this.router.navigate(['/login']); // Redireciona para a página de login após o cadastro
-   // } else {
-    //   this.markAllAsTouched(this.registrationForm); // Marca todos os campos como 'touched' para exibir erros de validação
-    //   alert('Por favor, preencha todos os campos corretamente.');
-    // }
+    // Descomentei a lógica de validação
+    if (this.registrationForm.valid) {
+      console.log('Formulário válido!', this.registrationForm.value); // Para depuração
+      this.router.navigate(['/login']);
+    } else {
+      this.markAllAsTouched(this.registrationForm);
+      console.log('Por favor, preencha todos os campos corretamente ou verifique os erros.'); // Substituído alert por console.log
+    }
   }
 }
