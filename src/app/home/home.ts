@@ -122,7 +122,7 @@ export class Home implements OnInit {
         this.accountData = response.data;
         this.message = response.message;
       },
-    });
+    });}
   EditarConta = EditarConta; 
 
 
