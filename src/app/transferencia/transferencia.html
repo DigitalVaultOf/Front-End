@@ -3,32 +3,56 @@
 
   <div class="fixed z-50 bg-white rounded-lg shadow-lg w-96 p-6 flex flex-col space-y-4">
     <h2 class="text-xl font-semibold text-gray-800">Qual o valor de transferência?</h2>
+
     <input
+      *ngIf="!exibirSenha"
       type="number"
       [(ngModel)]="amount"
       placeholder="Digite o valor"
       class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
     />
-    <h2 class="text-xl font-semibold text-gray-800">Para quem você quer transferir?</h2>
+
     <input
+      *ngIf="!exibirSenha"
       [(ngModel)]="accountNumberTo"
       placeholder="Número da conta"
       class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
     />
-    
+
     <input
+      *ngIf="!exibirSenha"
       [(ngModel)]="description"
       placeholder="Descrição da transferência"
       class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
     />
+
+    <div *ngIf="exibirSenha" class="flex flex-col space-y-2">
+      <div class="font-semibold text-gray-700">
+        Você está transferindo <strong>R$ {{ amount | number:'1.2-2' }}</strong> para a conta <strong>{{ accountNumberTo }}</strong>.
+      </div>
+
+      <input
+        type="password"
+        placeholder="Digite sua senha"
+        [(ngModel)]="password"
+        (input)="mensagemErro = null"
+        class="border border-gray-300 rounded-md px-4 py-2 mt-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+      />
+
+      <div *ngIf="mensagemErro" class="text-red-600 font-semibold mt-1">
+        {{ mensagemErro }}
+      </div>
+    </div>
+
     <button
       (click)="transferir()"
-      class="bg-indigo-600 text-white rounded-md py-2 font-semibold hover:bg-indigo-700 transition"
+      [disabled]="!exibirSenha ? (!amount || !accountNumberTo) : !password"
+      class="bg-indigo-600 disabled:opacity-50 text-white rounded-md py-2 font-semibold hover:bg-indigo-700 transition"
     >
-      Transferir
+      {{ exibirSenha ? 'Transferir' : 'Confirmar valor' }}
     </button>
 
-    <button (click)="closeModal()">
+    <button (click)="closeModal()" class="mt-2 text-gray-600 hover:text-gray-900">
       Cancelar
     </button>
   </div>
