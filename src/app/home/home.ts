@@ -122,7 +122,8 @@ export class Home implements OnInit {
         this.accountData = response.data;
         this.message = response.message;
       },
-    });
+    });}
+    
   EditarConta = EditarConta; 
 
 
@@ -140,10 +141,6 @@ export class Home implements OnInit {
     }
   }
 
-  goTo(path: string) {
-    this.showContent = false;
-    this.router.navigate(['/home/', path]);
-  }
 
   logout() {
     if (confirm('Deseja realmente sair?')) {
