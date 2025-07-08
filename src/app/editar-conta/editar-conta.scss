@@ -1,3 +1,42 @@
+$primary-color: #1667d7;
+$primary-hover-color: #1357b3;
+$secondary-color: #e9ecef;
+$secondary-hover-color: #d1d5db;
+$border-color: #ced4da;
+$text-primary: #333;
+$text-secondary: #555;
+$border-radius: 6px;
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  &:focus {
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba(22, 103, 215, 0.2);
+  }
+  &:disabled {
+    background-color: $secondary-color;
+  }
+}
+
+.btn-primary {
+  background-color: $primary-color;
+  color: white;
+  &:hover {
+    background-color: $primary-hover-color;
+  }
+}
+
+.btn-secondary {
+  background-color: $secondary-color;
+  color: $text-primary;
+  &:hover {
+    background-color: $secondary-hover-color;
+  }
+}
+
 .modal-container {
   background: white;
   border-radius: 10px;
@@ -30,7 +69,9 @@
   color: #888;
   cursor: pointer;
   padding: 0;
-  &:hover { color: #333; }
+  &:hover {
+    color: #333;
+  }
 }
 
 .modal-content {
@@ -66,10 +107,10 @@
   }
 
   small {
-      font-size: 0.8rem;
-      color: #777;
-      margin-top: 0.25rem;
-      display: block;
+    font-size: 0.8rem;
+    color: #777;
+    margin-top: 0.25rem;
+    display: block;
   }
 }
 
@@ -81,16 +122,14 @@
 
 .form-group {
   // margin-bottom: 1rem; // Reduzido de 1.25rem
-  flex: 1; 
+  flex: 1;
 }
-
 
 .divider {
-    border: none;
-    border-top: 1px solid #e9ecef;
-    margin: 1.25rem 0; // Reduzido de 1.5rem
+  border: none;
+  border-top: 1px solid #e9ecef;
+  margin: 1.25rem 0; // Reduzido de 1.5rem
 }
-
 
 .modal-footer {
   display: flex;
@@ -112,13 +151,17 @@
 .btn-primary {
   background-color: #1667d7;
   color: white;
-  &:hover { background-color: #1357b3; }
+  &:hover {
+    background-color: #1357b3;
+  }
 }
 
 .btn-secondary {
   background-color: #e9ecef;
   color: #333;
-  &:hover { background-color: #d1d5db; }
+  &:hover {
+    background-color: #d1d5db;
+  }
 }
 
 @keyframes modal-fade-in {
@@ -134,7 +177,7 @@
 
 .modal-content {
   padding: 0 1.5rem; // Ajustamos o padding para a rolagem funcionar melhor
-  
+
   // AQUI ESTÁ A LÓGICA DO SCROLLVIEW
   max-height: 60vh; // Define uma altura máxima (60% da altura da tela)
   overflow-y: auto; // Adiciona a barra de rolagem vertical QUANDO necessário
@@ -144,7 +187,6 @@
     padding: 1.5rem 0;
   }
 }
-
 
 label {
   display: block;
