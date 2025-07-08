@@ -1,10 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, Injector, OnInit, Type } from '@angular/core';
+import {
+  Component,
+  Injector,
+  OnInit,
+  Type,
+  HostListener,
+  ElementRef,
+} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Router } from '@angular/router';
 import { Transferencia } from '../transferencia/transferencia';
 import { Deposito } from '../deposito/deposito';
 import { Withdraw } from '../withdraw/withdraw';
+import { EditarConta } from '../editar-conta/editar-conta'; 
 import { Overlay, OverlayModule, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal, PortalModule } from '@angular/cdk/portal';
 import { Auth } from '../services/auth';
@@ -12,11 +20,20 @@ import { interval, Subscription, switchMap } from 'rxjs';
 import { User, UserI } from '../services/user';
 import { Estrato, Movimentacao } from '../services/estrato';
 import { ChangeDetectorRef } from '@angular/core';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faSignOutAlt, faCog, faChevronRight, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, OverlayModule, PortalModule],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    OverlayModule,
+    PortalModule,
+    FontAwesomeModule,
+  ],
   templateUrl: './home.html',
   styleUrls: ['./home.scss'],
 })
@@ -32,7 +49,14 @@ export class Home implements OnInit {
   error: string = '';
   protected title = 'Front-End-Net';
   showContent = true;
+  isDropdownOpen = false;
 
+  faSignOutAlt = faSignOutAlt;
+  faCog = faCog;
+  faChevronRight = faChevronRight;
+  faEdit = faEdit;
+  faTrash = faTrash;
+ 
   private overlayRef?: OverlayRef;
 
   Transferencia = Transferencia;
@@ -45,6 +69,7 @@ export class Home implements OnInit {
     private auth: Auth,
     private user: User,
     private cdr: ChangeDetectorRef,
+    private el: ElementRef,
     private extrato: Estrato
   ) {}
 
@@ -98,12 +123,38 @@ export class Home implements OnInit {
         this.message = response.message;
       },
     });
+  EditarConta = EditarConta; 
+
+
+
+  toggleDropdown(event: MouseEvent) {
+    event.stopPropagation(); // Impede que o clique se propague e feche o menu imediatamente
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickout(event: MouseEvent) {
+    // Se o clique foi fora do elemento que contém o dropdown, feche-o
+    if (!this.el.nativeElement.contains(event.target)) {
+      this.isDropdownOpen = false;
+    }
+  }
+
+  goTo(path: string) {
+    this.showContent = false;
+    this.router.navigate(['/home/', path]);
   }
 
   logout() {
     if (confirm('Deseja realmente sair?')) {
       this.auth.logout();
       this.router.navigate(['/login']);
+    }
+  }
+
+  excluirConta() {
+    if (confirm('Deseja realmente excluir sua conta?')) {
+      
     }
   }
 

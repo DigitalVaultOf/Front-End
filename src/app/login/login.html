@@ -5,13 +5,14 @@
     <form (ngSubmit)="login()">
       <div class="mb-4">
         <label for="account" class="block text-sm font-medium text-gray-700"
-          >Conta</label
+          
+        >Conta</label
         >
         <input
           type="text"
           id="account"
           name="account"
-          [(ngModel)]="accountNumber"
+          [(ngModel)]="loginInput"
           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
           placeholder="Número da Conta"
           required
@@ -20,9 +21,9 @@
       </div>
 
       <div class="mb-6">
-        <label for="senha" class="block text-sm font-medium text-gray-700"
-          >Senha</label
-        >
+
+        <label for="senha" class="block text-sm font-medium text-gray-700"> Senha </label>
+
         <input
           type="password"
           id="senha"
@@ -46,8 +47,8 @@
     </form>
 
     <p class="mt-4 text-sm text-center text-gray-600">
-      Esqueceu a senha?
-      <a href="#" class="text-blue-600 hover:underline">Recuperar</a>
+      Não tem uma conta?
+      <a href="/user-registration" class="text-blue-600 hover:underline">Registrar</a>
     </p>
   </div>
 </div>

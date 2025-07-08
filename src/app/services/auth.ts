@@ -6,6 +6,9 @@ import { tap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class Auth {
+  getAccountNumber() {
+    throw new Error('Method not implemented.');
+  }
 
   private token: string | null = null;
   private apiUrl = 'https://localhost:7178/auth/api/Auth/login';
@@ -20,11 +23,8 @@ export class Auth {
     }
   }
 
-  login(accountNumber: string, password: string) {
-    return this.http.post<any>(this.apiUrl, {
-      accountNumber,
-      password,
-    }).pipe(
+  login(credentials: { accountNumber?: string; email?: string; cpf?: string; password: string }) {
+    return this.http.post<any>(this.apiUrl, credentials).pipe(
       tap(response => {
         if (this.isBrowser) {
           localStorage.setItem('token', response.data.token);
@@ -33,6 +33,7 @@ export class Auth {
       })
     );
   }
+  
 
   logout(): void {
     if (this.isBrowser) {
