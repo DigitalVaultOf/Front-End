@@ -6,6 +6,9 @@ import { tap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class Auth {
+  getAccountNumber() {
+    throw new Error('Method not implemented.');
+  }
 
   private token: string | null = null;
   private apiUrl = 'https://localhost:7178/auth/api/Auth/login';
