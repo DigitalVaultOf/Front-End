@@ -1,8 +1,6 @@
 <header>
   <h1>Banco Web</h1>
   <nav>
-    <a href="/home">Home</a>
-
     <div class="dropdown-container">
       <a (click)="toggleDropdown($event)" class="dropdown-toggle">
         <fa-icon [icon]="faCog"></fa-icon>
@@ -37,8 +35,7 @@
 </header>
 <main>
   <section class="saldo-card">
-    <h2>Saldo Atual: R$ 12.345,67</h2>
-    <p>Última atualização: 01/07/2025 13:00</p>
+    <h2>Saldo Atual:{{ accountData?.balance | currency : "BRL" }}</h2>
   </section>
   @if (showContent) {
   <section class="actions">
@@ -66,19 +63,18 @@
         <p>Saque</p>
       </a>
     </div>
-    <div class="action">
-      <img
-        src="https://img.icons8.com/fluency/48/services.png"
-        alt="Todas as funções"
-      />
-      <p>Todas as funções</p>
-    </div>
   </section>
   <section class="card-info">
-    <h3>Cartão de Crédito</h3>
-    <p>Limite disponível: R$ 4.000,00</p>
-    <p>Fatura atual: R$ 1.234,56</p>
-    <p>Vencimento: 10/07/2025</p>
+    <button (click)="history()">Ver histórico</button>
+    <button (click)="carregarMovimentacoesSemana()">Ver histórico Semana</button>
+    <button (click)="carregarMovimentacoesMes()">Ver histórico Mes</button>
+    <ul>
+      <li *ngFor="let item of valores">
+        Tipo: {{ item.movimentTypeEnum }}, Data:
+        {{ item.dateTimeMoviment | date : "short" }}, Valor:
+        {{ item.amount | currency : "BRL" }}
+      </li>
+    </ul>
   </section>
   } @else {
   <router-outlet></router-outlet>

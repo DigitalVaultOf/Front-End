@@ -3,21 +3,38 @@
 
   <div class="fixed z-50 bg-white rounded-lg shadow-lg w-96 p-6 flex flex-col space-y-4">
     <h2 class="text-xl font-semibold text-gray-800">Quanto você quer sacar?</h2>
+
     <input
+      *ngIf="!exibirSenha"
       type="number"
       [(ngModel)]="valor"
       placeholder="Digite o valor"
       class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      
     />
+
+    <div *ngIf="exibirSenha" class="flex flex-col space-y-2">
+      <div>Valor a sacar: <strong>R$ {{ valor | number:'1.2-2' }}</strong></div>
+
+      <input
+        type="password"
+        placeholder="Digite sua senha"
+        [(ngModel)]="senha"
+        (input)="mensagemErro = null"
+        class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+      />
+
+      <div *ngIf="mensagemErro" class="text-red-600 font-semibold">{{ mensagemErro }}</div>
+    </div>
+
     <button
+      [disabled]="!exibirSenha ? !valor : !senha"
       (click)="sacar()"
-      class="bg-indigo-600 text-white rounded-md py-2 font-semibold hover:bg-indigo-700 transition"
+      class="bg-indigo-600 text-white rounded-md py-2 font-semibold hover:bg-indigo-700 transition disabled:opacity-50 "
     >
-      Sacar
+      {{ exibirSenha ? 'Confirmar saque' : 'Confirmar valor' }}
     </button>
 
-    <button (click)="closeModal()">
+    <button (click)="closeModal()" class="mt-2 text-gray-600 hover:text-gray-900">
       Cancelar
     </button>
   </div>

@@ -10,7 +10,7 @@ export class Deposit {
 
   constructor(private http: HttpClient) { }
 
-  deposit(value: number){
-    return this.http.post(`${this.apiUrl}/deposit`, { value })
+  deposit(data: { value: number; password: string }) {
+    return this.http.post(`${this.apiUrl}/deposit`, data);
   }
 }
