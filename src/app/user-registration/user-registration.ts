@@ -13,6 +13,7 @@ import { cadastrar } from '../services/cadastroService'; // Importando o serviç
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
   providers: [provideNgxMask()], // Onde NgxMask é fornecido para o componente
 })
+
 export class UserRegistration implements OnInit {
 
   closeErrorModal(): void{
@@ -64,22 +65,26 @@ export class UserRegistration implements OnInit {
   }
 
   cadastro() {
-    
     if (this.registrationForm.valid) {
       this.cadastroSer.cadastrarUsuario(this.registrationForm.value).subscribe({
         next: (response) => {
-          console.log('Cadastro realizado com sucesso!', response);
-          this.router.navigate(['/login']);
-        },
-        error: (error) => {
-          console.error('Erro no cadastro:', error);
+          console.log('Resposta do back: ', response);
 
-          if(error.error && error.error.message) {
-            this.errorMessage = error.error.message;
-          }else if (error.status === 409){
-            this.errorMessage = 'Usuário já cadastrado com este CPF ou e-mail. Por favor, tente novamente com um CPF ou e-mail diferente.';
+          if(response && response.data === false){
+            this.errorMessage = response.message;
+            this.showErrorModal = true; // Exibe o modal de erro
           }else{
-            this.errorMessage = 'Ocorreu um erro ao cadastrar o usuário. Por favor, tente novamente mais tarde.';
+            this.router.navigate(['/login']);
+            console.log('Usuário cadastrado com sucesso!');
+          }
+        },
+        error: (err) => {
+          if (err.error && err.error.Message) { 
+            this.errorMessage = err.error.Message;
+          } else if (err.status) {
+            this.errorMessage = `Erro ${err.status}: ${err.statusText || 'Ocorreu um problema na comunicação com o servidor.'}`;
+          } else {
+            this.errorMessage = 'Não foi possível conectar ao servidor. Verifique sua conexão ou tente mais tarde.';
           }
           this.showErrorModal = true; // Exibe o modal de erro
         }
