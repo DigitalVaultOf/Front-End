@@ -14,14 +14,20 @@ import { cadastrar } from '../services/cadastroService'; // Importando o serviç
   providers: [provideNgxMask()], // Onde NgxMask é fornecido para o componente
 })
 export class UserRegistration implements OnInit {
+
+  closeErrorModal(): void{
+    this.showErrorModal = false;
+    this.errorMessage = '';
+  }
   protected title = 'User-Registration-Net';
   protected registrationForm!: FormGroup;
   
   cpfMask = '';
   showContent = true;
+  showErrorModal: boolean = false;
+  errorMessage: string = '';
 
-  constructor(private router: Router, private fb: FormBuilder, private cadastroSer: cadastrar)
-    {}
+  constructor(private router: Router, private fb: FormBuilder, private cadastroSer: cadastrar){}
 
   ngOnInit(): void {
     this.registrationForm = this.fb.group({
@@ -67,13 +73,19 @@ export class UserRegistration implements OnInit {
         },
         error: (error) => {
           console.error('Erro no cadastro:', error);
+
+          if(error.error && error.error.message) {
+            this.errorMessage = error.error.message;
+          }
+          this.showErrorModal = true; // Exibe o modal de erro
         }
       });
   
     }else{
       this.markAllAsTouched(this.registrationForm);
       console.log('Formulário inválido');
-      alert('Por favor, preencha todos os campos corretamente. Verifique todos os campos e tente novamente.');
+      this.errorMessage = 'Por favor, preencha todos os campos corretamente. Verifique todos os campos e tente novamente.';
+      this.showErrorModal = true;
     }
   }
 }
