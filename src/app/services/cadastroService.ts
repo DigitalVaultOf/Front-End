@@ -19,7 +19,7 @@ export interface UserData {
     constructor( private http: HttpClient){}
 
     cadastrarUsuario(data: UserData): Observable<string> {
-      return this.http.post<string>(`${this.apiUrl}/user/api/User/create`, data,{
+      return this.http.post<string>(`${this.apiUrl}/user/api/User/create-user`, data,{
          responseType: 'text' as 'json'
       });
     }
