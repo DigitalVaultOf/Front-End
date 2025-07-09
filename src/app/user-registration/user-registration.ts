@@ -76,6 +76,10 @@ export class UserRegistration implements OnInit {
 
           if(error.error && error.error.message) {
             this.errorMessage = error.error.message;
+          }else if (error.status === 409){
+            this.errorMessage = 'Usuário já cadastrado com este CPF ou e-mail. Por favor, tente novamente com um CPF ou e-mail diferente.';
+          }else{
+            this.errorMessage = 'Ocorreu um erro ao cadastrar o usuário. Por favor, tente novamente mais tarde.';
           }
           this.showErrorModal = true; // Exibe o modal de erro
         }
