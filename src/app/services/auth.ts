@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { tap } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class Auth {
   getAccountNumber() {
@@ -23,17 +24,28 @@ export class Auth {
     }
   }
 
-  login(credentials: { accountNumber?: string; email?: string; cpf?: string; password: string }) {
+  login(credentials: {
+    accountNumber?: string;
+    email?: string;
+    cpf?: string;
+    password: string;
+  }) {
     return this.http.post<any>(this.apiUrl, credentials).pipe(
-      tap(response => {
+      tap((response) => {
         if (this.isBrowser) {
           localStorage.setItem('token', response.data.token);
           this.token = response.data.token;
         }
+      }),
+      catchError((err) => {
+        let errorMessage = 'Ocorreu um erro desconhecido.';
+        if (err.error && err.error.message) {
+          errorMessage = err.error.message;
+        }
+        return throwError(() => new Error(errorMessage));
       })
     );
   }
-  
 
   logout(): void {
     if (this.isBrowser) {

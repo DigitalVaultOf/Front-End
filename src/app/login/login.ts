@@ -37,7 +37,7 @@ export class Login {
   
     this.auth.login(payload).subscribe({
       next: () => this.router.navigate(['/home']),
-      error: () => alert('Credenciais inválidas'),
+      error: (err) => alert(err.message || 'Ocorreu um erro ao fazer login.'),
     });
   }
 }
