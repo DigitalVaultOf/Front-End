@@ -52,4 +52,10 @@ export class UserService {
       )
       .pipe(map((response) => response.data));
   }
+
+  DeleteUser(accountNumber: string): Observable<boolean> {
+    return this.http
+      .delete<ResponseModel<boolean>>(`${API_URL}/user/api/User/delete-user/${accountNumber}`)
+      .pipe(map((response) => response.data));
+  }
 }

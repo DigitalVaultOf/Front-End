@@ -1,0 +1,21 @@
+<div class="modal-container">
+  <div class="modal-header">
+    <h2>Confirmar Exclusão</h2>
+    <button class="close-btn" (click)="closeModal()">x</button>
+  </div>
+
+  <div class="modal-content">
+    <p>Você tem certeza de que deseja excluir sua conta?</p>
+    <p>
+      <strong>Esta ação é irreversível.</strong> Você não poderá mais acessar
+      sua conta e suas funcionalidades.
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+    <button class="btn btn-danger" (click)="confirmarExclusao()">
+      Sim, excluir conta!
+    </button>
+  </div>
+</div>
