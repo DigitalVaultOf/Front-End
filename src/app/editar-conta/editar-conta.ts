@@ -1,4 +1,11 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import {
+  Component,
+  Inject,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+} from '@angular/core';
 import { OverlayRef } from '@angular/cdk/overlay';
 import { CommonModule } from '@angular/common';
 import {
@@ -41,8 +48,11 @@ export function passwordMatchValidator(
   templateUrl: './editar-conta.html',
   styleUrls: ['./editar-conta.scss'],
 })
-export class EditarConta implements OnInit {
+export class EditarConta implements OnInit, AfterViewInit {
   usuarioForm!: FormGroup;
+  isModalVisible = false; // Controla a visibilidade do modal
+
+  @ViewChild('modalContainer') modalContainer!: ElementRef;
 
   constructor(
     private fb: FormBuilder,
@@ -51,8 +61,14 @@ export class EditarConta implements OnInit {
     @Inject(OverlayRef) private overlayRef: OverlayRef
   ) {}
 
-  closeModal() {
-    this.overlayRef.dispose();
+   closeModal() {
+    // 1. Removemos a classe 'open'. O CSS cuidará da animação de saída.
+    this.modalContainer.nativeElement.classList.remove('open');
+
+    // 2. Esperamos a animação (300ms) terminar antes de destruir o overlay.
+    setTimeout(() => {
+      this.overlayRef.dispose();
+    }, 300);
   }
 
   ngOnInit(): void {
@@ -95,6 +111,13 @@ export class EditarConta implements OnInit {
         this.closeModal();
       },
     });
+  }
+
+  ngAfterViewInit(): void {
+    // Usamos um pequeno timeout para garantir que o navegador aplique os estilos iniciais antes de animar
+    setTimeout(() => {
+      this.modalContainer.nativeElement.classList.add('open');
+    }, 10);
   }
 
   atualizarUsuario() {

@@ -87,7 +87,7 @@ main {
   cursor: pointer;
   transition: background-color 0.3s ease;
   margin-bottom: 1rem;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }
 
 .card-info button:hover {
@@ -100,12 +100,12 @@ main {
   margin: 0;
   max-height: 220px;
   overflow-y: auto;
-  border-top: 1px solid rgba(255,255,255,0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .card-info ul li {
   padding: 0.6rem 0;
-  border-bottom: 1px solid rgba(255,255,255,0.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   line-height: 1.4;
   font-weight: 500;
 }
@@ -136,20 +136,19 @@ main {
   display: flex;
   align-items: center;
   gap: 8px;
+  fa-icon {
+    transition: transform 0.3s ease-in-out;
+  }
+}
+  
+.dropdown-toggle fa-icon.rotated {
+  transform: rotate(180deg);
 }
 
 .dropdown-menu {
   position: absolute;
   top: 100%;
-
-  // REMOVA esta linha:
-  // right: 0;
-
-  // ADICIONE estas 2 linhas:
   left: 50%;
-  transform: translateX(-50%);
-
-  // ... o resto do seu estilo continua igual
   margin-top: 10px;
   background-color: rgb(3, 14, 29);
   color: #333;
@@ -158,7 +157,19 @@ main {
   z-index: 1000;
   min-width: 180px;
   overflow: hidden;
-  animation: fadeIn 0.2s ease-out;
+
+  // ESTADO INICIAL (ESCONDIDO)
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(-10px); // Começa um pouco acima e centralizado
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out, visibility 0.2s; // Animação suave
+}
+
+// ESTADO VISÍVEL (quando a classe .show é adicionada)
+.dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0); // Posição final
 }
 
 .dropdown-item {
@@ -177,8 +188,8 @@ main {
 }
 
 .item-chevron {
-  margin-left: auto; 
-  font-size: 0.8em; 
+  margin-left: auto;
+  font-size: 0.8em;
   opacity: 0.7;
 }
 
@@ -198,20 +209,8 @@ main {
 }
 
 .item-chevron {
-  margin-left: auto; 
-  font-size: 0.8em; 
+  margin-left: auto;
+  font-size: 0.8em;
   opacity: 0.7;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    // Combinamos os dois transforms: o de centralizar e o da animação
-    transform: translateX(-50%) translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    // O estado final também precisa manter a centralização
-    transform: translateX(-50%) translateY(0);
-  }
-}

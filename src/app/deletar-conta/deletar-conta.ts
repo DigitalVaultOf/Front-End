@@ -1,4 +1,11 @@
-import { Component, Input } from '@angular/core';
+import {
+  Component,
+  Input,
+  Inject, // <-- Importar Inject
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+} from '@angular/core';
 import { OverlayRef } from '@angular/cdk/overlay';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -7,7 +14,6 @@ import { Auth } from '../services/auth';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
-
 @Component({
   selector: 'app-deletar-conta',
   standalone: true,
@@ -15,21 +21,40 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
   templateUrl: './deletar-conta.html',
   styleUrls: ['./deletar-conta.scss'],
 })
-export class DeletarConta {
+export class DeletarConta implements AfterViewInit { // <-- Implementa AfterViewInit
   @Input() accountNumber!: string;
   faTimes = faTimes;
 
+  // Referência ao nosso contêiner do modal no HTML
+  @ViewChild('modalContainer') modalContainer!: ElementRef;
+
   constructor(
     private userService: UserService,
-    private overlayRef: OverlayRef,
+    @Inject(OverlayRef) private overlayRef: OverlayRef, // <-- Adicionado @Inject para clareza
     private auth: Auth,
     private router: Router
   ) {}
 
-  closeModal() {
-    this.overlayRef.dispose();
+  // ngAfterViewInit é chamado depois que o HTML do componente é renderizado
+  ngAfterViewInit(): void {
+    // Adiciona a classe 'open' para acionar a animação de entrada
+    setTimeout(() => {
+      this.modalContainer.nativeElement.classList.add('open');
+    }, 10);
   }
 
+  // closeModal agora anima antes de fechar
+  closeModal() {
+    // 1. Remove a classe 'open' para acionar a animação de saída
+    this.modalContainer.nativeElement.classList.remove('open');
+
+    // 2. Espera a animação (300ms) terminar antes de destruir o overlay
+    setTimeout(() => {
+      this.overlayRef.dispose();
+    }, 300);
+  }
+
+  // O método confirmarExclusao só precisa de uma pequena mudança: chamar o novo closeModal
   confirmarExclusao(): void {
     if (!this.accountNumber) {
       console.error('Número da conta não fornecido.');
@@ -39,9 +64,9 @@ export class DeletarConta {
 
     this.userService.DeleteUser(this.accountNumber).subscribe({
       next: (sucesso) => {
-        alert('Conta excluída com sucesso. Você será desconectado.');
+        alert('Conta desativada com sucesso. Você será desconectado.');
         this.auth.logout();
-        this.closeModal();
+        this.closeModal(); // <-- Já contém a lógica de animação e dispose
         this.router.navigate(['/login']);
       },
       error: (err) => {
