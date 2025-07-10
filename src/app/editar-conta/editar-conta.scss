@@ -7,44 +7,14 @@ $text-primary: #333;
 $text-secondary: #555;
 $border-radius: 6px;
 
-input[type="text"],
-input[type="email"],
-input[type="password"] {
-  border: 1px solid $border-color;
-  border-radius: $border-radius;
-  &:focus {
-    border-color: $primary-color;
-    box-shadow: 0 0 0 3px rgba(22, 103, 215, 0.2);
-  }
-  &:disabled {
-    background-color: $secondary-color;
-  }
-}
-
-.btn-primary {
-  background-color: $primary-color;
-  color: white;
-  &:hover {
-    background-color: $primary-hover-color;
-  }
-}
-
-.btn-secondary {
-  background-color: $secondary-color;
-  color: $text-primary;
-  &:hover {
-    background-color: $secondary-hover-color;
-  }
-}
-
 .modal-container {
   background: white;
   border-radius: 10px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
-  max-width: 500px;
+  max-width: 700px; 
   width: 100%;
   animation: modal-fade-in 0.3s ease-out;
-  overflow: hidden; // Garante que os cantos arredondados sejam aplicados
+  overflow: hidden;
 }
 
 .modal-header {
@@ -52,40 +22,45 @@ input[type="password"] {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid $secondary-color;
 
   h2 {
     margin: 0;
     font-size: 1.25rem;
-    color: #333;
+    color: $text-primary;
   }
 }
 
 .close-btn {
   background: none;
   border: none;
-  font-size: 2rem;
+  font-size: 1.5rem; // Reduzido para alinhar melhor com o fa-icon
   line-height: 1;
   color: #888;
   cursor: pointer;
   padding: 0;
-  &:hover {
-    color: #333;
-  }
+  &:hover { color: $text-primary; }
 }
 
 .modal-content {
-  padding: 1rem;
+  padding: 0 1.5rem; 
+  max-height: 60vh; 
+  overflow-y: auto; 
+
+  form {
+    padding: 1.5rem 0;
+  }
 
   .form-group {
     margin-bottom: 1rem;
+    flex: 1; 
   }
 
   label {
     display: block;
     font-weight: 500;
     margin-bottom: 0.5rem;
-    color: #555;
+    color: $text-secondary;
   }
 
   input[type="text"],
@@ -93,16 +68,22 @@ input[type="password"] {
   input[type="password"] {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
     font-size: 1rem;
     box-sizing: border-box;
     transition: border-color 0.2s, box-shadow 0.2s;
 
     &:focus {
       outline: none;
-      border-color: #1667d7;
+      border-color: $primary-color;
       box-shadow: 0 0 0 3px rgba(22, 103, 215, 0.2);
+    }
+
+    &:disabled {
+      background-color: $secondary-color;
+      cursor: not-allowed;
+      opacity: 0.8;
     }
   }
 
@@ -114,21 +95,10 @@ input[type="password"] {
   }
 }
 
-.info-group {
-  display: flex;
-  gap: 1rem; // Mantive um bom espaço horizontal
-  // margin-bottom: 1rem; // Reduzido de 1.25rem
-}
-
-.form-group {
-  // margin-bottom: 1rem; // Reduzido de 1.25rem
-  flex: 1;
-}
-
 .divider {
   border: none;
-  border-top: 1px solid #e9ecef;
-  margin: 1.25rem 0; // Reduzido de 1.5rem
+  border-top: 1px solid $secondary-color;
+  margin: 1.25rem 0;
 }
 
 .modal-footer {
@@ -137,31 +107,28 @@ input[type="password"] {
   gap: 0.75rem;
   padding: 1rem 1.5rem;
   background-color: #f8f9fa;
+  border-top: 1px solid $secondary-color;
 }
 
 .btn {
   padding: 0.6rem 1.2rem;
   border: none;
-  border-radius: 6px;
+  border-radius: $border-radius;
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
 .btn-primary {
-  background-color: #1667d7;
+  background-color: $primary-color;
   color: white;
-  &:hover {
-    background-color: #1357b3;
-  }
+  &:hover { background-color: $primary-hover-color; }
 }
 
 .btn-secondary {
-  background-color: #e9ecef;
-  color: #333;
-  &:hover {
-    background-color: #d1d5db;
-  }
+  background-color: $secondary-color;
+  color: $text-primary;
+  &:hover { background-color: $secondary-hover-color; }
 }
 
 @keyframes modal-fade-in {
@@ -172,50 +139,5 @@ input[type="password"] {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-.modal-content {
-  padding: 0 1.5rem; // Ajustamos o padding para a rolagem funcionar melhor
-
-  // AQUI ESTÁ A LÓGICA DO SCROLLVIEW
-  max-height: 60vh; // Define uma altura máxima (60% da altura da tela)
-  overflow-y: auto; // Adiciona a barra de rolagem vertical QUANDO necessário
-
-  // Adiciona um espaçamento interno ao formulário para compensar o padding removido
-  form {
-    padding: 1.5rem 0;
-  }
-}
-
-label {
-  display: block;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  color: #555;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="password"] {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ced4da;
-  border-radius: 6px;
-  font-size: 1rem;
-  box-sizing: border-box;
-  transition: border-color 0.2s, box-shadow 0.2s;
-
-  &:focus {
-    outline: none;
-    border-color: #1667d7;
-    box-shadow: 0 0 0 3px rgba(22, 103, 215, 0.2);
-  }
-
-  // ESTILO PARA CAMPOS DESATIVADOS
-  &:disabled {
-    background-color: #e9ecef;
-    cursor: not-allowed;
-    opacity: 0.8;
   }
 }

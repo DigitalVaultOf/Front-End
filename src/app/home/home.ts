@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
   Component,
   Injector,
@@ -6,6 +6,9 @@ import {
   Type,
   HostListener,
   ElementRef,
+  ChangeDetectorRef,
+  Inject,
+  PLATFORM_ID,
 } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Router } from '@angular/router';
@@ -19,7 +22,6 @@ import { Auth } from '../services/auth';
 import { interval, Subscription, switchMap } from 'rxjs';
 import { User, UserI } from '../services/user';
 import { Estrato, Movimentacao } from '../services/estrato';
-import { ChangeDetectorRef } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faSignOutAlt,
@@ -30,7 +32,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { DeletarConta } from '../deletar-conta/deletar-conta';
 import { UserService } from '../services/user.service';
-
 
 @Component({
   selector: 'app-root',
@@ -46,7 +47,6 @@ import { UserService } from '../services/user.service';
   styleUrls: ['./home.scss'],
 })
 export class Home implements OnInit {
-
   usuarioLogado: any;
 
   menuOpen = false;
@@ -78,6 +78,7 @@ export class Home implements OnInit {
   DeletarConta = DeletarConta;
 
   constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
     private overlay: Overlay,
     private router: Router,
     private auth: Auth,
@@ -94,35 +95,39 @@ export class Home implements OnInit {
         this.usuarioLogado = usuario;
         this.loadAccount(); // Carrega os dados da conta
         this.history(); // Carrega o histórico de transações
-        
+
         this.updateSubscription = interval(1000)
-        .pipe(switchMap(() => this.user.getUser()))
-        .subscribe({
-          next: (response) => {
-            this.accountData = response.data;
-            this.cdr.detectChanges(); // Força a atualização da tela
-            this.message = response.message;
-          },
-          error: (err) => {
-            console.error('Erro ao atualizar os dados da conta.', err);
-            this.error = 'Erro ao atualizar os dados.';
-          },
-        });
+          .pipe(switchMap(() => this.user.getUser()))
+          .subscribe({
+            next: (response) => {
+              this.accountData = response.data;
+              this.cdr.detectChanges(); // Força a atualização da tela
+              this.message = response.message;
+            },
+            error: (err) => {
+              console.error('Erro ao atualizar os dados da conta.', err);
+              this.error = 'Erro ao atualizar os dados.';
+            },
+          });
       },
       error: (err) => {
         console.error('Falha ao obter dados do usuário, deslogando.', err);
-        alert('Sua sessão expirou ou a conta é inválida. Por favor, faça o login novamente.');
+        if (isPlatformBrowser(this.platformId)) {
+          alert(
+            'Sua sessão expirou ou a conta é inválida. Por favor, faça o login novamente.'
+          );
+        }
         this.auth.logout(); // Garante que qualquer resquício de token seja limpo
         this.router.navigate(['/login']); // Força o redirecionamento para o login
       },
     });
   }
-  
+
   ngOnDestroy(): void {
-  if (this.updateSubscription) {
-    this.updateSubscription.unsubscribe();
+    if (this.updateSubscription) {
+      this.updateSubscription.unsubscribe();
+    }
   }
-}
 
   history() {
     this.extrato.getHistory().subscribe({
@@ -153,7 +158,8 @@ export class Home implements OnInit {
         this.accountData = response.data;
         this.message = response.message;
       },
-    });}
+    });
+  }
 
   toggleDropdown(event: MouseEvent) {
     event.stopPropagation(); // Impede que o clique se propague e feche o menu imediatamente
@@ -168,9 +174,13 @@ export class Home implements OnInit {
     }
   }
 
-
   logout() {
-    if (confirm('Deseja realmente sair?')) {
+    if (isPlatformBrowser(this.platformId)) {
+      if (confirm('Deseja realmente sair?')) {
+        this.auth.logout();
+        this.router.navigate(['/login']);
+      }
+    } else {
       this.auth.logout();
       this.router.navigate(['/login']);
     }
@@ -178,7 +188,9 @@ export class Home implements OnInit {
 
   abrirModalExclusao() {
     if (!this.usuarioLogado || !this.usuarioLogado.accountNumber) {
-      alert('Não foi possível obter os dados da conta para a exclusão.');
+      if (isPlatformBrowser(this.platformId)) {
+        alert('Não foi possível obter os dados da conta para a exclusão.');
+      }
       return;
     }
 

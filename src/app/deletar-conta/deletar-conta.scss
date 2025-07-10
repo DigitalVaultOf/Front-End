@@ -40,7 +40,9 @@ $border-radius: 6px;
   color: #888;
   cursor: pointer;
   padding: 0;
-  &:hover { color: #333; }
+  &:hover {
+    color: #333;
+  }
 }
 
 .modal-content {
@@ -71,14 +73,18 @@ $border-radius: 6px;
 .btn-secondary {
   background-color: $secondary-color;
   color: $text-primary;
-  &:hover { background-color: $secondary-hover-color; }
+  &:hover {
+    background-color: $secondary-hover-color;
+  }
 }
 
 // Estilo para o botão de desativar (vermelho)
 .btn-danger {
   background-color: $danger-color;
   color: white;
-  &:hover { background-color: $danger-hover-color; }
+  &:hover {
+    background-color: $danger-hover-color;
+  }
 }
 
 @keyframes modal-fade-in {
