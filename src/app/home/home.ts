@@ -29,6 +29,7 @@ import {
   faChevronRight,
   faEdit,
   faTrash,
+  faChevronDown,
 } from '@fortawesome/free-solid-svg-icons';
 import { DeletarConta } from '../deletar-conta/deletar-conta';
 import { UserService } from '../services/user.service';
@@ -61,12 +62,12 @@ export class Home implements OnInit {
   protected title = 'Front-End-Net';
   showContent = true;
   isDropdownOpen = false;
-
   faSignOutAlt = faSignOutAlt;
   faCog = faCog;
   faChevronRight = faChevronRight;
   faEdit = faEdit;
   faTrash = faTrash;
+  faChevronDown = faChevronDown;
 
   private overlayRef?: OverlayRef;
   updateSubscription!: Subscription;
@@ -94,7 +95,7 @@ export class Home implements OnInit {
       next: (usuario) => {
         this.usuarioLogado = usuario;
         this.loadAccount(); // Carrega os dados da conta
-        this.history(); // Carrega o histórico de transações
+        this.history(); // Carrega o histórico de transações automaticamente
 
         this.updateSubscription = interval(1000)
           .pipe(switchMap(() => this.user.getUser()))
@@ -208,7 +209,9 @@ export class Home implements OnInit {
     const componentRef = overlayRef.attach(portal);
 
     componentRef.instance.accountNumber = this.usuarioLogado.accountNumber;
-    overlayRef.backdropClick().subscribe(() => overlayRef.dispose());
+    overlayRef
+      .backdropClick()
+      .subscribe(() => componentRef.instance.closeModal());
   }
 
   private createInjector(overlayRef: OverlayRef): Injector {
@@ -230,8 +233,10 @@ export class Home implements OnInit {
 
     const injector = this.createInjector(this.overlayRef);
     const portal = new ComponentPortal(component, null, injector);
-    this.overlayRef.attach(portal);
-    this.overlayRef.backdropClick().subscribe(() => this.closeModal());
+    const componentRef = this.overlayRef.attach(portal);
+    this.overlayRef
+      .backdropClick()
+      .subscribe(() => componentRef.instance.closeModal());
   }
 
   closeModal() {

@@ -4,12 +4,14 @@
     <div class="dropdown-container">
       <a (click)="toggleDropdown($event)" class="dropdown-toggle">
         <fa-icon [icon]="faCog"></fa-icon>
-        <span> Configurações ▼</span>
+        <span> Configurações</span>
+        <fa-icon
+          [icon]="faChevronDown"
+          [class.rotated]="isDropdownOpen"
+        ></fa-icon>
       </a>
 
-      @if (isDropdownOpen) {
-      <div class="dropdown-menu">
-
+      <div class="dropdown-menu" [class.show]="isDropdownOpen">
         <a class="dropdown-item" (click)="openModal(EditarConta)">
           <fa-icon [icon]="faEdit"></fa-icon>
           <span>Editar Conta</span>
@@ -27,9 +29,8 @@
           <span>Sair</span>
           <fa-icon class="item-chevron" [icon]="faChevronRight"></fa-icon>
         </a>
-
       </div>
-      }
+      
     </div>
   </nav>
 </header>
@@ -66,7 +67,9 @@
   </section>
   <section class="card-info">
     <button (click)="history()">Ver histórico</button>
-    <button (click)="carregarMovimentacoesSemana()">Ver histórico Semana</button>
+    <button (click)="carregarMovimentacoesSemana()">
+      Ver histórico Semana
+    </button>
     <button (click)="carregarMovimentacoesMes()">Ver histórico Mes</button>
     <ul>
       <li *ngFor="let item of valores">
