@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Auth } from '../services/auth';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http'; 
 
 @Component({
   selector: 'app-login',
@@ -53,10 +54,8 @@ export class Login {
       .subscribe({
         next: (res) => {
           this.accountOptions = res.data?.accountNumbers || [];
-          if (this.accountOptions.length > 1) {
-            this.showAccountSelection = true;
-          } else if (this.accountOptions.length === 1) {
-            this.selectAccount(this.accountOptions[0]);
+          if (this.accountOptions.length > 0) {
+            this.validatePasswordAndProceed(email, null, this.accountOptions[0]);
           } else {
             alert('Nenhuma conta encontrada.');
           }
@@ -71,16 +70,40 @@ export class Login {
       .subscribe({
         next: (res) => {
           this.accountOptions = res.data?.accountNumbers || [];
-          if (this.accountOptions.length > 1) {
-            this.showAccountSelection = true;
-          } else if (this.accountOptions.length === 1) {
-            this.selectAccount(this.accountOptions[0]);
+          if (this.accountOptions.length > 0) {
+            this.validatePasswordAndProceed(null, cpfFormatted, this.accountOptions[0]);
           } else {
             alert('Nenhuma conta encontrada.');
           }
         },
         error: (err) => alert('Erro ao buscar contas.'),
       });
+  }
+
+  private validatePasswordAndProceed(email: string | null, cpf: string | null, accountToTest: string) {
+    const payload: any = {
+      password: this.password,
+      selectedAccountNumber: accountToTest,
+    };
+
+    if (email) {
+      payload.email = email;
+    } else if (cpf) {
+      payload.cpf = cpf; 
+    }
+
+    this.auth.login(payload).subscribe({
+      next: () => {
+        if (this.accountOptions.length > 1) {
+          this.showAccountSelection = true;
+        } else {
+          this.selectAccount(this.accountOptions[0]);
+        }
+      },
+      error: (err: HttpErrorResponse) => {
+        alert(err.error?.message || 'Senha incorreta.');
+      },
+    });
   }
 
   selectAccount(account: string) {
