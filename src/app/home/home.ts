@@ -33,6 +33,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { DeletarConta } from '../deletar-conta/deletar-conta';
 import { UserService } from '../services/user.service';
+import { AlertService } from '../services/alert.service'; // Ajuste o caminho
+import { ConfirmationService } from '../services/confirmation.service'; // Ajuste o caminho
 
 @Component({
   selector: 'app-root',
@@ -80,6 +82,8 @@ export class Home implements OnInit {
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
+    private confirmationService: ConfirmationService,
+    private alertService: AlertService,
     private overlay: Overlay,
     private router: Router,
     private auth: Auth,
@@ -176,42 +180,60 @@ export class Home implements OnInit {
   }
 
   logout() {
-    if (isPlatformBrowser(this.platformId)) {
-      if (confirm('Deseja realmente sair?')) {
+    const title = 'Confirmação de Logout';
+    const message = 'Você tem certeza que deseja sair?';
+
+    this.confirmationService.show(title, message).subscribe((result) => {
+      if (result) {
         this.auth.logout();
         this.router.navigate(['/login']);
       }
-    } else {
-      this.auth.logout();
-      this.router.navigate(['/login']);
-    }
+    });
   }
 
   abrirModalExclusao() {
     if (!this.usuarioLogado || !this.usuarioLogado.accountNumber) {
       if (isPlatformBrowser(this.platformId)) {
-        alert('Não foi possível obter os dados da conta para a exclusão.');
+        this.alertService.showError(
+          'Erro',
+          'Não foi possível identificar a conta para desativação.'
+        );
       }
       return;
     }
 
-    const overlayRef = this.overlay.create({
-      hasBackdrop: true,
-      positionStrategy: this.overlay
-        .position()
-        .global()
-        .centerHorizontally()
-        .centerVertically(),
-    });
-
-    const injector = this.createInjector(overlayRef);
-    const portal = new ComponentPortal(DeletarConta, null, injector);
-    const componentRef = overlayRef.attach(portal);
-
-    componentRef.instance.accountNumber = this.usuarioLogado.accountNumber;
-    overlayRef
-      .backdropClick()
-      .subscribe(() => componentRef.instance.closeModal());
+    this.confirmationService
+      .show(
+        'Desativar Conta',
+        'Você tem certeza? Esta ação é irreversível e sua conta será desativada permanentemente.',
+        'error'
+      )
+      .subscribe((result) => {
+        if (result) {
+          this.userService
+            .DeleteUser(this.usuarioLogado.accountNumber)
+            .subscribe({
+              next: (sucesso) => {
+                if (sucesso) {
+                  this.alertService.showSuccess(
+                    'Sucesso',
+                    'Sua conta foi desativada. Você será desconectado em breve...'
+                  );
+                  setTimeout(() => {
+                    this.auth.logout();
+                    this.router.navigate(['/login']);
+                  }, 2000);
+                }
+              },
+              error: (err) => {
+                this.alertService.showError(
+                  'Erro',
+                  err.error?.message || 'Não foi possível desativar a conta.'
+                );
+              },
+            });
+        }
+      });
   }
 
   private createInjector(overlayRef: OverlayRef): Injector {

@@ -1,0 +1,52 @@
+import { Injectable, Injector } from '@angular/core';
+import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { ComponentPortal } from '@angular/cdk/portal';
+import {
+  AlertComponent,
+  AlertData,
+  ALERT_DATA,
+} from '../alert.component/alert.component';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class AlertService {
+  constructor(private overlay: Overlay, private injector: Injector) {}
+
+  show(data: AlertData): void {
+    const overlayRef = this.overlay.create({});
+
+    const customInjector = Injector.create({
+      parent: this.injector,
+      providers: [
+        { provide: ALERT_DATA, useValue: data },
+        { provide: OverlayRef, useValue: overlayRef },
+      ],
+    });
+
+    const portal = new ComponentPortal(AlertComponent, null, customInjector);
+    overlayRef.attach(portal);
+  }
+
+  showSuccess(title: string, message: string) {
+    this.show({
+      type: 'success',
+      title,
+      message,
+    });
+  }
+  showError(title: string, message: string) {
+    this.show({
+      type: 'error',
+      title,
+      message,
+    });
+  }
+  showWarning(title: string, message: string) {
+    this.show({
+      type: 'warning',
+      title,
+      message,
+    });
+  }
+}

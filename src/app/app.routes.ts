@@ -11,7 +11,7 @@ export const routes: Routes = [
     { path: '', component: Login },
     { path: 'user-registration', component: UserRegistration },
     { path: 'login', component: Login },
-    { path: 'home', component: Home },
+    { path: 'home', component: Home, canActivate: [authGuard] },
     { path: 'deposit', component: Deposito, canActivate: [authGuard] },
 ]
 @NgModule({

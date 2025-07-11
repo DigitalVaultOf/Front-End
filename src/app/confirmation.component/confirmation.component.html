@@ -1,0 +1,35 @@
+<div
+  #modalContainer
+  class="modal-container"
+  [ngClass]="{
+    'alert-success': data.type === 'success',
+    'alert-error': data.type === 'error',
+    'alert-warning': data.type === 'warning'
+  }"
+>
+  <div class="modal-header">
+    <h2>{{ data.title }}</h2>
+    <button class="close-btn" (click)="close(false)">
+      <fa-icon [icon]="faTimes"></fa-icon>
+    </button>
+  </div>
+
+  <div class="modal-content">
+    <div class="confirmation-icon">
+      @if(data.type === 'success'){
+      <fa-icon [icon]="faCheckCircle"></fa-icon>
+      } @else {
+      <fa-icon [icon]="faExclamationTriangle"></fa-icon>
+      }
+    </div>
+
+    <div class="confirmation-text">
+      <p>{{ data.message }}</p>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="close(false)">Cancelar</button>
+    <button class="btn btn-primary" (click)="close(true)">Confirmar</button>
+  </div>
+</div>
