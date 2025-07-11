@@ -1,0 +1,163 @@
+// Variáveis de cor para os diferentes tipos de confirmação
+$primary-color: #1667d7;
+$primary-hover-color: #1357b3;
+$secondary-color: #e9ecef;
+$secondary-hover-color: #d1d5db;
+$text-primary: #333;
+$border-radius: 6px;
+
+$success-color: #28a745;
+$error-color: #dc3545;
+$warning-color: #ffc107;
+
+.modal-container.alert-success .confirmation-icon {
+  color: $success-color;
+}
+.modal-container.alert-error .confirmation-icon {
+  color: $error-color;
+}
+.modal-container.alert-warning .confirmation-icon {
+  color: $warning-color;
+}
+
+.modal-container.alert-error {
+  .btn-primary {
+    background-color: $error-color; // Usa a cor de perigo (vermelho)
+
+    &:hover {
+      background-color: #c82333; // Um vermelho um pouco mais escuro
+    }
+  }
+}
+
+// Quando o modal for do tipo SUCESSO
+.modal-container.alert-success {
+  .btn-primary {
+    background-color: $success-color; // Usa a cor de sucesso (verde)
+    
+    &:hover {
+      background-color: #218838; // Um verde um pouco mais escuro
+    }
+  }
+}
+
+// Quando o modal for do tipo AVISO (warning)
+.modal-container.alert-warning {
+  .btn-primary {
+    background-color: $warning-color; // Usa a cor de aviso (amarelo)
+    color: #333; // Texto escuro para melhor contraste com o amarelo
+
+    &:hover {
+      background-color: #e0a800; // Um amarelo um pouco mais escuro
+    }
+  }
+}
+
+// Estrutura base do modal (igual aos outros para consistência)
+.modal-container {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+  max-width: 450px;
+  width: 100%;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.modal-container.open {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid $secondary-color;
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: $text-primary;
+  }
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #888;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  &:hover {
+    color: #333;
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+}
+
+// Estilo para o corpo do modal de confirmação
+.modal-content {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  gap: 1rem;
+}
+
+.confirmation-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+}
+
+.confirmation-text p {
+  margin: 0;
+  line-height: 1.6;
+  color: #555;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  background-color: #f8f9fa;
+  border-top: 1px solid $secondary-color;
+}
+
+.btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: $border-radius;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.btn:hover{
+  transform: translateY(-3px);
+}
+
+.btn-primary {
+  background-color: $primary-color;
+  color: white;
+  &:hover {
+    background-color: $primary-hover-color;
+  }
+}
+
+.btn-secondary {
+  background-color: $secondary-color;
+  color: $text-primary;
+  &:hover {
+    background-color: $secondary-hover-color;
+  }
+}

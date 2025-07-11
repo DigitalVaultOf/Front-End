@@ -1,0 +1,30 @@
+<div
+  #alertContainer
+  class="alert-modal"
+  [ngClass]="{
+    'alert-sucesso': data.type === 'success',
+    'alert-erro': data.type === 'error',
+    'alert-warning': data.type === 'warning'
+  }"
+>
+  <div class="alert-icon">
+    @if(data.type === 'success'){
+    <fa-icon [icon]="faCheckCircle"></fa-icon>
+
+    } @else if (data.type === 'error') {
+    <fa-icon [icon]="faExclamationTriangle"></fa-icon>
+
+    } @else {
+    <fa-icon [icon]="faExclamationTriangle"></fa-icon>
+    }
+  </div>
+
+  <div class="alert-content">
+    <h3>{{ data.title }}</h3>
+    <p>{{ data.message }}</p>
+  </div>
+
+  <button class="close-btn" (click)="close()">
+    <fa-icon [icon]="faTimes"></fa-icon>
+  </button>
+</div>
