@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+
 @Component({
   selector: 'app-deposito',
   standalone: true,
@@ -26,6 +27,39 @@ export class Deposito {
   console.log('Fechando modal...');
   this.overlayRef.dispose();
   }
+
+  preventNegativeInput(event: KeyboardEvent): void {
+    const input = event.key;
+    const value = (event.target as HTMLInputElement).value;
+
+    if (
+      !/^\d$/.test(input) && // Não é um dígito
+      input !== '.' && // Permite ponto decimal
+      input !== ',' && // Permite vírgula decimal (se for o caso da sua localidade)
+      input !== 'Backspace' &&
+      input !== 'Delete' &&
+      input !== 'ArrowLeft' &&
+      input !== 'ArrowRight' &&
+      input !== 'Tab'
+    ) {
+      event.preventDefault(); // Impede a digitação
+    }
+
+    // Verifica se o valor é negativo ou não numérico
+    if (value.startsWith('-') || isNaN(Number(value))) {
+      event.preventDefault();
+    }
+  }
+
+  onPaste(event: ClipboardEvent): void {
+  const clipboardData = event.clipboardData?.getData('text');
+  if (clipboardData) {
+    // Verifica se o valor colado é negativo ou não numérico
+    if (clipboardData.startsWith('-') || isNaN(Number(clipboardData))) {
+      event.preventDefault();
+    }
+  } 
+}
 
   confirmarDeposito() {
     console.log('ConfirmarDeposito acionado');
