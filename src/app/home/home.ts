@@ -95,37 +95,39 @@ export class Home implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.userService.GetUserById().subscribe({
-      next: (usuario) => {
-        this.usuarioLogado = usuario;
-        this.loadAccount(); // Carrega os dados da conta
-        this.history(); // Carrega o histórico de transações automaticamente
+    if (isPlatformBrowser(this.platformId)) {
+      this.userService.GetUserById().subscribe({
+        next: (usuario) => {
+          this.usuarioLogado = usuario;
+          this.loadAccount(); // Carrega os dados da conta
+          this.history(); // Carrega o histórico de transações automaticamente
 
-        this.updateSubscription = interval(1000)
-          .pipe(switchMap(() => this.user.getUser()))
-          .subscribe({
-            next: (response) => {
-              this.accountData = response.data;
-              this.cdr.detectChanges(); // Força a atualização da tela
-              this.message = response.message;
-            },
-            error: (err) => {
-              console.error('Erro ao atualizar os dados da conta.', err);
-              this.error = 'Erro ao atualizar os dados.';
-            },
-          });
-      },
-      error: (err) => {
-        console.error('Falha ao obter dados do usuário, deslogando.', err);
-        if (isPlatformBrowser(this.platformId)) {
+          this.updateSubscription = interval(1000)
+            .pipe(switchMap(() => this.user.getUser()))
+            .subscribe({
+              next: (response) => {
+                this.accountData = response.data;
+                this.cdr.detectChanges(); // Força a atualização da tela
+                this.message = response.message;
+              },
+              error: (err) => {
+                console.error('Erro ao atualizar os dados da conta.', err);
+                this.error = 'Erro ao atualizar os dados.';
+              },
+            });
+        },
+        error: (err) => {
+          console.error('Falha ao obter dados do usuário, deslogando.', err);
+
           alert(
             'Sua sessão expirou ou a conta é inválida. Por favor, faça o login novamente.'
           );
-        }
-        this.auth.logout(); // Garante que qualquer resquício de token seja limpo
-        this.router.navigate(['/login']); // Força o redirecionamento para o login
-      },
-    });
+
+          this.auth.logout(); // Garante que qualquer resquício de token seja limpo
+          this.router.navigate(['/login']); // Força o redirecionamento para o login
+        },
+      });
+    }
   }
 
   ngOnDestroy(): void {
