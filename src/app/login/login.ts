@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Auth } from '../services/auth';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { HttpErrorResponse } from '@angular/common/http'; 
+import { HttpErrorResponse } from '@angular/common/http';
+import { AlertService } from '../services/alert.service'; // Ajuste o caminho
 
 @Component({
   selector: 'app-login',
@@ -24,7 +25,8 @@ export class Login {
   constructor(
     private auth: Auth,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private alertService: AlertService
   ) {}
 
   login() {
@@ -50,12 +52,18 @@ export class Login {
 
   getAccountsByEmail(email: string) {
     this.http
-      .get<any>(`https://localhost:7178/user/api/User/GetAccountByEmail/${email}`)
+      .get<any>(
+        `https://localhost:7178/user/api/User/GetAccountByEmail/${email}`
+      )
       .subscribe({
         next: (res) => {
           this.accountOptions = res.data?.accountNumbers || [];
           if (this.accountOptions.length > 0) {
-            this.validatePasswordAndProceed(email, null, this.accountOptions[0]);
+            this.validatePasswordAndProceed(
+              email,
+              null,
+              this.accountOptions[0]
+            );
           } else {
             alert('Nenhuma conta encontrada.');
           }
@@ -66,12 +74,18 @@ export class Login {
 
   getAccountsByCpf(cpfFormatted: string) {
     this.http
-      .get<any>(`https://localhost:7178/user/api/User/GetAccountByCpf/${cpfFormatted}`)
+      .get<any>(
+        `https://localhost:7178/user/api/User/GetAccountByCpf/${cpfFormatted}`
+      )
       .subscribe({
         next: (res) => {
           this.accountOptions = res.data?.accountNumbers || [];
           if (this.accountOptions.length > 0) {
-            this.validatePasswordAndProceed(null, cpfFormatted, this.accountOptions[0]);
+            this.validatePasswordAndProceed(
+              null,
+              cpfFormatted,
+              this.accountOptions[0]
+            );
           } else {
             alert('Nenhuma conta encontrada.');
           }
@@ -80,7 +94,11 @@ export class Login {
       });
   }
 
-  private validatePasswordAndProceed(email: string | null, cpf: string | null, accountToTest: string) {
+  private validatePasswordAndProceed(
+    email: string | null,
+    cpf: string | null,
+    accountToTest: string
+  ) {
     const payload: any = {
       password: this.password,
       selectedAccountNumber: accountToTest,
@@ -89,7 +107,7 @@ export class Login {
     if (email) {
       payload.email = email;
     } else if (cpf) {
-      payload.cpf = cpf; 
+      payload.cpf = cpf;
     }
 
     this.auth.login(payload).subscribe({
@@ -101,7 +119,8 @@ export class Login {
         }
       },
       error: (err: HttpErrorResponse) => {
-        alert(err.error?.message || 'Senha incorreta.');
+        this.alertService.showError('Erro de autenticação', err.message);
+        console.error('Erro de autenticação:', err);
       },
     });
   }
