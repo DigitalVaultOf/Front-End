@@ -1,66 +1,187 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  Inject,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+} from '@angular/core';
 import { OverlayRef } from '@angular/cdk/overlay';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { UserService } from '../services/user.service';
+import { Observable, forkJoin } from 'rxjs';
+
+export function passwordMatchValidator(
+  control: AbstractControl
+): ValidationErrors | null {
+  const newPassword = control.get('novaSenha');
+  const confirmNewPassword = control.get('confirmarNovaSenha');
+
+  if (
+    !newPassword ||
+    !confirmNewPassword ||
+    !newPassword.value ||
+    !confirmNewPassword.value
+  ) {
+    return null;
+  }
+
+  return newPassword.value === confirmNewPassword.value
+    ? null
+    : { passwordMismatch: true };
+}
 
 @Component({
   selector: 'app-editar-conta',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule
-  ],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './editar-conta.html',
-  styleUrls: ['./editar-conta.scss']
+  styleUrls: ['./editar-conta.scss'],
 })
-export class EditarConta implements OnInit {
-  // Propriedades para os campos de visualização
-  idContaCorrente: string = '';
-  idContaPoupanca: string = '';
-  idUsuario: string = '';
-  cpf: string = '';
+export class EditarConta implements OnInit, AfterViewInit {
+  usuarioForm!: FormGroup;
+  isModalVisible = false; // Controla a visibilidade do modal
 
-  // Propriedades para os campos editáveis
-  nome: string = '';
-  email: string = '';
-  senhaAtual: string = '';
-  novaSenha: string = '';
-  confirmarNovaSenha: string = '';
+  @ViewChild('modalContainer') modalContainer!: ElementRef;
 
-  constructor(private overlayRef: OverlayRef) { }
+  constructor(
+    private fb: FormBuilder,
+    private usuarioService: UserService,
+    private route: ActivatedRoute,
+    @Inject(OverlayRef) private overlayRef: OverlayRef
+  ) {}
 
-  ngOnInit(): void {
-    // Simulando a busca dos dados do usuário logado
-    this.idContaCorrente = '218048';
-    this.idContaPoupanca = '923569';
-    this.idUsuario = 'd2794289-f2d8-432e-9ba8-e33bd92944ff';
-    this.cpf = '123.456.789-10';
-    this.nome = 'Seu Nome Atual';
-    this.email = 'seu@email.com';
+   closeModal() {
+    // 1. Removemos a classe 'open'. O CSS cuidará da animação de saída.
+    this.modalContainer.nativeElement.classList.remove('open');
+
+    // 2. Esperamos a animação (300ms) terminar antes de destruir o overlay.
+    setTimeout(() => {
+      this.overlayRef.dispose();
+    }, 300);
   }
 
-  confirmar(): void {
-    if (this.novaSenha !== this.confirmarNovaSenha) {
-      alert('A nova senha e a confirmação não correspondem.');
+  ngOnInit(): void {
+    this.usuarioForm = this.fb.group(
+      {
+        id: [{ value: '', disabled: true }],
+        accountNumber: [{ value: '', disabled: true }],
+        cpf: [{ value: '', disabled: true }],
+        nome: ['', Validators.required],
+        email: ['', [Validators.required, Validators.email]],
+        senhaAtual: [''],
+        novaSenha: [''],
+        confirmarNovaSenha: [''],
+      },
+      { validators: passwordMatchValidator }
+    );
+
+    this.usuarioForm.get('senhaAtual')?.valueChanges.subscribe(() => {
+      if (this.usuarioForm.get('senhaAtual')?.hasError('senhaIncorreta')) {
+        this.usuarioForm.get('senhaAtual')?.setErrors(null);
+      }
+    });
+
+    this.usuarioService.GetUserById().subscribe({
+      next: (usuario) => {
+        console.log('Dados recebidos da API:', usuario);
+        this.usuarioForm.patchValue({
+          id: usuario.id,
+          accountNumber: usuario.accountNumber,
+          cpf: usuario.cpf,
+          nome: usuario.name,
+          email: usuario.email,
+        });
+      },
+      error: (err) => {
+        console.error('Falha ao buscar dados do usuário:', err);
+        alert(
+          'Não foi possível carregar os dados do usuário. Verifique o console para mais detalhes.'
+        );
+        this.closeModal();
+      },
+    });
+  }
+
+  ngAfterViewInit(): void {
+    // Usamos um pequeno timeout para garantir que o navegador aplique os estilos iniciais antes de animar
+    setTimeout(() => {
+      this.modalContainer.nativeElement.classList.add('open');
+    }, 10);
+  }
+
+  atualizarUsuario() {
+    if (this.usuarioForm.invalid) {
+      if (this.usuarioForm.errors?.['passwordMismatch']) {
+        alert('A nova senha e a confirmação não coincidem.');
+      }
       return;
     }
 
-    console.log('Dados para salvar:', {
-      nome: this.nome,
-      email: this.email,
-      senhaAtual: this.senhaAtual,
-      novaSenha: this.novaSenha,
+    const rawValues = this.usuarioForm.getRawValue();
+    const updateObservables: Observable<any>[] = [];
+
+    if (
+      this.usuarioForm.get('nome')?.dirty ||
+      this.usuarioForm.get('email')?.dirty
+    ) {
+      const dadosAtualizados = {
+        id: rawValues.id,
+        name: rawValues.nome,
+        email: rawValues.email,
+        cpf: rawValues.cpf,
+        accountNumber: rawValues.accountNumber,
+      };
+      updateObservables.push(this.usuarioService.UpdateUser(dadosAtualizados));
+    }
+
+    if (
+      rawValues.senhaAtual &&
+      rawValues.novaSenha &&
+      rawValues.confirmarNovaSenha
+    ) {
+      const dadosSenha = {
+        currentPassword: rawValues.senhaAtual,
+        newPassword: rawValues.novaSenha,
+        confirmNewPassword: rawValues.confirmarNovaSenha,
+      };
+      updateObservables.push(this.usuarioService.UpdatePassword(dadosSenha));
+    }
+
+    if (updateObservables.length === 0) {
+      console.log('Nenhum dado foi modificado.');
+      alert('Nenhum dado foi modificado.');
+      return;
+    }
+
+    forkJoin(updateObservables).subscribe({
+      next: () => {
+        console.log('Dados atualizados com sucesso!');
+        alert('Dados atualizados com sucesso!');
+        this.closeModal();
+      },
+      error: (err) => {
+        console.error('Erro ao atualizar usuário:', err);
+        if (err.error && err.error.message === 'Senha atual incorreta.') {
+          this.usuarioForm
+            .get('senhaAtual')
+            ?.setErrors({ senhaIncorreta: true });
+        }
+        const alertMessage =
+          err.error?.message ||
+          'Ocorreu um erro ao salvar as alterações. Tente novamente.';
+        alert(alertMessage);
+      },
     });
-
-    alert('Conta atualizada com sucesso! (Verifique os dados no console)');
-    this.close();
-  }
-
-  cancelar(): void {
-    this.close();
-  }
-
-  private close(): void {
-    this.overlayRef.dispose();
   }
 }

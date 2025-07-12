@@ -1,0 +1,81 @@
+$success-color: #28a745;
+$error-color: #dc3545;
+$warning-color: #eccb0d;
+
+.alert-modal {
+  display: flex;
+  align-items: center;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  min-width: 300px;
+  max-width: 400px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-left: 5px solid;
+  padding: 1rem;
+  z-index: 2000; // Garante que fique acima de outros modais
+
+  // Animação de entrada e saída
+  opacity: 0;
+  transform: translateX(100%);
+  transition: opacity 0.3s ease-out, transform 0.4s ease-out;
+
+  &.open {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.alert-icon {
+  font-size: 1.8rem;
+  margin-right: 1rem;
+}
+
+.alert-content {
+  flex-grow: 1;
+  h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1rem;
+  }
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #555;
+  }
+}
+
+// Estilos específicos para cada tipo
+.alert-sucesso {
+  border-left-color: $success-color;
+  .alert-icon {
+    color: $success-color;
+  }
+}
+
+.alert-erro {
+  border-left-color: $error-color;
+  .alert-icon {
+    color: $error-color;
+  }
+}
+
+.alert-warning {
+  border-left-color: $warning-color;
+  .alert-icon {
+    color: $warning-color;
+  }
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 1.2rem;
+  align-self: flex-start;
+  &:hover {
+    color: #555;
+  }
+}

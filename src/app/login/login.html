@@ -1,29 +1,23 @@
 <div class="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-  <div class="bg-white shadow-xl rounded-2xl w-full max-w-md p-8">
+  <div *ngIf="!showAccountSelection && !loggedIn" class="bg-white shadow-xl rounded-2xl w-full max-w-md p-8">
     <h2 class="text-2xl font-bold text-center text-blue-700 mb-6">Login</h2>
 
     <form (ngSubmit)="login()">
       <div class="mb-4">
-        <label for="account" class="block text-sm font-medium text-gray-700"
-          
-        >Conta</label
-        >
+        <label for="account" class="block text-sm font-medium text-gray-700">Conta</label>
         <input
           type="text"
           id="account"
           name="account"
           [(ngModel)]="loginInput"
           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
-          placeholder="Número da Conta"
+          placeholder="Número da Conta, CPF ou E-mail"
           required
-          minlength="6"
         />
       </div>
 
       <div class="mb-6">
-
-        <label for="senha" class="block text-sm font-medium text-gray-700"> Senha </label>
-
+        <label for="senha" class="block text-sm font-medium text-gray-700">Senha</label>
         <input
           type="password"
           id="senha"
@@ -32,23 +26,42 @@
           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
           placeholder="********"
           required
-          minlength="6"
         />
       </div>
 
-      <a (click)="login()">
-        <button
-          type="submit"
-          class="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition-colors"
-        >
-          Entrar
-        </button></a
+      <button
+        type="submit"
+        class="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition-colors"
       >
+        Entrar
+      </button>
     </form>
 
     <p class="mt-4 text-sm text-center text-gray-600">
       Não tem uma conta?
       <a href="/user-registration" class="text-blue-600 hover:underline">Registrar</a>
     </p>
+  </div>
+
+  <div *ngIf="showAccountSelection" class="bg-white shadow-xl rounded-2xl w-full max-w-md p-8">
+    <h2 class="text-2xl font-bold text-center text-blue-700 mb-6">Escolha a Conta</h2>
+
+    <div class="space-y-4">
+      <div *ngFor="let account of accountOptions">
+        <button
+          (click)="selectAccount(account)"
+          class="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition-colors"
+        >
+          {{ account }}
+        </button>
+      </div>
+    </div>
+
+    <button
+      (click)="logout()"
+      class="mt-4 w-full bg-red-600 text-white py-2 rounded-xl hover:bg-red-700 transition-colors"
+    >
+      Sair
+    </button>
   </div>
 </div>
