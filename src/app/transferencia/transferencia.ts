@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OverlayRef } from '@angular/cdk/overlay';
 import { HttpClient } from '@angular/common/http';
@@ -12,8 +12,9 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./transferencia.scss'],
 })
 export class Transferencia {
+  @Input() transferencia: any;
   accountNumberTo: string = '';
-  amount: number = 0;
+  amount: number = 0.00;
   description: string = '';
   password: string = '';
   mensagemErro: string | null = null;
@@ -26,6 +27,39 @@ export class Transferencia {
 
   closeModal() {
     this.overlayRef.dispose();
+  }
+
+  preventNegativeInput(event: KeyboardEvent): void{
+    const input = event.key;
+    const value = (event.target as HTMLInputElement).value;
+
+     if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(input)) {
+      return;
+    }
+
+    if (input === '-') {
+      event.preventDefault();
+      return;
+    }
+
+    if (!/^\d$/.test(input) && input !== '.' && input !== ',') {
+      event.preventDefault();
+      return;
+    }
+
+    if ((input === '.' || input === ',') && (value.includes('.') || value.includes(','))) {
+      event.preventDefault();
+      return;
+    }
+  }
+
+  onPaste(event : ClipboardEvent): void{
+    const clipboardData = event.clipboardData?.getData('text');
+    if(clipboardData){
+      if(clipboardData.startsWith('-') || isNaN(Number(clipboardData)) || Number(clipboardData) < 0){
+        event.preventDefault();
+      }
+    }
   }
 
   transferir() {

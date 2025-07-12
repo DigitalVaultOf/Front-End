@@ -1,5 +1,5 @@
 import { OverlayRef } from '@angular/cdk/overlay';
-import { Component, Inject, Input } from '@angular/core';
+import { Component, Inject, Input, OnInit} from '@angular/core';
 import { Deposit } from '../services/deposit';
 import { FormsModule } from '@angular/forms';
 import { ChangeDetectorRef } from '@angular/core';
@@ -15,10 +15,11 @@ import { CommonModule } from '@angular/common';
 })
 export class Deposito {
   @Input() deposito: any;
-  valorDeposito: number = 0;
+  valorDeposito: number = 0.00;
   senha: string = '';
   mensagemErro: string | null = null;
   exibirSenha: boolean = false;
+
 
 
   constructor(@Inject(OverlayRef) private overlayRef: OverlayRef, private depositService: Deposit,  private cdr: ChangeDetectorRef) {}
@@ -32,37 +33,47 @@ export class Deposito {
     const input = event.key;
     const value = (event.target as HTMLInputElement).value;
 
-    if (
-      !/^\d$/.test(input) && // Não é um dígito
-      input !== '.' && // Permite ponto decimal
-      input !== ',' && // Permite vírgula decimal (se for o caso da sua localidade)
-      input !== 'Backspace' &&
-      input !== 'Delete' &&
-      input !== 'ArrowLeft' &&
-      input !== 'ArrowRight' &&
-      input !== 'Tab'
-    ) {
-      event.preventDefault(); // Impede a digitação
-    }
+    if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(input)) {
+        return;
+      }
 
-    // Verifica se o valor é negativo ou não numérico
-    if (value.startsWith('-') || isNaN(Number(value))) {
-      event.preventDefault();
-    }
+      // Permite dígitos e apenas um ponto/vírgula decimal
+      if (!/^\d$/.test(input) && input !== '.' && input !== ',') {
+        event.preventDefault();
+        return;
+      }
+
+
+      if (input === '-') {
+        event.preventDefault();
+        return;
+      }
+
+      // Impede múltiplos pontos/vírgulas
+      if ((input === '.' || input === ',') && (value.includes('.') || value.includes(','))) {
+        event.preventDefault();
+        return;
+      }
+
   }
 
   onPaste(event: ClipboardEvent): void {
-  const clipboardData = event.clipboardData?.getData('text');
-  if (clipboardData) {
-    // Verifica se o valor colado é negativo ou não numérico
-    if (clipboardData.startsWith('-') || isNaN(Number(clipboardData))) {
-      event.preventDefault();
-    }
-  } 
-}
+    const clipboardData = event.clipboardData?.getData('text');
+    if (clipboardData) {
+      // Verifica se o valor colado é negativo ou não numérico
+      if (clipboardData.startsWith('-') || isNaN(Number(clipboardData)) || Number(clipboardData) < 0) {
+        event.preventDefault();
+      }
+    } 
+  }
 
   confirmarDeposito() {
     console.log('ConfirmarDeposito acionado');
+
+    if(this.valorDeposito < 0){
+      this.mensagemErro = "O valor do depósito não pode ser negativo."
+      return
+    }
     
     if (!this.exibirSenha) {
       console.log('Exibindo campo de senha...');
@@ -97,7 +108,5 @@ export class Deposito {
     });
   }
   
-  
-  
-  
+
 }
