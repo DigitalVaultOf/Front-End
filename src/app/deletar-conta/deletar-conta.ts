@@ -13,6 +13,7 @@ import { UserService } from '../services/user.service';
 import { Auth } from '../services/auth';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AlertService } from '../services/alert.service';
 
 @Component({
   selector: 'app-deletar-conta',
@@ -21,7 +22,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
   templateUrl: './deletar-conta.html',
   styleUrls: ['./deletar-conta.scss'],
 })
-export class DeletarConta implements AfterViewInit { // <-- Implementa AfterViewInit
+export class DeletarConta implements AfterViewInit {
+  // <-- Implementa AfterViewInit
   @Input() accountNumber!: string;
   faTimes = faTimes;
 
@@ -30,6 +32,7 @@ export class DeletarConta implements AfterViewInit { // <-- Implementa AfterView
 
   constructor(
     private userService: UserService,
+    private alertService: AlertService,
     @Inject(OverlayRef) private overlayRef: OverlayRef, // <-- Adicionado @Inject para clareza
     private auth: Auth,
     private router: Router
@@ -58,13 +61,19 @@ export class DeletarConta implements AfterViewInit { // <-- Implementa AfterView
   confirmarExclusao(): void {
     if (!this.accountNumber) {
       console.error('Número da conta não fornecido.');
-      alert('Número da conta não fornecido.');
+      this.alertService.showError(
+        'Ops! Algo deu errado...',
+        'Número da conta não fornecido.'
+      );
       return;
     }
 
     this.userService.DeleteUser(this.accountNumber).subscribe({
       next: (sucesso) => {
-        alert('Conta desativada com sucesso. Você será desconectado.');
+        this.alertService.showSuccess(
+          'Sucesso!',
+          'Conta desativada com sucesso. Você será desconectado(a).'
+        );
         this.auth.logout();
         this.closeModal(); // <-- Já contém a lógica de animação e dispose
         this.router.navigate(['/login']);
@@ -74,7 +83,7 @@ export class DeletarConta implements AfterViewInit { // <-- Implementa AfterView
         const alertMessage =
           err.error?.message ||
           'Não foi possível desativar a conta. Tente novamente.';
-        alert(alertMessage);
+        this.alertService.showError('Ops! Algo deu errado...', alertMessage);
       },
     });
   }
