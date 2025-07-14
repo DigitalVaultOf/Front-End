@@ -189,6 +189,10 @@ export class Home implements OnInit {
     this.confirmationService.show(title, message).subscribe((result) => {
       if (result) {
         this.auth.logout();
+        this.alertService.showSuccess(
+          'Sucesso!',
+          'Logout realizado com sucesso!'
+        );
         this.router.navigate(['/login']);
       }
     });

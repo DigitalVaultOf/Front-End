@@ -45,7 +45,11 @@ export class Login {
           this.loggedIn = true;
           this.router.navigate(['/home']);
         },
-        error: (err) => alert(err.message || 'Erro no login.'),
+        error: (err) =>
+          this.alertService.showError(
+            'Ops! Algo deu errado...',
+            err.message || 'Algo deu errado ao realizar login.'
+          ),
       });
     }
   }
@@ -65,10 +69,17 @@ export class Login {
               this.accountOptions[0]
             );
           } else {
-            alert('Nenhuma conta encontrada.');
+            this.alertService.showError(
+              'Ops! Algo deu errado...',
+              'Não foi possível encontrar contas associadas a este e-mail.'
+            );
           }
         },
-        error: (err) => alert('Erro ao buscar contas.'),
+        error: (err) =>
+          this.alertService.showError(
+            'Ops! Algo deu errado...',
+            err.message || 'Erro ao buscar contas.'
+          ),
       });
   }
 
@@ -87,10 +98,17 @@ export class Login {
               this.accountOptions[0]
             );
           } else {
-            alert('Nenhuma conta encontrada.');
+            this.alertService.showError(
+              'Ops! Algo deu errado...',
+              'Nenhuma conta encontrada para este CPF.'
+            );
           }
         },
-        error: (err) => alert('Erro ao buscar contas.'),
+        error: (err) =>
+          this.alertService.showError(
+            'Ops! Algo deu errado...',
+            err.message || 'Erro ao buscar contas.'
+          ),
       });
   }
 
@@ -119,7 +137,7 @@ export class Login {
         }
       },
       error: (err: HttpErrorResponse) => {
-        this.alertService.showError('Erro de autenticação', err.message);
+        this.alertService.showError('Ops! Algo deu errado...', err.message);
         console.error('Erro de autenticação:', err);
       },
     });
@@ -143,9 +161,17 @@ export class Login {
     this.auth.login(payload).subscribe({
       next: () => {
         this.loggedIn = true;
+        this.alertService.showSuccess(
+          'Sucesso!',
+          'Login realizado com sucesso!'
+        );
         this.router.navigate(['/home']);
       },
-      error: (err) => alert(err.message || 'Erro ao selecionar a conta.'),
+      error: (err) =>
+        this.alertService.showError(
+          'Ops! Algo deu errado...',
+          err.message || 'Erro ao selecionar a conta.'
+        ),
     });
   }
 
