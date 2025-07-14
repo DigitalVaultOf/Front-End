@@ -20,6 +20,7 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../services/user.service';
 import { Observable, forkJoin } from 'rxjs';
+import { AlertService } from '../services/alert.service';
 
 export function passwordMatchValidator(
   control: AbstractControl
@@ -55,13 +56,14 @@ export class EditarConta implements OnInit, AfterViewInit {
   @ViewChild('modalContainer') modalContainer!: ElementRef;
 
   constructor(
+    private alertService: AlertService,
     private fb: FormBuilder,
     private usuarioService: UserService,
     private route: ActivatedRoute,
     @Inject(OverlayRef) private overlayRef: OverlayRef
   ) {}
 
-   closeModal() {
+  closeModal() {
     // 1. Removemos a classe 'open'. O CSS cuidará da animação de saída.
     this.modalContainer.nativeElement.classList.remove('open');
 
@@ -105,8 +107,9 @@ export class EditarConta implements OnInit, AfterViewInit {
       },
       error: (err) => {
         console.error('Falha ao buscar dados do usuário:', err);
-        alert(
-          'Não foi possível carregar os dados do usuário. Verifique o console para mais detalhes.'
+        this.alertService.showError(
+          'Ops! Algo deu errado...',
+          'Não foi possível carregar os dados do usuário.'
         );
         this.closeModal();
       },
@@ -123,7 +126,10 @@ export class EditarConta implements OnInit, AfterViewInit {
   atualizarUsuario() {
     if (this.usuarioForm.invalid) {
       if (this.usuarioForm.errors?.['passwordMismatch']) {
-        alert('A nova senha e a confirmação não coincidem.');
+        this.alertService.showError(
+          'Ops! Algo deu errado...',
+          'A nova senha e a confirmação não coincidem.'
+        );
       }
       return;
     }
@@ -160,14 +166,21 @@ export class EditarConta implements OnInit, AfterViewInit {
 
     if (updateObservables.length === 0) {
       console.log('Nenhum dado foi modificado.');
-      alert('Nenhum dado foi modificado.');
+      this.alertService.showWarning(
+        'Ei! Nada mudou por aqui...',
+        'Nenhum dado foi modificado.'
+      );
+
       return;
     }
 
     forkJoin(updateObservables).subscribe({
       next: () => {
         console.log('Dados atualizados com sucesso!');
-        alert('Dados atualizados com sucesso!');
+        this.alertService.showSuccess(
+          'Sucesso!',
+          'Seus dados foram atualizados com sucesso!'
+        );
         this.closeModal();
       },
       error: (err) => {
@@ -180,7 +193,7 @@ export class EditarConta implements OnInit, AfterViewInit {
         const alertMessage =
           err.error?.message ||
           'Ocorreu um erro ao salvar as alterações. Tente novamente.';
-        alert(alertMessage);
+        this.alertService.showError('Ops! Algo deu errado...', alertMessage);
       },
     });
   }

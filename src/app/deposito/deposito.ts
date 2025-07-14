@@ -1,17 +1,17 @@
 import { OverlayRef } from '@angular/cdk/overlay';
-import { Component, Inject, Input, OnInit} from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Deposit } from '../services/deposit';
 import { FormsModule } from '@angular/forms';
 import { ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { AlertService } from '../services/alert.service';
 
 @Component({
   selector: 'app-deposito',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './deposito.html',
-  styleUrl: './deposito.scss'
+  styleUrl: './deposito.scss',
 })
 export class Deposito {
   @Input() deposito: any;
@@ -20,13 +20,16 @@ export class Deposito {
   mensagemErro: string | null = null;
   exibirSenha: boolean = false;
 
+  constructor(
+    private overlayRef: OverlayRef,
+    private alertService: AlertService,
+    private depositService: Deposit,
+    private cdr: ChangeDetectorRef // Mantido para o controle de 'exibirSenha'
+  ) {}
 
-
-  constructor(@Inject(OverlayRef) private overlayRef: OverlayRef, private depositService: Deposit,  private cdr: ChangeDetectorRef) {}
-
-  closeModal() {
-  console.log('Fechando modal...');
-  this.overlayRef.dispose();
+  closeModal(): void {
+    console.log('Fechando modal...');
+    this.overlayRef.dispose();
   }
 
   preventNegativeInput(event: KeyboardEvent): void {
@@ -54,13 +57,11 @@ export class Deposito {
         event.preventDefault();
         return;
       }
-
   }
 
   onPaste(event: ClipboardEvent): void {
     const clipboardData = event.clipboardData?.getData('text');
     if (clipboardData) {
-      // Verifica se o valor colado é negativo ou não numérico
       if (clipboardData.startsWith('-') || isNaN(Number(clipboardData)) || Number(clipboardData) < 0) {
         event.preventDefault();
       }
@@ -74,39 +75,45 @@ export class Deposito {
       this.mensagemErro = "O valor do depósito não pode ser negativo."
       return
     }
-    
     if (!this.exibirSenha) {
-      console.log('Exibindo campo de senha...');
       this.exibirSenha = true;
-  
       this.cdr.detectChanges();
-  
-      setTimeout(() => {
-        this.cdr.detectChanges();
-      }, 0);
-  
       return;
     }
-  
+
+    // 2. Prepara os dados para a requisição
     const dto = {
       value: this.valorDeposito,
-      password: this.senha
+      password: this.senha,
     };
-  
+
     this.depositService.deposit(dto).subscribe({
       next: (res: any) => {
         if (res?.data) {
           this.mensagemErro = null;
+          this.alertService.showSuccess(
+            'Sucesso!',
+            'Depósito realizado com sucesso!'
+          );
           this.closeModal();
         } else {
-          this.mensagemErro = res?.message || 'Algo deu errado.';
+          this.handleError(res?.message || 'Não foi possível realizar o depósito.');
         }
       },
       error: (err) => {
-        this.mensagemErro = err.error?.message || 'Erro ao fazer depósito.';
-      }
+        this.handleError(err.error?.message || 'Erro ao comunicar com o servidor.');
+      },
     });
   }
+ 
+  private handleError(message: string): void {
+    this.mensagemErro = message;
+    this.alertService.showError('Ops! Algo deu errado...', message);
+    this.cdr.detectChanges(); // Garante que a mensagem de erro seja exibida no template 
+  }
+}
+
+
   
 
-}
+
