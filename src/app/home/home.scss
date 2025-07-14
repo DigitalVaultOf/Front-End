@@ -17,9 +17,9 @@ header h1 {
   font-size: 1.5rem;
 }
 nav {
-  display: flex; // Garante que os itens da navegação fiquem em linha
-  align-items: center; // Alinha os itens verticalmente
-  gap: 2rem; // Adiciona um espaço de 2rem ENTRE cada item
+  display: flex;
+  align-items: center;
+  gap: 2rem;
 
   a {
     color: white;
@@ -61,6 +61,11 @@ main {
 }
 .action:hover {
   transform: translateY(-5px);
+}
+.centro{
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .action img {
   width: 40px;
