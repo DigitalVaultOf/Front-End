@@ -8,6 +8,11 @@ export interface UserData {
     email: string;
     password: string;
 }
+export interface backResponse{
+  data: boolean;
+  message: string;
+}
+
 
 @Injectable({
     providedIn: 'root'
@@ -16,12 +21,10 @@ export interface UserData {
     private apiUrl = 'https://localhost:7178';
     
 
-    constructor( private http: HttpClient){}
+    constructor(private http: HttpClient){}
 
-    cadastrarUsuario(data: UserData): Observable<string> {
-      return this.http.post<string>(`${this.apiUrl}/user/api/User/create-user`, data,{
-         responseType: 'text' as 'json'
-      });
+    cadastrarUsuario(data: UserData): Observable<backResponse> {
+      return this.http.post<backResponse>(`${this.apiUrl}/user/api/User/create-user`, data);
     }
 
 }

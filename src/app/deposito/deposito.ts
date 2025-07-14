@@ -15,7 +15,7 @@ import { AlertService } from '../services/alert.service';
 })
 export class Deposito {
   @Input() deposito: any;
-  valorDeposito: number = 0;
+  valorDeposito: number = 0.00;
   senha: string = '';
   mensagemErro: string | null = null;
   exibirSenha: boolean = false;
@@ -36,47 +36,47 @@ export class Deposito {
     const input = event.key;
     const value = (event.target as HTMLInputElement).value;
 
-    if (
-      !/^\d$/.test(input) &&
-      input !== '.' &&
-      input !== ',' &&
-      input !== 'Backspace' &&
-      input !== 'Delete' &&
-      input !== 'ArrowLeft' &&
-      input !== 'ArrowRight' &&
-      input !== 'Tab'
-    ) {
-      event.preventDefault();
-    }
+    if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(input)) {
+        return;
+      }
 
-    if (value.startsWith('-') || isNaN(Number(value))) {
-      event.preventDefault();
-    }
+      // Permite dígitos e apenas um ponto/vírgula decimal
+      if (!/^\d$/.test(input) && input !== '.' && input !== ',') {
+        event.preventDefault();
+        return;
+      }
+
+
+      if (input === '-') {
+        event.preventDefault();
+        return;
+      }
+
+      // Impede múltiplos pontos/vírgulas
+      if ((input === '.' || input === ',') && (value.includes('.') || value.includes(','))) {
+        event.preventDefault();
+        return;
+      }
   }
 
   onPaste(event: ClipboardEvent): void {
     const clipboardData = event.clipboardData?.getData('text');
-    if (clipboardData && (clipboardData.startsWith('-') || isNaN(Number(clipboardData)))) {
-      event.preventDefault();
+    if (clipboardData) {
+      if (clipboardData.startsWith('-') || isNaN(Number(clipboardData)) || Number(clipboardData) < 0) {
+        event.preventDefault();
+      }
+    } 
+  }
+
+  confirmarDeposito() {
+    console.log('ConfirmarDeposito acionado');
+
+    if(this.valorDeposito < 0){
+      this.mensagemErro = "O valor do depósito não pode ser negativo."
+      return
     }
-  }
-
-  /**
-   * Centraliza a lógica de tratamento de erros para definir a mensagem
-   * local e exibir um alerta global.
-   * @param message A mensagem de erro a ser exibida.
-   */
-  private handleError(message: string): void {
-    this.mensagemErro = message;
-    this.alertService.showError('Ops! Algo deu errado...', message);
-    this.cdr.detectChanges(); // Garante que a mensagem de erro seja exibida no template
-  }
-
-  confirmarDeposito(): void {
-    // 1. Se o campo de senha ainda não estiver visível, apenas o exibe e para a execução.
     if (!this.exibirSenha) {
       this.exibirSenha = true;
-      // O ChangeDetectorRef pode ser útil aqui se a exibição não for imediata
       this.cdr.detectChanges();
       return;
     }
@@ -87,10 +87,8 @@ export class Deposito {
       password: this.senha,
     };
 
-    // 3. Chama o serviço de depósito e se inscreve para a resposta
     this.depositService.deposit(dto).subscribe({
       next: (res: any) => {
-        // --- SUCESSO ---
         if (res?.data) {
           this.mensagemErro = null;
           this.alertService.showSuccess(
@@ -99,14 +97,23 @@ export class Deposito {
           );
           this.closeModal();
         } else {
-          // --- ERRO DE NEGÓCIO (API retornou 200, mas com falha) ---
           this.handleError(res?.message || 'Não foi possível realizar o depósito.');
         }
       },
       error: (err) => {
-        // --- ERRO DE CONEXÃO/HTTP (API retornou 4xx ou 5xx) ---
         this.handleError(err.error?.message || 'Erro ao comunicar com o servidor.');
       },
     });
   }
+ 
+  private handleError(message: string): void {
+    this.mensagemErro = message;
+    this.alertService.showError('Ops! Algo deu errado...', message);
+    this.cdr.detectChanges(); // Garante que a mensagem de erro seja exibida no template 
+  }
 }
+
+
+  
+
+
