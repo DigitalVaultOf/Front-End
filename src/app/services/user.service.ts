@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../environments/environment';
 
-const API_URL = 'https://localhost:7178';
+const API_URL = environment.API_URL;
 
 export interface GetUserDto {
   id: string;
@@ -23,9 +24,7 @@ export interface ResponseModel<T> {
   message: string;
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class UserService {
   constructor(private http: HttpClient) {}
 
@@ -55,7 +54,25 @@ export class UserService {
 
   DeleteUser(accountNumber: string): Observable<boolean> {
     return this.http
-      .delete<ResponseModel<boolean>>(`${API_URL}/user/api/User/delete-user/${accountNumber}`)
+      .delete<ResponseModel<boolean>>(
+        `${API_URL}/user/api/User/delete-user/${accountNumber}`
+      )
+      .pipe(map((response) => response.data));
+  }
+
+  GetAccountsByEmail(email: string): Observable<string[]> {
+    return this.http
+      .get<ResponseModel<string[]>>(
+        `${API_URL}/user/api/User/GetAccountByEmail/${email}`
+      )
+      .pipe(map((response) => response.data));
+  }
+
+  GetAccountsByCpf(cpf: string): Observable<string[]> {
+    return this.http
+      .get<ResponseModel<string[]>>(
+        `${API_URL}/user/api/User/GetAccountByCpf/${cpf}`
+      )
       .pipe(map((response) => response.data));
   }
 }

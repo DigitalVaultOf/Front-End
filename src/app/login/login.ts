@@ -5,7 +5,8 @@ import { Auth } from '../services/auth';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AlertService } from '../services/alert.service'; // Ajuste o caminho
+import { AlertService } from '../services/alert.service';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-login',
@@ -24,6 +25,7 @@ export class Login {
 
   constructor(
     private auth: Auth,
+    private userService: UserService,
     private http: HttpClient,
     private router: Router,
     private alertService: AlertService
