@@ -119,7 +119,8 @@ export class Home implements OnInit {
         error: (err) => {
           console.error('Falha ao obter dados do usuário, deslogando.', err);
 
-          alert(
+          this.alertService.showWarning(
+            'Sessão Expirada!',
             'Sua sessão expirou ou a conta é inválida. Por favor, faça o login novamente.'
           );
 
@@ -197,7 +198,7 @@ export class Home implements OnInit {
     if (!this.usuarioLogado || !this.usuarioLogado.accountNumber) {
       if (isPlatformBrowser(this.platformId)) {
         this.alertService.showError(
-          'Erro',
+          'Ops! Algo deu errado...',
           'Não foi possível identificar a conta para desativação.'
         );
       }
@@ -218,7 +219,7 @@ export class Home implements OnInit {
               next: (sucesso) => {
                 if (sucesso) {
                   this.alertService.showSuccess(
-                    'Sucesso',
+                    'Sucesso!',
                     'Sua conta foi desativada. Você será desconectado em breve...'
                   );
                   setTimeout(() => {
@@ -229,7 +230,7 @@ export class Home implements OnInit {
               },
               error: (err) => {
                 this.alertService.showError(
-                  'Erro',
+                  'Ops! Algo deu errado...',
                   err.error?.message || 'Não foi possível desativar a conta.'
                 );
               },
