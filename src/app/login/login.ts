@@ -57,61 +57,55 @@ export class Login {
   }
 
   getAccountsByEmail(email: string) {
-    this.http
-      .get<any>(
-        `https://localhost:7178/user/api/User/GetAccountByEmail/${email}`
-      )
-      .subscribe({
-        next: (res) => {
-          this.accountOptions = res.data?.accountNumbers || [];
-          if (this.accountOptions.length > 0) {
-            this.validatePasswordAndProceed(
-              email,
-              null,
-              this.accountOptions[0]
-            );
-          } else {
-            this.alertService.showError(
-              'Ops! Algo deu errado...',
-              'Não foi possível encontrar contas associadas a este e-mail.'
-            );
-          }
-        },
-        error: (err) =>
+    // CHAMA O SERVIÇO AO INVÉS DO HTTP DIRETAMENTE
+    this.userService.GetAccountsByEmail(email).subscribe({
+      next: (accounts: string[]) => {
+        this.accountOptions = accounts || [];
+        if (this.accountOptions.length > 0) {
+          this.validatePasswordAndProceed(
+            email,
+            null,
+            this.accountOptions[0]
+          );
+        } else {
           this.alertService.showError(
             'Ops! Algo deu errado...',
-            err.message || 'Erro ao buscar contas.'
-          ),
-      });
+            'Não foi possível encontrar contas associadas a este e-mail.'
+          );
+        }
+      },
+      error: (err) =>
+        this.alertService.showError(
+          'Ops! Algo deu errado...',
+          err.message || 'Erro ao buscar contas.'
+        ),
+    });
   }
 
   getAccountsByCpf(cpfFormatted: string) {
-    this.http
-      .get<any>(
-        `https://localhost:7178/user/api/User/GetAccountByCpf/${cpfFormatted}`
-      )
-      .subscribe({
-        next: (res) => {
-          this.accountOptions = res.data?.accountNumbers || [];
-          if (this.accountOptions.length > 0) {
-            this.validatePasswordAndProceed(
-              null,
-              cpfFormatted,
-              this.accountOptions[0]
-            );
-          } else {
-            this.alertService.showError(
-              'Ops! Algo deu errado...',
-              'Nenhuma conta encontrada para este CPF.'
-            );
-          }
-        },
-        error: (err) =>
+    // CHAMA O SERVIÇO AO INVÉS DO HTTP DIRETAMENTE
+    this.userService.GetAccountsByCpf(cpfFormatted).subscribe({
+      next: (accounts: string[]) => {
+        this.accountOptions = accounts || [];
+        if (this.accountOptions.length > 0) {
+          this.validatePasswordAndProceed(
+            null,
+            cpfFormatted,
+            this.accountOptions[0]
+          );
+        } else {
           this.alertService.showError(
             'Ops! Algo deu errado...',
-            err.message || 'Erro ao buscar contas.'
-          ),
-      });
+            'Nenhuma conta encontrada para este CPF.'
+          );
+        }
+      },
+      error: (err) =>
+        this.alertService.showError(
+          'Ops! Algo deu errado...',
+          err.message || 'Erro ao buscar contas.'
+        ),
+    });
   }
 
   private validatePasswordAndProceed(
