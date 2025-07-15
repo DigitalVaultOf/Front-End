@@ -19,6 +19,13 @@ export interface UpdatePasswordDto {
   confirmNewPassword: string;
 }
 
+export interface CreateAccountDto {
+  name: string;
+  cpf: string;
+  email: string;
+  password: string;
+}
+
 export interface ResponseModel<T> {
   data: T;
   message: string;
@@ -28,16 +35,25 @@ export interface ResponseModel<T> {
 export class UserService {
   constructor(private http: HttpClient) {}
 
+  CreateUserWithAccount(
+    data: CreateAccountDto
+  ): Observable<ResponseModel<boolean>> {
+    return this.http.post<ResponseModel<boolean>>(
+      `${API_URL}/user/api/create-user`,
+      data
+    );
+  }
+
   GetUserById(): Observable<GetUserDto> {
     return this.http
-      .get<ResponseModel<GetUserDto>>(`${API_URL}/user/api/User/GetUserById`)
+      .get<ResponseModel<GetUserDto>>(`${API_URL}/user/api/GetUserById`)
       .pipe(map((response) => response.data));
   }
 
   UpdateUser(updateUserDto: GetUserDto): Observable<boolean> {
     return this.http
       .put<ResponseModel<boolean>>(
-        `${API_URL}/user/api/User/update-user`,
+        `${API_URL}/user/api/update-user`,
         updateUserDto
       )
       .pipe(map((response) => response.data));
@@ -46,7 +62,7 @@ export class UserService {
   UpdatePassword(updatePasswordDto: UpdatePasswordDto): Observable<boolean> {
     return this.http
       .post<ResponseModel<boolean>>(
-        `${API_URL}/user/api/User/update-password`,
+        `${API_URL}/user/api/update-password`,
         updatePasswordDto
       )
       .pipe(map((response) => response.data));
@@ -55,7 +71,7 @@ export class UserService {
   DeleteUser(accountNumber: string): Observable<boolean> {
     return this.http
       .delete<ResponseModel<boolean>>(
-        `${API_URL}/user/api/User/delete-user/${accountNumber}`
+        `${API_URL}/user/api/delete-user/${accountNumber}`
       )
       .pipe(map((response) => response.data));
   }
@@ -63,7 +79,7 @@ export class UserService {
   GetAccountsByEmail(email: string): Observable<string[]> {
     return this.http
       .get<ResponseModel<string[]>>(
-        `${API_URL}/user/api/User/GetAccountByEmail/${email}`
+        `${API_URL}/user/api/GetAccountByEmail/${email}`
       )
       .pipe(map((response) => response.data));
   }
@@ -71,7 +87,7 @@ export class UserService {
   GetAccountsByCpf(cpf: string): Observable<string[]> {
     return this.http
       .get<ResponseModel<string[]>>(
-        `${API_URL}/user/api/User/GetAccountByCpf/${cpf}`
+        `${API_URL}/user/api/GetAccountByCpf/${cpf}`
       )
       .pipe(map((response) => response.data));
   }

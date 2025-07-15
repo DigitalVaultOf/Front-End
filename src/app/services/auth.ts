@@ -13,7 +13,7 @@ export class Auth {
   }
 
   private token: string | null = null;
-  private apiUrl = `${environment.API_URL}/auth/api/Auth/login`;
+  private apiUrl = `${environment.API_URL}/auth/api/login`;
 
   private isBrowser = typeof window !== 'undefined' && !!window.localStorage;
 
