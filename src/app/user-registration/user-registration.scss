@@ -20,6 +20,10 @@
     text-align: center;
     animation: fadeIn 0.3s ease-in-out;
 }
+button[type="submit"]:disabled {
+  background-color: #60a5fa; // Um azul mais claro
+  cursor: not-allowed;
+}
 @keyframes fadeIn {
     
     from {
