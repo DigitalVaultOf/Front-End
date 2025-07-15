@@ -163,10 +163,17 @@ export class Home implements OnInit {
     this.carregandoTransacoes = true; 
     this.extrato.getHistoryPaginated(this.paginaAtual, this.itensPorPagina).subscribe({
       next: (res) => {
+        console.log('respo', res);
         this.valores = res.data; // Atribui array de objetos à variável valores
-        this.totalItens = res.total; // Atualiza o total de itens
+        this.totalItens = res.data.totalCount; // Atualiza o total de itens
         this.totalPaginas = Math.ceil(this.totalItens / this.itensPorPagina); // Calcula o total de páginas
         this.carregandoTransacoes = false; // Finaliza o carregamento
+        console.log('totalItens:', this.totalItens);
+        console.log('itensPorPagina:', this.itensPorPagina);
+        console.log('totalPaginas:', this.totalPaginas);
+        console.log('Paginação visível (totalPaginas > 1):', this.totalPaginas > 1);
+
+      this.cdr.detectChanges(); // Garante que a view seja atualizada
       },
       error: (err) => {
         console.error('Erro ao carregar movimentações:', err);
