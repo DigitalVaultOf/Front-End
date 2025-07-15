@@ -30,6 +30,7 @@ import {
   faEdit,
   faTrash,
   faChevronDown,
+  faChevronLeft,
 } from '@fortawesome/free-solid-svg-icons';
 import { DeletarConta } from '../deletar-conta/deletar-conta';
 import { UserService } from '../services/user.service';
@@ -57,19 +58,27 @@ export class Home implements OnInit {
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
   }
+  paginaAtual :number = 1;
+  itensPorPagina: number = 10; 
+  totalItens: number = 0; 
+  totalPaginas: number = 0; 
   valores: Movimentacao[] = [];
   accountData: UserI['data'] | null = null;
   message: string = '';
+  Math = Math;
   error: string = '';
   protected title = 'Front-End-Net';
   showContent = true;
   isDropdownOpen = false;
+  carregandoTransacoes = false; 
   faSignOutAlt = faSignOutAlt;
   faCog = faCog;
   faChevronRight = faChevronRight;
   faEdit = faEdit;
   faTrash = faTrash;
   faChevronDown = faChevronDown;
+  faChevronLeft = faChevronLeft;
+  
 
   private overlayRef?: OverlayRef;
   updateSubscription!: Subscription;
@@ -96,11 +105,15 @@ export class Home implements OnInit {
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
+
+      this.inicializarPaginacao();
+
       this.userService.GetUserById().subscribe({
         next: (usuario) => {
           this.usuarioLogado = usuario;
           this.loadAccount(); // Carrega os dados da conta
           this.history(); // Carrega o histórico de transações automaticamente
+          this.carregarMovimentacoes();
 
           this.updateSubscription = interval(1000)
             .pipe(switchMap(() => this.user.getUser()))
@@ -146,6 +159,22 @@ export class Home implements OnInit {
     });
   }
 
+  carregarMovimentacoes(){
+    this.carregandoTransacoes = true; 
+    this.extrato.getHistoryPaginated(this.paginaAtual, this.itensPorPagina).subscribe({
+      next: (res) => {
+        this.valores = res.data; // Atribui array de objetos à variável valores
+        this.totalItens = res.total; // Atualiza o total de itens
+        this.totalPaginas = Math.ceil(this.totalItens / this.itensPorPagina); // Calcula o total de páginas
+        this.carregandoTransacoes = false; // Finaliza o carregamento
+      },
+      error: (err) => {
+        console.error('Erro ao carregar movimentações:', err);
+        this.carregandoTransacoes = false; // Finaliza o carregamento mesmo em caso de erro
+      },
+    });
+  }
+
   carregarMovimentacoesSemana() {
     this.extrato.getMovimentacoesUltimaSemana().subscribe({
       next: (res) => (this.valores = res.data),
@@ -167,6 +196,49 @@ export class Home implements OnInit {
         this.message = response.message;
       },
     });
+  }
+
+  inicializarPaginacao(): void {
+    this.paginaAtual = 1;
+    this.itensPorPagina = 10;
+    this.totalItens = 0;
+    this.totalPaginas = 0;
+    this.carregandoTransacoes = false;
+    this.valores = [];
+  }
+
+  irParaPagina(pagina: number): void {
+    if (pagina >= 1 || pagina <= this.totalPaginas && pagina !== this.paginaAtual) {
+      this.paginaAtual = pagina;
+      this.carregarMovimentacoes();
+      return; // Evita navegar para páginas inválidas
+    }
+  }
+  
+  irParaProximaPagina(): void {
+    if (this.paginaAtual < this.totalPaginas) {
+      this.paginaAtual++;
+      this.carregarMovimentacoes();
+    }
+  }
+
+  irParaPaginaAnterior(): void {
+    if (this.paginaAtual > 1) {
+      this.paginaAtual--;
+      this.carregarMovimentacoes();
+    }
+  }
+
+  getPaginasVisiveis(): number[] {
+    const paginas: number[] = [];
+    const inicio = Math.max(1, this.paginaAtual - 2);
+    const fim = Math.min(this.totalPaginas, this.paginaAtual + 2);
+  
+    for (let i = inicio; i <= fim; i++) {
+      paginas.push(i);
+    }
+  
+    return paginas;
   }
 
   toggleDropdown(event: MouseEvent) {
@@ -268,4 +340,5 @@ export class Home implements OnInit {
     this.overlayRef?.dispose();
     this.overlayRef = undefined;
   }
+  
 }

@@ -214,3 +214,102 @@ main {
   opacity: 0.7;
 }
 
+/* --- Estilos da Paginação --- */
+.paginacao-footer {
+  margin-top: 5rem;
+  display: flex;
+  flex-direction: column; /* Para empilhar o wrapper e a info em telas menores */
+  align-items: center;
+  gap: 1rem; /* Espaçamento entre o wrapper e as informações */
+  padding-top: 1rem;
+  border-top: 7px solid rgba(255, 255, 255, 0.2);
+}
+
+.paginacao-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Espaçamento entre os botões */
+  flex-wrap: wrap; /* Permite que os botões quebrem a linha em telas menores */
+  justify-content: center;
+}
+
+.paginacao-footer button {
+  background-color: #0d47a1; /* Azul escuro para os botões */
+  color: white;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px; /* Cantos mais arredondados */
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sutil sombra para profundidade */
+}
+
+.paginacao-footer button:hover:not([disabled]) {
+  background-color: #1976d2; /* Tom mais claro ao passar o mouse */
+  transform: translateY(-2px); /* Efeito de "levantar" */
+}
+
+.paginacao-footer button:disabled {
+  background-color: #cccccc; /* Cinza para botões desabilitados */
+  cursor: not-allowed;
+  opacity: 0.7;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Estilo para o botão de número ativo */
+.paginacao-footer .btn-numero.ativa {
+  background-color: #44bd32; /* Verde para a página atual */
+  transform: scale(1.05); /* Levemente maior para destaque */
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+.paginacao-footer .btn-numero.ativa:hover {
+  background-color: #3a9a28; /* Verde mais escuro no hover do ativo */
+}
+
+.numeros-container {
+  display: flex;
+  gap: 0.3rem; /* Espaçamento menor entre os números */
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.paginacao-footer .reticencias {
+  color: white;
+  font-weight: bold;
+  padding: 0.75rem 0.25rem; /* Ajuste para centralizar com os botões */
+}
+
+.paginacao-info {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* Responsividade básica para telas menores */
+@media (max-width: 768px) {
+  .paginacao-wrapper {
+    flex-direction: column; /* Empilha os botões em telas pequenas */
+    gap: 0.75rem;
+  }
+
+  .paginacao-footer button {
+    width: 100%; /* Botões ocupam a largura total em telas pequenas */
+    justify-content: center; /* Centraliza o conteúdo do botão */
+    padding: 0.9rem 1.25rem; /* Ajusta o padding */
+  }
+
+  .numeros-container {
+    width: 100%; /* Container de números ocupa a largura total */
+    justify-content: center;
+  }
+
+  .paginacao-footer .btn-navegacao span {
+    display: none; /* Esconde o texto "Anterior" e "Próxima" */
+  }
+}
