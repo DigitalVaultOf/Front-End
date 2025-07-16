@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../environments/environment';
 
 export interface Movimentacao {
   acountNumberTo: string | null;
@@ -10,21 +11,27 @@ export interface Movimentacao {
   acountNumber: string;
 }
 
+export interface MovimentacaoResponse {
+  data: Movimentacao[];
+  totalPages: number;
+  totalElements: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class Estrato {
-  private apiUrl = 'https://localhost:7178/user/api/Movimentation/';
+  private apiUrl = `${environment.API_URL}/movimentation/api/`;
 
   constructor(private http: HttpClient) {}
 
   
-  getHistoryPaginated(page: number, pageSize: number): Observable<any> {
+  getHistoryPaginated(page: number, pageSize: number): Observable<MovimentacaoResponse> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('pageSize', pageSize.toString());
 
-    return this.http.get<any>(`${this.apiUrl}history`, { params });
+    return this.http.get<MovimentacaoResponse>(`${this.apiUrl}history`, { params });
   }
 
   getHistory(): Observable<{ data: Movimentacao[] }> {

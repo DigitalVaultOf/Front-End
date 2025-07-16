@@ -22,7 +22,7 @@ import { ComponentPortal, PortalModule } from '@angular/cdk/portal';
 import { AuthService } from '../services/auth.service';
 import { interval, Subscription, switchMap } from 'rxjs';
 import { User, UserI } from '../services/user';
-import { Estrato, Movimentacao } from '../services/estrato';
+import { Estrato, Movimentacao, MovimentacaoResponse } from '../services/estrato';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faSignOutAlt,
@@ -64,6 +64,7 @@ export class Home implements OnInit {
   totalItens: number = 0; 
   totalPaginas: number = 0; 
   valores: Movimentacao[] = [];
+  movimentacoes: MovimentacaoResponse[] = [];
   accountData: UserI['data'] | null = null;
   message: string = '';
   Math = Math;
@@ -167,7 +168,7 @@ export class Home implements OnInit {
       next: (res) => {
         console.log('respo', res);
         this.valores = res.data; // Atribui array de objetos à variável valores
-        this.totalItens = res.data.totalCount; // Atualiza o total de itens
+        this.totalItens = res.totalElements; // Atualiza o total de itens
         this.totalPaginas = Math.ceil(this.totalItens / this.itensPorPagina); // Calcula o total de páginas
         this.carregandoTransacoes = false; // Finaliza o carregamento
         console.log('totalItens:', this.totalItens);
