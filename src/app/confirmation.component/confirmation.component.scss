@@ -8,7 +8,7 @@ $border-radius: 6px;
 
 $success-color: #28a745;
 $error-color: #dc3545;
-$warning-color: #ffc107;
+$warning-color: #eb830c;
 
 .modal-container.alert-success .confirmation-icon {
   color: $success-color;
@@ -45,10 +45,10 @@ $warning-color: #ffc107;
 .modal-container.alert-warning {
   .btn-primary {
     background-color: $warning-color; // Usa a cor de aviso (amarelo)
-    color: #333; // Texto escuro para melhor contraste com o amarelo
+    color: #ffffff; // Texto escuro para melhor contraste com o amarelo
 
     &:hover {
-      background-color: #e0a800; // Um amarelo um pouco mais escuro
+      background-color: #be6600; // Um laranja um pouco mais escuro
     }
   }
 }

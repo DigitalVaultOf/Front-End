@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../environments/environment';
 
-const API_URL = 'https://localhost:7178';
+const API_URL = environment.API_URL;
 
 export interface GetUserDto {
   id: string;
@@ -12,10 +13,18 @@ export interface GetUserDto {
   cpf: string;
   accountNumber: string;
 }
+
 export interface UpdatePasswordDto {
   currentPassword: string;
   newPassword: string;
   confirmNewPassword: string;
+}
+
+export interface CreateAccountDto {
+  name: string;
+  cpf: string;
+  email: string;
+  password: string;
 }
 
 export interface ResponseModel<T> {
@@ -23,22 +32,29 @@ export interface ResponseModel<T> {
   message: string;
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class UserService {
   constructor(private http: HttpClient) {}
 
+  CreateUserWithAccount(
+    data: CreateAccountDto
+  ): Observable<ResponseModel<boolean>> {
+    return this.http.post<ResponseModel<boolean>>(
+      `${API_URL}/user/api/create-user`,
+      data
+    );
+  }
+
   GetUserById(): Observable<GetUserDto> {
     return this.http
-      .get<ResponseModel<GetUserDto>>(`${API_URL}/user/api/User/GetUserById`)
+      .get<ResponseModel<GetUserDto>>(`${API_URL}/user/api/GetUserById`)
       .pipe(map((response) => response.data));
   }
 
   UpdateUser(updateUserDto: GetUserDto): Observable<boolean> {
     return this.http
       .put<ResponseModel<boolean>>(
-        `${API_URL}/user/api/User/update-user`,
+        `${API_URL}/user/api/update-user`,
         updateUserDto
       )
       .pipe(map((response) => response.data));
@@ -47,7 +63,7 @@ export class UserService {
   UpdatePassword(updatePasswordDto: UpdatePasswordDto): Observable<boolean> {
     return this.http
       .post<ResponseModel<boolean>>(
-        `${API_URL}/user/api/User/update-password`,
+        `${API_URL}/user/api/update-password`,
         updatePasswordDto
       )
       .pipe(map((response) => response.data));
@@ -55,7 +71,9 @@ export class UserService {
 
   DeleteUser(accountNumber: string): Observable<boolean> {
     return this.http
-      .delete<ResponseModel<boolean>>(`${API_URL}/user/api/User/delete-user/${accountNumber}`)
+      .delete<ResponseModel<boolean>>(
+        `${API_URL}/user/api/delete-user/${accountNumber}`
+      )
       .pipe(map((response) => response.data));
   }
 }

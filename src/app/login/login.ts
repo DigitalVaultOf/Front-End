@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Auth } from '../services/auth';
+import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AlertService } from '../services/alert.service'; // Ajuste o caminho
+import { AlertService } from '../services/alert.service';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-login',
@@ -23,104 +24,108 @@ export class Login {
   selectedAccount: string = '';
 
   constructor(
-    private auth: Auth,
+    private auth: AuthService,
+    private userService: UserService,
     private http: HttpClient,
     private router: Router,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private cdr: ChangeDetectorRef
   ) {}
+
+  formatCpf(cpf: string): string {
+    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  }
+
+  formatInput(event: any) {
+    const value = event.target.value;
+    if (value.includes('@') || /[a-zA-Z]/.test(value)) {
+      this.loginInput = value;
+      return;
+    }
+    const numbersOnly = value.replace(/\D/g, '');
+
+    if (numbersOnly.length === 11) {
+      event.target.value = this.formatCpf(numbersOnly);
+      this.loginInput = event.target.value;
+    } else if (numbersOnly.length <= 11) {
+      event.target.value = numbersOnly;
+      this.loginInput = event.target.value;
+    } else {
+      const cpfLimit = numbersOnly.substring(0, 11);
+      event.target.value = this.formatCpf(cpfLimit);
+      this.loginInput = event.target.value;
+    }
+  }
 
   login() {
     const trimmedInput = this.loginInput.trim();
-    const payload: any = { password: this.password };
+    const trimmedPassword = this.password.trim();
 
+    // Validações
+    if (!trimmedInput) {
+      this.alertService.showWarning(
+        'Campo obrigatório',
+        'Por favor, informe o número da conta, CPF ou e-mail.'
+      );
+      return;
+    }
+
+    if (!trimmedPassword) {
+      this.alertService.showWarning(
+        'Campo obrigatório',
+        'Por favor, informe sua senha.'
+      );
+      return;
+    }
+
+    const payload: any = { password: trimmedPassword };
+
+    // Detectar tipo de entrada
     if (trimmedInput.includes('@')) {
       payload.email = trimmedInput;
-      this.getAccountsByEmail(payload.email);
-    } else if (/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(trimmedInput)) {
-      this.getAccountsByCpf(trimmedInput);
+    } else if (trimmedInput.replace(/\D/g, '').length === 11) {
+      payload.cpf = trimmedInput.replace(/\D/g, '');
     } else {
       payload.accountNumber = trimmedInput;
-      this.auth.login(payload).subscribe({
-        next: () => {
-          this.loggedIn = true;
-          this.router.navigate(['/home']);
-        },
-        error: (err) => alert(err.message || 'Erro no login.'),
-      });
-    }
-  }
-
-  getAccountsByEmail(email: string) {
-    this.http
-      .get<any>(
-        `https://localhost:7178/user/api/User/GetAccountByEmail/${email}`
-      )
-      .subscribe({
-        next: (res) => {
-          this.accountOptions = res.data?.accountNumbers || [];
-          if (this.accountOptions.length > 0) {
-            this.validatePasswordAndProceed(
-              email,
-              null,
-              this.accountOptions[0]
-            );
-          } else {
-            alert('Nenhuma conta encontrada.');
-          }
-        },
-        error: (err) => alert('Erro ao buscar contas.'),
-      });
-  }
-
-  getAccountsByCpf(cpfFormatted: string) {
-    this.http
-      .get<any>(
-        `https://localhost:7178/user/api/User/GetAccountByCpf/${cpfFormatted}`
-      )
-      .subscribe({
-        next: (res) => {
-          this.accountOptions = res.data?.accountNumbers || [];
-          if (this.accountOptions.length > 0) {
-            this.validatePasswordAndProceed(
-              null,
-              cpfFormatted,
-              this.accountOptions[0]
-            );
-          } else {
-            alert('Nenhuma conta encontrada.');
-          }
-        },
-        error: (err) => alert('Erro ao buscar contas.'),
-      });
-  }
-
-  private validatePasswordAndProceed(
-    email: string | null,
-    cpf: string | null,
-    accountToTest: string
-  ) {
-    const payload: any = {
-      password: this.password,
-      selectedAccountNumber: accountToTest,
-    };
-
-    if (email) {
-      payload.email = email;
-    } else if (cpf) {
-      payload.cpf = cpf;
     }
 
+    // Fazer login
     this.auth.login(payload).subscribe({
-      next: () => {
-        if (this.accountOptions.length > 1) {
+      next: (response: any) => {
+        if (
+          !response.data.token &&
+          response.data.accountNumbers &&
+          response.data.accountNumbers.length > 0
+        ) {
+          // Múltiplas contas - mostrar seleção
+          this.accountOptions = response.data.accountNumbers;
           this.showAccountSelection = true;
+          this.cdr.detectChanges();
         } else {
-          this.selectAccount(this.accountOptions[0]);
+          // Login direto com sucesso
+          this.loggedIn = true;
+          this.alertService.showSuccess(
+            'Sucesso!',
+            'Login realizado com sucesso!'
+          );
+          this.cdr.detectChanges();
+          this.router.navigate(['/home']);
         }
       },
       error: (err: HttpErrorResponse) => {
-        this.alertService.showError('Erro de autenticação', err.message);
-        console.error('Erro de autenticação:', err);
+        if (err.error && err.error.data && err.error.data.accountNumbers) {
+          // Erro que contém múltiplas contas
+          this.accountOptions = err.error.data.accountNumbers;
+          this.showAccountSelection = true;
+          this.cdr.detectChanges();
+        } else {
+          this.alertService.showError(
+            'Ops! Algo deu errado...',
+            err.error?.message ||
+              err.message ||
+              'Algo deu errado ao realizar login.'
+          );
+        }
       },
     });
   }
@@ -128,24 +133,42 @@ export class Login {
   selectAccount(account: string) {
     this.selectedAccount = account;
 
+    if (!this.password.trim()) {
+      this.alertService.showError(
+        'Erro',
+        'Sessão expirada. Faça login novamente.'
+      );
+      this.logout();
+      return;
+    }
+
     const payload: any = {
-      password: this.password,
+      password: this.password.trim(),
       selectedAccountNumber: account,
     };
 
     const trimmedInput = this.loginInput.trim();
     if (trimmedInput.includes('@')) {
       payload.email = trimmedInput;
-    } else if (/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(trimmedInput)) {
-      payload.cpf = trimmedInput;
+    } else if (trimmedInput.replace(/\D/g, '').length === 11) {
+      payload.cpf = trimmedInput.replace(/\D/g, '');
     }
 
     this.auth.login(payload).subscribe({
       next: () => {
         this.loggedIn = true;
+        this.alertService.showSuccess(
+          'Sucesso!',
+          'Login realizado com sucesso!'
+        );
+        this.cdr.detectChanges();
         this.router.navigate(['/home']);
       },
-      error: (err) => alert(err.message || 'Erro ao selecionar a conta.'),
+      error: (err) =>
+        this.alertService.showError(
+          'Ops! Algo deu errado...',
+          err.error?.message || err.message || 'Erro ao selecionar a conta.'
+        ),
     });
   }
 
@@ -154,5 +177,6 @@ export class Login {
     this.showAccountSelection = false;
     this.loginInput = '';
     this.password = '';
+    this.cdr.detectChanges();
   }
 }

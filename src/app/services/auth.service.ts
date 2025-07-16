@@ -2,17 +2,18 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { tap, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
-export class Auth {
+export class AuthService {
   getAccountNumber() {
     throw new Error('Method not implemented.');
   }
 
   private token: string | null = null;
-  private apiUrl = 'https://localhost:7178/auth/api/Auth/login';
+  private apiUrl = `${environment.API_URL}/auth/api/login`;
 
   private isBrowser = typeof window !== 'undefined' && !!window.localStorage;
 
@@ -29,13 +30,16 @@ export class Auth {
     email?: string;
     cpf?: string;
     password: string;
+    selectedAccountNumber?: string;
   }) {
     return this.http.post<any>(this.apiUrl, credentials).pipe(
       tap((response) => {
-        if (this.isBrowser) {
+        // 🔒 SÓ SALVAR TOKEN SE ELE EXISTIR E NÃO FOR NULL!
+        if (this.isBrowser && response.data?.token) {
           localStorage.setItem('token', response.data.token);
           this.token = response.data.token;
         }
+        // Se não tem token (múltiplas contas), não faz nada
       }),
       catchError((err) => {
         let errorMessage = 'Ocorreu um erro desconhecido.';
@@ -56,11 +60,13 @@ export class Auth {
 
   isLoggedIn(): boolean {
     if (!this.isBrowser) return false;
-    return !!localStorage.getItem('token');
+    const token = localStorage.getItem('token');
+    return !!token && token !== 'null' && token !== 'undefined';
   }
 
   getToken(): string | null {
     if (!this.isBrowser) return null;
-    return localStorage.getItem('token');
+    const token = localStorage.getItem('token');
+    return token && token !== 'null' && token !== 'undefined' ? token : null;
   }
 }

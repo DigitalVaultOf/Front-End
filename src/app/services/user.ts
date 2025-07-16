@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Auth } from './auth';
+import { AuthService } from './auth.service';
 import { Observable } from 'rxjs';
 
 export interface UserI {
@@ -19,7 +19,7 @@ export interface UserI {
 export class User {
   private apiUrl = 'https://localhost:7178/user/api/User/';
 
-  constructor(private http: HttpClient, private auth: Auth) {}
+  constructor(private http: HttpClient, private auth: AuthService) {}
 
   getUser(): Observable<UserI> {
     return this.http.get<UserI>(`${this.apiUrl}GetAccountByNumber`);

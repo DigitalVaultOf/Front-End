@@ -2,7 +2,11 @@
   <div class="bg-white shadow-xl rounded-2xl w-full max-w-md p-8">
     <h2 class="text-2xl font-bold text-center text-blue-700 mb-6">Cadastro</h2>
 
-    <form id="userRegistration" [formGroup]="registrationForm" (ngSubmit)="cadastro()">
+    <form
+      id="userRegistration"
+      [formGroup]="registrationForm"
+      (ngSubmit)="Cadastrar()"
+    >
       <div class="mb-3">
         <label for="name" class="block text-sm font-medium text-gray-700">
           Nome
@@ -14,6 +18,21 @@
           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
           placeholder="Nome completo"
         />
+        <!-- Exibir erro do nome -->
+        <div
+          *ngIf="
+            registrationForm.get('name')?.touched &&
+            registrationForm.get('name')?.errors
+          "
+          class="text-red-500 text-sm mt-1"
+        >
+          <span *ngIf="registrationForm.get('name')?.errors?.['required']"
+            >Nome é obrigatório</span
+          >
+          <span *ngIf="registrationForm.get('name')?.errors?.['minlength']"
+            >Nome deve ter pelo menos 2 caracteres</span
+          >
+        </div>
       </div>
 
       <div class="mb-4">
@@ -27,6 +46,21 @@
           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
           placeholder="titular@gmail.com"
         />
+        <!-- Exibir erro do email -->
+        <div
+          *ngIf="
+            registrationForm.get('email')?.touched &&
+            registrationForm.get('email')?.errors
+          "
+          class="text-red-500 text-sm mt-1"
+        >
+          <span *ngIf="registrationForm.get('email')?.errors?.['required']"
+            >Email é obrigatório</span
+          >
+          <span *ngIf="registrationForm.get('email')?.errors?.['email']"
+            >Email inválido</span
+          >
+        </div>
       </div>
 
       <div class="mb-5">
@@ -41,6 +75,24 @@
           mask="000.000.000-00"
           placeholder="xxx.xxx.xxx-xx"
         />
+        <!-- Exibir erro do CPF -->
+        <div
+          *ngIf="
+            registrationForm.get('cpf')?.touched &&
+            registrationForm.get('cpf')?.errors
+          "
+          class="text-red-500 text-sm mt-1"
+        >
+          <span *ngIf="registrationForm.get('cpf')?.errors?.['required']"
+            >CPF é obrigatório</span
+          >
+          <span *ngIf="registrationForm.get('cpf')?.errors?.['cpfIncompleto']"
+            >CPF deve conter 11 dígitos</span
+          >
+          <span *ngIf="registrationForm.get('cpf')?.errors?.['cpfRepetido']"
+            >CPF inválido</span
+          >
+        </div>
       </div>
 
       <div class="mb-6">
@@ -54,11 +106,30 @@
           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
           placeholder="********"
         />
+        <!-- Exibir erro da senha -->
+        <div
+          *ngIf="
+            registrationForm.get('password')?.touched &&
+            registrationForm.get('password')?.errors
+          "
+          class="text-red-500 text-sm mt-1"
+        >
+          <span *ngIf="registrationForm.get('password')?.errors?.['required']"
+            >Senha é obrigatória</span
+          >
+          <span *ngIf="registrationForm.get('password')?.errors?.['minlength']"
+            >Senha deve ter pelo menos 6 caracteres</span
+          >
+        </div>
       </div>
+
       <div class="mb-6">
         <label
           for="confirmPassword"
-          class="block text-sm font-medium text-gray-700"> Confirmar Senha </label>
+          class="block text-sm font-medium text-gray-700"
+        >
+          Confirmar Senha
+        </label>
         <input
           type="password"
           id="confirmPassword"
@@ -66,25 +137,74 @@
           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
           placeholder="********"
         />
+        <!-- Exibir erro da confirmação de senha -->
+        <div
+          *ngIf="
+            registrationForm.get('confirmPassword')?.touched &&
+            registrationForm.get('confirmPassword')?.errors
+          "
+          class="text-red-500 text-sm mt-1"
+        >
+          <span
+            *ngIf="registrationForm.get('confirmPassword')?.errors?.['required']"
+            >Confirmação de senha é obrigatória</span
+          >
+          <span
+            *ngIf="registrationForm.get('confirmPassword')?.errors?.['passwordMismatch']"
+            >As senhas não coincidem</span
+          >
+        </div>
       </div>
-      
-        <button form="userRegistration" type="submit"class="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition-colors"> Cadastrar</button>
+
+      <button
+        form="userRegistration"
+        type="submit"
+        class="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center"
+        [disabled]="isLoading"
+      >
+        @if (isLoading) {
+        <svg
+          class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          ></circle>
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
+        </svg>
+        }
+        <span>{{ isLoading ? "Cadastrando..." : "Cadastrar" }}</span>
+      </button>
     </form>
+
     <p class="mt-4 text-sm text-center text-gray-600">
-        Já tem uma conta?
-        <a href="/login" class="text-blue-600 hover:underline"> Login</a>
-      </p>
+      Já tem uma conta?
+      <a href="/login" class="text-blue-600 hover:underline">Login</a>
+    </p>
   </div>
 </div>
 
-<div class="modal-error" *ngIf= "showErrorModal">]
-    <div class="modal-content">
-      <h3 class="text-xl font-bold text-red-600 mb-4">Erro!</h3>
-      <p class="text-gray-700 mb-6">{{ errorMessage }}</p>
-      <button
-        (click)="closeErrorModal()"
-        class="w-full bg-red-600 text-white py-2 rounded-xl hover:bg-red-700 transition-colors">
-        OK
-      </button>
-    </div>
+<!-- Modal de erro corrigido -->
+<div class="modal-error" *ngIf="showErrorModal">
+  <div class="modal-content">
+    <h3 class="text-xl font-bold text-red-600 mb-4">Erro!</h3>
+    <p class="text-gray-700 mb-6">{{ errorMessage }}</p>
+    <button
+      (click)="closeErrorModal()"
+      class="w-full bg-red-600 text-white py-2 rounded-xl hover:bg-red-700 transition-colors"
+    >
+      OK
+    </button>
+  </div>
 </div>
