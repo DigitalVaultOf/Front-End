@@ -81,19 +81,110 @@
       </a>
     </div>
   </section>
+
   <section class="card-info">
-    <button (click)="history()">Ver histórico</button>
-    <button (click)="carregarMovimentacoesSemana()">
-      Ver histórico Semana
-    </button>
-    <button (click)="carregarMovimentacoesMes()">Ver histórico Mes</button>
-    <ul>
-      <li *ngFor="let item of valores">
-        Tipo: {{ item.movimentTypeEnum }}, Data:
-        {{ item.dateTimeMoviment | date : "short" }}, Valor:
-        {{ item.amount | currency : "BRL" }}
-      </li>
-    </ul>
+    <!-- Cabeçalho da seção -->
+    <div class="historico-header">
+      <h3>Histórico de Transações</h3>
+      <div class="filtros-periodo">
+        <button (click)="history()">Todos</button>
+        <button (click)="carregarMovimentacoesSemana()">Semana</button>
+        <button (click)="carregarMovimentacoesMes()">Mês</button>
+      </div>
+    </div>
+
+    <!-- Lista de transações -->
+    <div class="transacoes-container">
+      <div *ngIf="carregandoTransacoes" class="loading">
+        Carregando transações...
+      </div>
+
+      <ul
+        *ngIf="!carregandoTransacoes && valores.length > 0"
+        class="transacoes-lista"
+      >
+        <li *ngFor="let item of valores" class="transacao-item">
+          Tipo: {{ item.movimentTypeEnum }}, Data:
+          {{ item.dateTimeMoviment | date : "dd/MM/yyyy" }}, Valor:
+          {{ item.amount | currency : "BRL" }}
+        </li>
+      </ul>
+
+      <div
+        *ngIf="!carregandoTransacoes && valores.length === 0"
+        class="sem-transacoes"
+      >
+        Nenhuma transação encontrada para o período selecionado.
+      </div>
+    </div>
+
+    <!-- Paginação Híbrida - Parte Inferior -->
+    <div *ngIf="totalPaginas > 1" class="paginacao-footer">
+      <div class="paginacao-wrapper">
+        <!-- Botão Anterior -->
+        <button
+          (click)="irParaPaginaAnterior()"
+          [disabled]="paginaAtual === 1"
+          class="btn-navegacao anterior"
+        >
+          <fa-icon [icon]="faChevronLeft"></fa-icon>
+          <span>Anterior</span>
+        </button>
+
+        <!-- Container dos Números -->
+        <div class="numeros-container">
+          <!-- Primeira página (sempre visível se não for a atual) -->
+          <button
+            *ngIf="paginaAtual > 3"
+            (click)="irParaPagina(1)"
+            class="btn-numero"
+          >
+            1
+          </button>
+
+          <!-- Reticências iniciais -->
+          <span *ngIf="paginaAtual > 4" class="reticencias">...</span>
+
+          <button
+            *ngFor="let pagina of getPaginasVisiveis()"
+            (click)="irParaPagina(pagina)"
+            [class.ativa]="pagina === paginaAtual"
+            class="btn-numero"
+          >
+            {{ pagina }}
+          </button>
+
+          <span *ngIf="paginaAtual < totalPaginas - 3" class="reticencias"
+            >...</span
+          >
+
+          <button
+            *ngIf="paginaAtual < totalPaginas - 2"
+            (click)="irParaPagina(totalPaginas)"
+            class="btn-numero"
+          >
+            {{ totalPaginas }}
+          </button>
+        </div>
+
+        <button
+          (click)="irParaProximaPagina()"
+          [disabled]="paginaAtual === totalPaginas"
+          class="btn-navegacao proximo"
+        >
+          <span>Próxima</span>
+          <fa-icon [icon]="faChevronRight"></fa-icon>
+        </button>
+      </div>
+
+      <div class="paginacao-info">
+        <span class="info-itens">
+          Mostrando {{ (paginaAtual - 1) * itensPorPagina + 1 }} -
+          {{ Math.min(paginaAtual * itensPorPagina, totalItens) }}
+          de {{ totalItens }} transações
+        </span>
+      </div>
+    </div>
   </section>
   } @else {
   <router-outlet></router-outlet>
