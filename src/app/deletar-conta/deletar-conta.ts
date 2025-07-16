@@ -10,7 +10,7 @@ import { OverlayRef } from '@angular/cdk/overlay';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../services/user.service';
-import { Auth } from '../services/auth';
+import { AuthService } from '../services/auth.service';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AlertService } from '../services/alert.service';
@@ -34,7 +34,7 @@ export class DeletarConta implements AfterViewInit {
     private userService: UserService,
     private alertService: AlertService,
     @Inject(OverlayRef) private overlayRef: OverlayRef, // <-- Adicionado @Inject para clareza
-    private auth: Auth,
+    private auth: AuthService,
     private router: Router
   ) {}
 
