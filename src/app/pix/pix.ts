@@ -1,37 +1,47 @@
-import { Component } from '@angular/core';
+import { Component, Input, ChangeDetectorRef } from '@angular/core';
+import { OverlayRef } from '@angular/cdk/overlay';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-pix',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './pix.html',
   styleUrl: './pix.scss'
 })
 export class Pix {
-chavePix: string = '';
-valorPix: number | null = null;
-senha: string = '';
-mensagemErro: string | null = null;
-exibirSenha: boolean = false;
+  @Input() chavePix: string = '';
+  valorPix: number | null = null;
+  senha: string = '';
+  mensagemErro: string | null = null;
+  exibirSenha: boolean = false;
 
-confirmarPix() {
-  if (!this.exibirSenha) {
-    // Etapa 1 concluída, agora pede a senha
-    this.exibirSenha = true;
-  } else {
-    // Validação da senha e envio
-    if (this.senha !== 'suaSenhaSimulada') {
-      this.mensagemErro = 'Senha incorreta';
+  constructor(
+    private overlayRef: OverlayRef,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  confirmarPix() {
+    if (!this.exibirSenha) {
+      this.exibirSenha = true;
+      this.cdr.detectChanges();
       return;
     }
 
-    // Aqui você pode chamar o service para enviar o Pix
+    if (this.senha !== 'suaSenhaSimulada') {
+      this.mensagemErro = 'Senha incorreta';
+      this.cdr.detectChanges();
+      return;
+    }
+
     console.log(`Enviando R$ ${this.valorPix} para ${this.chavePix}`);
+    this.mensagemErro = null;
     this.closeModal();
   }
-}
 
-closeModal() {
-  // lógica para fechar modal
-}
-
+  closeModal(): void {
+    console.log('Fechando modal Pix...');
+    this.overlayRef.dispose();
+  }
 }
