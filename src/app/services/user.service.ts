@@ -13,6 +13,7 @@ export interface GetUserDto {
   cpf: string;
   accountNumber: string;
 }
+
 export interface UpdatePasswordDto {
   currentPassword: string;
   newPassword: string;
@@ -72,22 +73,6 @@ export class UserService {
     return this.http
       .delete<ResponseModel<boolean>>(
         `${API_URL}/user/api/delete-user/${accountNumber}`
-      )
-      .pipe(map((response) => response.data));
-  }
-
-  GetAccountsByEmail(email: string): Observable<string[]> {
-    return this.http
-      .get<ResponseModel<string[]>>(
-        `${API_URL}/user/api/GetAccountByEmail/${email}`
-      )
-      .pipe(map((response) => response.data));
-  }
-
-  GetAccountsByCpf(cpf: string): Observable<string[]> {
-    return this.http
-      .get<ResponseModel<string[]>>(
-        `${API_URL}/user/api/GetAccountByCpf/${cpf}`
       )
       .pipe(map((response) => response.data));
   }
