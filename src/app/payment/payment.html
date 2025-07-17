@@ -1,1 +1,92 @@
-<p>payment works!</p>
+<body>
+    <div class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Pagar Boleto</h2>
+                <p class="modal-subtitle">Insira o código de barras ou linha digitável</p>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Código de Barras ou Linha Digitável</label>
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        id="barcodeInput"
+                        placeholder="Cole ou digite o código aqui..."
+                        maxlength="54"
+                    >
+                    <div class="input-actions">
+                        <button class="input-btn" onclick="pasteFromClipboard()">
+                            📋 Colar
+                        </button>
+                        <button class="input-btn" onclick="clearInput()">
+                            🗑️ Limpar
+                        </button>
+                    </div>
+                    <div class="error-message" id="errorMessage"></div>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Validando boleto...</p>
+                </div>
+
+                <!-- <div class="warning-message" id="warningMessage">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                    </svg>
+                    <span>Este boleto está vencido. Pode haver cobrança de juros.</span>
+                </div> -->
+
+                <!-- <div class="payment-info" id="paymentInfo">
+                    <div class="payment-row">
+                        <span class="payment-label">Beneficiário:</span>
+                        <span class="payment-value" id="beneficiary">Empresa XYZ LTDA</span>
+                    </div>
+                    <div class="payment-row">
+                        <span class="payment-label">Valor:</span>
+                        <span class="payment-value amount" id="amount">R$ 156,75</span>
+                    </div>
+                    <div class="payment-row">
+                        <span class="payment-label">Vencimento:</span>
+                        <span class="payment-value" id="dueDate">15/07/2025</span>
+                    </div>
+                    <div class="payment-row">
+                        <span class="payment-label">Data de Pagamento:</span>
+                        <span class="payment-value" id="paymentDate">17/07/2025</span>
+                    </div>
+                </div> 
+                
+                **Tenho que verificar como buscar os dados do usuário logado e do boleto para exibir aqui.**
+                -->
+
+                <div class="account-section">
+                    <h3>Conta para Débito</h3>
+                    <!-- <select class="account-select" id="accountSelect">
+                        <option value="">Selecione uma conta</option>
+                        <option value="cc-001">Conta Corrente - Final 1234</option>
+                        <option value="cc-002">Conta Corrente - Final 5678</option>
+                        <option value="pp-001">Conta Poupança - Final 9012</option>
+                    </select> -->
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        id="barcodeInput"
+                        placeholder="Numero da conta"
+                        maxlength="54"
+                    >
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="payBtn" onclick="processPayment()" disabled>
+                        Pagar Boleto
+                    </button>
+                    <button class="btn btn-secondary" (click)="closeModal()">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

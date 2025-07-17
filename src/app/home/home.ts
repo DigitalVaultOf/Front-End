@@ -16,13 +16,14 @@ import { Transferencia } from '../transferencia/transferencia';
 import { Deposito } from '../deposito/deposito';
 import { Withdraw } from '../withdraw/withdraw';
 import { Pix } from '../pix/pix';
+import { Payment } from '../payment/payment';
 import { EditarConta } from '../editar-conta/editar-conta';
 import { Overlay, OverlayModule, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal, PortalModule } from '@angular/cdk/portal';
 import { AuthService } from '../services/auth.service';
 import { interval, Subscription, switchMap } from 'rxjs';
 import { User, UserI } from '../services/user';
-import { Estrato, Movimentacao, MovimentHistoryDto, PagesOfMovimentHistoryDto } from '../services/estrato';
+import { Estrato, Movimentacao, MovimentHistoryDto } from '../services/estrato';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faSignOutAlt,
@@ -89,6 +90,7 @@ export class Home implements OnInit {
   Deposito = Deposito;
   Withdraw = Withdraw;
   Pix = Pix;
+  Payment = Payment;
   EditarConta = EditarConta;
   DeletarConta = DeletarConta;
 
