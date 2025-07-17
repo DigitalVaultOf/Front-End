@@ -17,7 +17,7 @@ export class Pix {
   private apiUrl = `${environment.API_URL}/pix/api/`;
   constructor(private http: HttpClient, private auth: AuthService) {}
 
-  getMovimentacoesUltimaSemana(): Observable<{ data: pixI}> {
+  hasPix(): Observable<{ data: pixI}> {
     return this.http.get<{ data: pixI }>(
       `${this.apiUrl}get`
     );
