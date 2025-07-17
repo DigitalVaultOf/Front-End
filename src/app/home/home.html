@@ -100,10 +100,10 @@
       </div>
 
       <ul
-        *ngIf="!carregandoTransacoes && valores.length > 0"
+        *ngIf="!carregandoTransacoes && movimentacoes.length > 0"
         class="transacoes-lista"
       >
-        <li *ngFor="let item of valores" class="transacao-item">
+        <li *ngFor="let item of movimentacoes" class="transacao-item">
           Tipo: {{ item.movimentTypeEnum }}, Data:
           {{ item.dateTimeMoviment | date : "dd/MM/yyyy" }}, Valor:
           {{ item.amount | currency : "BRL" }}
