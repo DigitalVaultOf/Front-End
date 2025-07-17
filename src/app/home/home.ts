@@ -22,7 +22,7 @@ import { ComponentPortal, PortalModule } from '@angular/cdk/portal';
 import { AuthService } from '../services/auth.service';
 import { interval, Subscription, switchMap } from 'rxjs';
 import { User, UserI } from '../services/user';
-import { Estrato, Movimentacao } from '../services/estrato';
+import { Estrato, Movimentacao, MovimentHistoryDto, PagesOfMovimentHistoryDto } from '../services/estrato';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faSignOutAlt,
@@ -64,6 +64,7 @@ export class Home implements OnInit {
   totalItens: number = 0; 
   totalPaginas: number = 0; 
   valores: Movimentacao[] = [];
+  movimentacoes: MovimentHistoryDto[] = [];
   accountData: UserI['data'] | null = null;
   message: string = '';
   Math = Math;
@@ -165,8 +166,9 @@ export class Home implements OnInit {
     this.carregandoTransacoes = true; 
     this.extrato.getHistoryPaginated(this.paginaAtual, this.itensPorPagina).subscribe({
       next: (res) => {
+        setTimeout(() => {
         console.log('respo', res);
-        this.valores = res.data; // Atribui array de objetos à variável valores
+        this.movimentacoes = res.data.pages; // Atribui array de objetos à variável valores
         this.totalItens = res.data.totalCount; // Atualiza o total de itens
         this.totalPaginas = Math.ceil(this.totalItens / this.itensPorPagina); // Calcula o total de páginas
         this.carregandoTransacoes = false; // Finaliza o carregamento
@@ -176,7 +178,7 @@ export class Home implements OnInit {
         console.log('Paginação visível (totalPaginas > 1):', this.totalPaginas > 1);
 
       this.cdr.detectChanges(); // Garante que a view seja atualizada
-      },
+      });},
       error: (err) => {
         console.error('Erro ao carregar movimentações:', err);
         this.carregandoTransacoes = false; // Finaliza o carregamento mesmo em caso de erro

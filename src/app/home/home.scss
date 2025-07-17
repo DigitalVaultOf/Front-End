@@ -129,8 +129,6 @@ main {
   border-radius: 4px;
 }
 
-// DROPDOWN MENU STYLES
-
 .dropdown-container {
   position: relative; // Essencial para o posicionamento do menu
   display: inline-block;
@@ -162,8 +160,6 @@ main {
   z-index: 1000;
   min-width: 180px;
   overflow: hidden;
-
-  // ESTADO INICIAL (ESCONDIDO)
   opacity: 0;
   visibility: hidden;
   transform: translateX(-50%) translateY(-10px); // Começa um pouco acima e centralizado
@@ -221,100 +217,191 @@ main {
 
 /* --- Estilos da Paginação --- */
 .paginacao-footer {
-  margin-top: 5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  padding-top: 1.5rem;
   display: flex;
-  flex-direction: column; /* Para empilhar o wrapper e a info em telas menores */
-  align-items: center;
-  gap: 1rem; /* Espaçamento entre o wrapper e as informações */
-  padding-top: 1rem;
-  border-top: 7px solid rgba(255, 255, 255, 0.2);
-}
+  flex-direction: column;
+  gap: 1rem;
 
-.paginacao-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem; /* Espaçamento entre os botões */
-  flex-wrap: wrap; /* Permite que os botões quebrem a linha em telas menores */
-  justify-content: center;
-}
-
-.paginacao-footer button {
-  background-color: #0d47a1; /* Azul escuro para os botões */
-  color: white;
-  border: none;
-  padding: 0.75rem 1.25rem;
-  border-radius: 8px; /* Cantos mais arredondados */
-  cursor: pointer;
-  font-weight: 600;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sutil sombra para profundidade */
-}
-
-.paginacao-footer button:hover:not([disabled]) {
-  background-color: #1976d2; /* Tom mais claro ao passar o mouse */
-  transform: translateY(-2px); /* Efeito de "levantar" */
-}
-
-.paginacao-footer button:disabled {
-  background-color: #cccccc; /* Cinza para botões desabilitados */
-  cursor: not-allowed;
-  opacity: 0.7;
-  box-shadow: none;
-  transform: none;
-}
-
-/* Estilo para o botão de número ativo */
-.paginacao-footer .btn-numero.ativa {
-  background-color: #44bd32; /* Verde para a página atual */
-  transform: scale(1.05); /* Levemente maior para destaque */
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-}
-
-.paginacao-footer .btn-numero.ativa:hover {
-  background-color: #3a9a28; /* Verde mais escuro no hover do ativo */
-}
-
-.numeros-container {
-  display: flex;
-  gap: 0.3rem; /* Espaçamento menor entre os números */
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.paginacao-footer .reticencias {
-  color: white;
-  font-weight: bold;
-  padding: 0.75rem 0.25rem; /* Ajuste para centralizar com os botões */
-}
-
-.paginacao-info {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.9rem;
-  text-align: center;
-}
-
-/* Responsividade básica para telas menores */
-@media (max-width: 768px) {
   .paginacao-wrapper {
-    flex-direction: column; /* Empilha os botões em telas pequenas */
-    gap: 0.75rem;
-  }
-
-  .paginacao-footer button {
-    width: 100%; /* Botões ocupam a largura total em telas pequenas */
-    justify-content: center; /* Centraliza o conteúdo do botão */
-    padding: 0.9rem 1.25rem; /* Ajusta o padding */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
   }
 
   .numeros-container {
-    width: 100%; /* Container de números ocupa a largura total */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
     justify-content: center;
+    flex: 1;
   }
 
-  .paginacao-footer .btn-navegacao span {
-    display: none; /* Esconde o texto "Anterior" e "Próxima" */
+  .btn-navegacao {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #44bd32;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    &:hover:not(:disabled) {
+      background-color: #3a9a28;
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      background-color: rgba(255, 255, 255, 0.3);
+      cursor: not-allowed;
+      opacity: 0.6;
+      transform: none;
+    }
+
+    &.anterior {
+      fa-icon {
+        order: -1;
+      }
+    }
+
+    &.proximo {
+      fa-icon {
+        order: 1;
+      }
+    }
+  }
+
+  .btn-numero {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 0.5rem 0.8rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
+    min-width: 40px;
+    text-align: center;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-1px);
+    }
+
+    &.ativa {
+      background-color: #44bd32;
+      border-color: #44bd32;
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 2px 4px rgba(68, 189, 50, 0.3);
+    }
+  }
+
+  .reticencias {
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: bold;
+    padding: 0 0.3rem;
+    user-select: none;
+  }
+
+  .paginacao-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .info-itens {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+      text-align: center;
+    }
+  }
+}
+
+/* ===== RESPONSIVIDADE ===== */
+
+@media (max-width: 768px) {
+  .historico-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+
+    .filtros-periodo {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .paginacao-footer {
+    .paginacao-wrapper {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .numeros-container {
+      order: 2;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .btn-navegacao {
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+
+      &.anterior {
+        order: 1;
+      }
+
+      &.proximo {
+        order: 3;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .card-info {
+    padding: 1rem;
+  }
+
+  .historico-header {
+    .filtros-periodo {
+      button {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.8rem;
+      }
+    }
+  }
+
+  .transacoes-container {
+    .transacao-item {
+      font-size: 0.9rem;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  .paginacao-footer {
+    .btn-numero {
+      padding: 0.4rem 0.6rem;
+      font-size: 0.8rem;
+      min-width: 35px;
+    }
+
+    .btn-navegacao {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.75rem;
+    }
   }
 }
