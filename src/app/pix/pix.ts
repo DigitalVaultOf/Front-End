@@ -27,6 +27,9 @@ export class Pix {
   chave: string = "";
   going: string = "";
   amount: number = 0.0;
+  name: string = "";
+  pixKey: string = "";
+  bank: string = "NovaBank";
 
   private http = inject(HttpClient);
 
@@ -168,6 +171,26 @@ export class Pix {
       coming: this.chave,
       amount: this.amount,
     };
-    this.pixService.makePix(data).subscribe({});
+    this.pixService.makePix(data).subscribe({
+      next: (res) =>{
+        console.log(res.data)
+      }, error: () => {
+        console.log("Erro")
+      }
+    });
+  }
+  criarPix(): void{
+    const data = {
+      name: this.name,
+      pixKey: this.pixKey,
+      bank: this.bank
+    };
+    this.pixService.makePixKey(data).subscribe({
+      next: (res) =>{
+        console.log(res.data)
+      }, error: (res) => {
+        console.log(res.message)
+      }
+    });
   }
 }

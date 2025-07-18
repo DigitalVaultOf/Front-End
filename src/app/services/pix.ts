@@ -14,7 +14,7 @@ export interface PixResponse<T> {
 })
 export class PixS {
   private apiUrl = `${environment.API_URL}/pix/api/`;
-  private apiUrl2 = `${environment.API_URL}/bank/pix/api`;
+  private apiUrl2 = `${environment.API_URL}/userpix/api/`;
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 
@@ -39,6 +39,6 @@ export class PixS {
     pixKey: string;
     bank: string;
   }): Observable<PixResponse<string>> {
-    return this.http.post<PixResponse<string>>(`${this.apiUrl2}registrar`, data);
+    return this.http.post<PixResponse<string>>(`${this.apiUrl}registrar`, data);
   }
 }

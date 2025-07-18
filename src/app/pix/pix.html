@@ -22,7 +22,7 @@
         class="bg-blue-600 text-white rounded-md py-2 font-semibold hover:bg-blue-700 transition w-full"
         (click)="modo = 'chave'"
       >
-        Criar/Editar Chave Pix
+        Criar Chave Pix
       </button>
 
       <button
@@ -43,7 +43,6 @@
 
     <ng-container *ngIf="modo === 'transferencia'">
       <h2 class="text-xl font-semibold text-gray-800">Enviar Pix</h2>
-      <form>
         <input
           *ngIf="!exibirSenha"
           type="text"
@@ -82,13 +81,12 @@
         </div>
 
         <button
-          [disabled]="!exibirSenha ? !valorPix || !chavePix : !senha"
+          
           class="bg-indigo-600 text-white rounded-md py-2 mt-4 font-semibold hover:bg-indigo-700 transition w-full disabled:opacity-50"
-          (click)="confirmarPix()"
+          (click)="enviarPix()"
         >
           {{ exibirSenha ? "Enviar Pix" : "Confirmar" }}
         </button>
-      </form>
       <button
         (click)="modo = 'menu'"
         class="mt-2 text-gray-600 hover:text-gray-900"
@@ -114,15 +112,22 @@
 
       <input
         type="text"
+        placeholder="Nome da chave"
+        [(ngModel)]="name"
+        class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+
+      <input
+        type="text"
         placeholder="Nova chave Pix"
-        [(ngModel)]="novaChave"
+        [(ngModel)]="pixKey"
         class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
       <button
-        [disabled]="!novaChave"
+        [disabled]="!pixKey && !name"
         class="bg-blue-600 text-white rounded-md py-2 mt-2 font-semibold hover:bg-blue-700 transition w-full disabled:opacity-50"
-        (click)="salvarChavePix()"
+        (click)="criarPix()"
       >
         {{ chaveEmEdicao ? "Atualizar" : "Salvar" }}
       </button>
