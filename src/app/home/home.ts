@@ -342,14 +342,21 @@ export class Home implements OnInit {
         .centerHorizontally()
         .centerVertically(),
     });
-
+  
     const injector = this.createInjector(this.overlayRef);
     const portal = new ComponentPortal(component, null, injector);
     const componentRef = this.overlayRef.attach(portal);
+  
+    (componentRef.instance as any).onReloadTable = () => {
+      this.carregarMovimentacoes();
+      this.history();
+    };
+  
     this.overlayRef
       .backdropClick()
       .subscribe(() => componentRef.instance.closeModal());
   }
+  
 
   closeModal() {
     this.overlayRef?.dispose();

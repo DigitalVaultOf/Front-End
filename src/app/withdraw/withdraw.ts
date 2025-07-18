@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { OverlayRef } from '@angular/cdk/overlay';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { Home } from '../home/home';
 
 @Component({
   selector: 'app-withdraw',
@@ -13,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class Withdraw {
   @Input() withdraw: any;
+  @Input() onReloadTable?: () => void;
   valor: number = 0.00;
   senha: string = '';
   exibirSenha: boolean = false;
@@ -82,6 +84,7 @@ export class Withdraw {
         next: (res: any) => {
           if (res?.data) {
             this.mensagemErro = null;
+            this.onReloadTable?.();
             this.closeModal();
           } else {
             this.mensagemErro = res?.message || 'Erro ao realizar saque.';
@@ -90,6 +93,8 @@ export class Withdraw {
         error: (err) => {
           this.mensagemErro = err.error?.message || 'Erro ao realizar saque.';
         }
+
+        
       });
   }
   
