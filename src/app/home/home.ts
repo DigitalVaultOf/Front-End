@@ -37,6 +37,8 @@ import { DeletarConta } from '../deletar-conta/deletar-conta';
 import { UserService } from '../services/user.service';
 import { AlertService } from '../services/alert.service'; 
 import { ConfirmationService } from '../services/confirmation.service';
+import { Export } from '../export/export';
+
 
 @Component({
   selector: 'app-root',
@@ -91,6 +93,7 @@ export class Home implements OnInit {
   Pix = Pix;
   EditarConta = EditarConta;
   DeletarConta = DeletarConta;
+  Export = Export;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
