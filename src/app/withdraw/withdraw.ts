@@ -77,7 +77,7 @@ export class Withdraw {
     };
   
     this.http
-      .post('https://localhost:7178/user/api/Movimentation/whitdraw', dto)
+      .post('http://localhost:5002/api/Movimentation/whitdraw', dto)
       .subscribe({
         next: (res: any) => {
           if (res?.data) {

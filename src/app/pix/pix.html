@@ -1,7 +1,38 @@
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
     <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-40"></div>
 
-    <div class="fixed z-50 bg-white rounded-lg shadow-lg w-96 p-6 flex flex-col space-y-4 ">
+  <div class="fixed z-50 bg-white rounded-lg shadow-lg w-96 p-6 flex flex-col space-y-4 ">
+
+    <ng-container *ngIf="modo === 'menu'">
+      <h2 class="text-xl font-semibold text-gray-800">Pix</h2>
+
+      <button
+        class="bg-indigo-600 text-white rounded-md py-2 font-semibold hover:bg-indigo-700 transition w-full"
+        (click)="modo = 'transferencia'"
+      >
+        Transferência
+      </button>
+
+      <button
+        class="bg-blue-600 text-white rounded-md py-2 font-semibold hover:bg-blue-700 transition w-full"
+        (click)="modo = 'chave'"
+      >
+        Criar/Editar Chave Pix
+      </button>
+
+      <button
+        class="bg-gray-600 text-white rounded-md py-2 font-semibold hover:bg-gray-700 transition w-full"
+        (click)="modo = 'historico'"
+      >
+        Histórico
+      </button>
+
+      <button (click)="closeModal()" class="mt-2 text-gray-600 hover:text-gray-900">
+        Cancelar
+      </button>
+    </ng-container>
+
+    <ng-container *ngIf="modo === 'transferencia'">
       <h2 class="text-xl font-semibold text-gray-800">Enviar Pix</h2>
 
       <input
@@ -26,7 +57,7 @@
         <div>
           Enviar <strong>R$ {{ valorPix | number: '1.2-2' }}</strong> para <strong>{{ chavePix }}</strong>
         </div>
-  
+
         <input
           type="password"
           placeholder="Digite sua senha"
@@ -34,12 +65,12 @@
           (input)="mensagemErro = null"
           class="border border-gray-300 rounded-md px-4 py-2 mt-2 focus:outline-none focus:ring-2 focus:ring-red-500"
         />
-  
+
         <div *ngIf="mensagemErro" class="text-red-600 font-semibold mt-2">
           {{ mensagemErro }}
         </div>
       </div>
-  
+
       <button
         [disabled]="!exibirSenha ? !valorPix || !chavePix : !senha"
         class="bg-indigo-600 text-white rounded-md py-2 mt-4 font-semibold hover:bg-indigo-700 transition w-full disabled:opacity-50"
@@ -48,9 +79,64 @@
         {{ exibirSenha ? 'Enviar Pix' : 'Confirmar' }}
       </button>
 
-      <button (click)="closeModal()" class="mt-2 text-gray-600 hover:text-gray-900">
-        Cancelar
+      <button (click)="modo = 'menu'" class="mt-2 text-gray-600 hover:text-gray-900">
+        Voltar ao menu
       </button>
-    </div>
-  </body>
-  
+    </ng-container>
+
+    <ng-container *ngIf="modo === 'chave'">
+      <h2 class="text-xl font-semibold text-gray-800">Minhas Chaves Pix</h2>
+    
+      <ul class="space-y-1 text-sm text-gray-700 mb-4">
+        <li *ngFor="let chave of chaves">
+          <span>{{ chave.tipo }}: {{ chave.valor }}</span>
+          <button
+            class="ml-2 text-blue-600 hover:underline"
+            (click)="selecionarChaveParaEditar(chave)"
+          >
+            Editar
+          </button>
+        </li>
+      </ul>
+    
+      <input
+        type="text"
+        placeholder="Nova chave Pix"
+        [(ngModel)]="novaChave"
+        class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    
+      <button
+        [disabled]="!novaChave"
+        class="bg-blue-600 text-white rounded-md py-2 mt-2 font-semibold hover:bg-blue-700 transition w-full disabled:opacity-50"
+        (click)="salvarChavePix()"
+      >
+        {{ chaveEmEdicao ? 'Atualizar' : 'Salvar' }}
+      </button>
+    
+      <button (click)="modo = 'menu'" class="mt-2 text-gray-600 hover:text-gray-900">
+        Voltar ao menu
+      </button>
+    </ng-container>
+    
+    <ng-container *ngIf="modo === 'historico'">
+      <h2 class="text-xl font-semibold text-gray-800">Histórico de Transações</h2>
+    
+      <div *ngIf="historico.length > 0; else semTransacoes" class="text-sm text-gray-700">
+        <ul class="list-disc ml-4 space-y-1">
+          <li *ngFor="let item of historico">
+            {{ item.descricao }}
+          </li>
+        </ul>
+      </div>
+    
+      <ng-template #semTransacoes>
+        <div class="text-gray-500 text-sm">Nenhuma transação encontrada.</div>
+      </ng-template>
+    
+      <button (click)="modo = 'menu'" class="mt-4 text-gray-600 hover:text-gray-900">
+        Voltar ao menu
+      </button>
+    </ng-container>    
+  </div>
+</body>
