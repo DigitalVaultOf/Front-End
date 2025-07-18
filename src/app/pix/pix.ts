@@ -1,5 +1,6 @@
 import { Component, Input, ChangeDetectorRef, inject } from '@angular/core';
 import { OverlayRef } from '@angular/cdk/overlay';
+import { PixS, PixResponse } from '../services/pix';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -9,7 +10,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
   standalone: true,
   imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './pix.html',
-  styleUrl: './pix.scss'
+  styleUrl: './pix.scss',
 })
 export class Pix {
   @Input() chavePix: string = '';
@@ -20,15 +21,46 @@ export class Pix {
   modo: 'menu' | 'transferencia' | 'chave' | 'historico' = 'menu';
   novaChave: string = '';
   historico: Array<{ descricao: string }> = [];
-  chaves: Array<{ id: number, tipo: string, valor: string }> = [];
-  chaveEmEdicao: { id: number, tipo: string, valor: string } | null = null;
+  chaves: Array<{ id: number; tipo: string; valor: string }> = [];
+  chaveEmEdicao: { id: number; tipo: string; valor: string } | null = null;
+  temPix: boolean | null = null;
+  chave: string = "";
+  going: string = "";
+  amount: number = 0.0;
 
   private http = inject(HttpClient);
 
   constructor(
     private overlayRef: OverlayRef,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private pixService: PixS
   ) {}
+
+  ngOnInit(): void {
+    this.pixService.hasPix().subscribe({
+      next: (res) => {
+        this.temPix = res.data;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Erro ao verificar Pix:', err);
+        this.temPix = false;
+        this.cdr.detectChanges();
+      },
+    });
+    this.pixService.getPix().subscribe({
+      next: (res) => {
+        this.chave = res.data;
+        this.cdr.detectChanges();
+        console.log(this.chave);
+      },
+      error: (err) => {
+        console.error('Erro ao verificar Pix:', err);
+        this.chave = "";
+        this.cdr.detectChanges();
+      },
+    });
+  }
 
   confirmarPix() {
     if (!this.exibirSenha) {
@@ -37,7 +69,7 @@ export class Pix {
       return;
     }
 
-    if (this.senha !== 'suaSenhaSimulada') { 
+    if (this.senha !== 'suaSenhaSimulada') {
       this.mensagemErro = 'Senha incorreta';
       this.cdr.detectChanges();
       return;
@@ -51,33 +83,41 @@ export class Pix {
     if (!this.novaChave) return;
 
     if (this.chaveEmEdicao) {
-      this.http.put(`/api/pix/chaves/${this.chaveEmEdicao.id}`, {
-        valor: this.novaChave
-      }).subscribe(() => {
-        this.resetarFormularioChave();
-        this.carregarChaves(); 
-      });
+      this.http
+        .put(`/api/pix/chaves/${this.chaveEmEdicao.id}`, {
+          valor: this.novaChave,
+        })
+        .subscribe(() => {
+          this.resetarFormularioChave();
+          this.carregarChaves();
+        });
     } else {
-      this.http.post('/api/pix/chaves', {
-        valor: this.novaChave,
-        tipo: 'email' 
-      }).subscribe(() => {
-        this.resetarFormularioChave();
-        this.carregarChaves(); 
-      });
+      this.http
+        .post('/api/pix/chaves', {
+          valor: this.novaChave,
+          tipo: 'email',
+        })
+        .subscribe(() => {
+          this.resetarFormularioChave();
+          this.carregarChaves();
+        });
     }
   }
 
   resetarFormularioChave() {
     this.novaChave = '';
     this.chaveEmEdicao = null;
-    this.modo = 'menu'; 
+    this.modo = 'menu';
   }
 
-  selecionarChaveParaEditar(chave: { id: number, tipo: string, valor: string }) {
+  selecionarChaveParaEditar(chave: {
+    id: number;
+    tipo: string;
+    valor: string;
+  }) {
     this.novaChave = chave.valor;
     this.chaveEmEdicao = chave;
-    this.modo = 'chave'; 
+    this.modo = 'chave';
   }
 
   abrirHistorico() {
@@ -95,7 +135,7 @@ export class Pix {
         this.historico = [];
         this.mensagemErro = 'Erro ao carregar histórico';
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -114,11 +154,20 @@ export class Pix {
         this.chaves = [];
         this.mensagemErro = 'Erro ao carregar chaves';
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
   closeModal(): void {
     this.overlayRef.dispose();
+  }
+
+  enviarPix(): void {
+    const data = {
+      going: this.going,
+      coming: this.chave,
+      amount: this.amount,
+    };
+    this.pixService.makePix(data).subscribe({});
   }
 }
