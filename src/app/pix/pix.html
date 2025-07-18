@@ -1,13 +1,13 @@
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40"></div>
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-40"></div>
 
-    <div class="fixed z-50 bg-white rounded-lg shadow-lg w-96 p-6 flex flex-col space-y-4">
+    <div class="fixed z-50 bg-white rounded-lg shadow-lg w-96 p-6 flex flex-col space-y-4 ">
       <h2 class="text-xl font-semibold text-gray-800">Enviar Pix</h2>
 
       <input
         *ngIf="!exibirSenha"
         type="text"
-        placeholder="Chave Pix (e-mail, telefone ou CPF)"
+        placeholder="Chave Pix"
         [(ngModel)]="chavePix"
         class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
       />

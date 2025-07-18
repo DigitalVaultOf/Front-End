@@ -116,7 +116,6 @@
     border-radius: 8px;
     font-size: 16px;
     transition: all 0.3s ease;
-    font-family: 'Courier New', monospace;
   
     &:focus {
       outline: none;
@@ -149,6 +148,10 @@
     font-size: 12px;
     cursor: pointer;
     transition: all 0.2s;
+    justify-content: center;
+    display: flex;
+    gap: 8px; 
+    margin-top: 8px; 
   
     &:hover {
       background: #e0e0e0;
@@ -291,6 +294,7 @@
   
   .action-buttons {
     display: flex;
+    justify-content: center;
     gap: 12px;
     flex-wrap: wrap;
   }
@@ -313,7 +317,6 @@
     }
   
     &.btn-primary {
-      background: #2196F3;
       color: white;
   
       &:hover:not(:disabled) {
