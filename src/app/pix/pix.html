@@ -1,7 +1,7 @@
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
   <div
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40"
-  ></div>
+  ></div> 
 
   <div
     class="fixed z-50 bg-white rounded-lg shadow-lg w-96 p-6 flex flex-col space-y-4"
@@ -25,18 +25,9 @@
         Criar Chave Pix
       </button>
 
-      <button
-        *ngIf="temPix"
-        class="bg-gray-600 text-white rounded-md py-2 font-semibold hover:bg-gray-700 transition w-full"
-        (click)="modo = 'historico'"
-      >
-        Histórico
-      </button>
+      
+      <button (click)="closeModal()" class="mt-2 text-gray-600 hover:text-gray-900">
 
-      <button
-        (click)="closeModal()"
-        class="mt-2 text-gray-600 hover:text-gray-900"
-      >
         Cancelar
       </button>
     </ng-container>

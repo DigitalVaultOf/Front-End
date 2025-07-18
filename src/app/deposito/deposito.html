@@ -1,50 +1,58 @@
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40"></div>
+<div class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title">Deposito</h2>
+        </div>
+        
+        <div class="modal-body">
+            <div class="form-group">
+                <label *ngIf="!exibirSenha" class="form-label">Quanto você quer depositar?</label>
+                <input
+                  *ngIf="!exibirSenha"
+                  type="number"
+                  placeholder="Digite o valor"
+                  [(ngModel)]="valorDeposito"
+                  [min]="0"
+                  #valorInput ="ngModel"
+                  [step]="0.10"
+                  class="form-input"
+                  (keydown) = "preventNegativeInput($event)"
+                  (paste) = "onPaste($event)"
+                />
+            </div>
 
-  <div class="fixed z-50 bg-white rounded-lg shadow-lg w-96 p-6 flex flex-col space-y-4">
-    <h2 class="text-xl font-semibold text-gray-800">Quanto você quer depositar?</h2>
+            <div *ngIf="exibirSenha" class="flex flex-col space-y-2">
+              <div>
+                Valor a depositar: <strong>R$ {{ valorDeposito | number:'1.2-2' }}</strong>
+              </div>
+        
+              <input
+                type="password"
+                placeholder="Digite sua senha"
+                [(ngModel)]="senha"
+                (input)="mensagemErro = null"
+                class="form-input"
+              />
+        
+              <div *ngIf="mensagemErro" class="text-red-600 font-semibold mt-2">
+                {{ mensagemErro }}
+              </div>
+            </div>
+            
+            <div class="action-buttons">
+              <button
+                [disabled]="!exibirSenha ? !valorDeposito : !senha"
+                class="btn btn-primary bg-indigo-600"
+                (click)="confirmarDeposito()"
+              >
+                {{ exibirSenha ? 'Depositar' : 'Confirmar valor' }}
+              </button>
 
-    <input
-      *ngIf="!exibirSenha"
-      type="number"
-      placeholder="Digite o valor"
-      [(ngModel)]="valorDeposito"
-      [min]="0"
-      #valorInput ="ngModel"
-      [step]="0.10"
-      class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      (keydown) = "preventNegativeInput($event)"
-      (paste) = "onPaste($event)"
-    />
-
-    <div *ngIf="exibirSenha" class="flex flex-col space-y-2">
-      <div>
-        Valor a depositar: <strong>R$ {{ valorDeposito | number:'1.2-2' }}</strong>
-      </div>
-
-      <input
-        type="password"
-        placeholder="Digite sua senha"
-        [(ngModel)]="senha"
-        (input)="mensagemErro = null"
-        class="border border-gray-300 rounded-md px-4 py-2 mt-2 focus:outline-none focus:ring-2 focus:ring-red-500"
-      />
-
-      <div *ngIf="mensagemErro" class="text-red-600 font-semibold mt-2">
-        {{ mensagemErro }}
-      </div>
+              <button (click)="closeModal()" class="btn btn-secondary">
+                Cancelar
+              </button>
+            </div>
+        </div>
     </div>
+</div>
 
-    <button
-      [disabled]="!exibirSenha ? !valorDeposito : !senha"
-      class="bg-indigo-600 text-white rounded-md py-2 mt-4 font-semibold hover:bg-indigo-700 transition w-full disabled:opacity-50"
-      (click)="confirmarDeposito()"
-    >
-      {{ exibirSenha ? 'Depositar' : 'Confirmar valor' }}
-    </button>
-
-    <button (click)="closeModal()" class="mt-2 text-gray-600 hover:text-gray-900">
-      Cancelar
-    </button>
-  </div>
-</body>
