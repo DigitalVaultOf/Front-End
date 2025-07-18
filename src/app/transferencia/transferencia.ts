@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class Transferencia {
   @Input() transferencia: any;
+  @Input() onReloadTable?: () => void;
   accountNumberTo: string = '';
   amount: number = 0.00;
   description: string = '';
@@ -77,10 +78,11 @@ export class Transferencia {
       password: this.password,
     };
 
-    this.http.post('https://localhost:7178/user/api/Transfer/Transfer', dto).subscribe({
+    this.http.post('http://localhost:5005/transfer/api/Transfer', dto).subscribe({
       next: (res: any) => {
         if (res?.data) {
           console.log('Transferência realizada com sucesso');
+          this.onReloadTable?.();
           this.closeModal();
         } else {
           this.mensagemErro = res?.message || 'Erro desconhecido na transferência.';
