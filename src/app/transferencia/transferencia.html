@@ -7,7 +7,7 @@
         
         <div class="modal-body">
             <div class="form-group">
-                <label class="form-label">Digite o valor da transferência</label>
+                <label *ngIf="!exibirSenha" class="form-label">Digite o valor da transferência</label>
                 <input
                   *ngIf="!exibirSenha"
                   type="number"
@@ -21,7 +21,7 @@
                   (paste) = "onPaste($event)"
                 />
                 
-                <label class="form-label">Digite o numero da conta</label>
+                <label *ngIf="!exibirSenha" class="form-label">Digite o numero da conta</label>
                 <input
                   *ngIf="!exibirSenha"
                   [(ngModel)]="accountNumberTo"
@@ -29,7 +29,7 @@
                   class="form-input" 
                 />
 
-                <label class="form-label">Descrição da transferencia</label>
+                <label *ngIf="!exibirSenha" class="form-label">Descrição da transferencia</label>
                 <input
                   *ngIf="!exibirSenha"
                   [(ngModel)]="description"

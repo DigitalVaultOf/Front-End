@@ -1,46 +1,53 @@
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-40"></div>
+<!-- Modal for boleto payment -->
+<div class="modal-overlay">
+  <div class="modal">
+      <div class="modal-header">
+          <h2 class="modal-title">Saque</h2>
+      </div>
+      
+      <div class="modal-body">
+          <div class="form-group">
+              <label *ngIf="!exibirSenha" class="form-label">Digite o valor que deseja sacar</label>
+                <input
+                *ngIf="!exibirSenha"
+                type="number"
+                [(ngModel)]="valor"
+                [min] = '0'
+                [step]="0.10"
+                #valorInput = "ngModel" 
+                placeholder="Digite o valor"
+                class="form-input"
+                (keydown) = "preventNegativeInput($event)"
+                (paste) = "onPaste($event)"
+              />
+              
+            <div *ngIf="exibirSenha" class="flex flex-col space-y-2">
+              <div>Valor a sacar: <strong>R$ {{ valor | number:'1.2-2' }}</strong></div>
+        
+              <input
+                type="password"
+                placeholder="Digite sua senha"
+                [(ngModel)]="senha"
+                (input)="mensagemErro = null"
+                class="form-input"
+              />
+        
+              <div *ngIf="mensagemErro" class="text-red-600 font-semibold">{{ mensagemErro }}</div>
+            </div>
 
-  <div class="fixed z-50 bg-white rounded-lg shadow-lg w-96 p-6 flex flex-col space-y-4 ">
-    <h2 class="text-xl font-semibold text-gray-800">Quanto você quer sacar?</h2>
+          <div class="action-buttons">
+            <button
+              [disabled]="!exibirSenha ? !valor : !senha"
+              (click)="sacar()"
+              class="btn btn-primary bg-indigo-600" id="payBtn"
+            >
+              {{ exibirSenha ? 'Confirmar saque' : 'Confirmar valor' }}
+            </button>
 
-    <input
-      *ngIf="!exibirSenha"
-      type="number"
-      [(ngModel)]="valor"
-      [min] = '0'
-      [step]="0.10"
-      #valorInput = "ngModel" 
-      placeholder="Digite o valor"
-      class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      (keydown) = "preventNegativeInput($event)"
-      (paste) = "onPaste($event)"
-    /><!--O valorInput faz com que o angular aponte a instancia ngModel, sendo responsável por gerenciar o estado do controle do formulário-->
-
-    <div *ngIf="exibirSenha" class="flex flex-col space-y-2">
-      <div>Valor a sacar: <strong>R$ {{ valor | number:'1.2-2' }}</strong></div>
-
-      <input
-        type="password"
-        placeholder="Digite sua senha"
-        [(ngModel)]="senha"
-        (input)="mensagemErro = null"
-        class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
-      />
-
-      <div *ngIf="mensagemErro" class="text-red-600 font-semibold">{{ mensagemErro }}</div>
-    </div>
-
-    <button
-      [disabled]="!exibirSenha ? !valor : !senha"
-      (click)="sacar()"
-      class="bg-indigo-600 text-white rounded-md py-2 font-semibold hover:bg-indigo-700 transition disabled:opacity-50 "
-    >
-      {{ exibirSenha ? 'Confirmar saque' : 'Confirmar valor' }}
-    </button>
-
-    <button (click)="closeModal()" class="mt-2 text-gray-600 hover:text-gray-900">
-      Cancelar
-    </button>
+            <button (click)="closeModal()" class="btn btn-secondary">
+              Cancelar
+            </button>
+          </div>
+      </div>
   </div>
-</body>
+</div>

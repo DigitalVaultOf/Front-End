@@ -1,66 +1,64 @@
-<body>
-    <div class="modal-overlay">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title">Pagar Boleto</h2>
+<div class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title">Pagar Boleto</h2>
+        </div>
+        
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Linha Digitável</label>
+                <input 
+                    type="text" 
+                    class="form-input" 
+                    id="barcodeInput"
+                    placeholder="Cole ou digite o código aqui..."
+                    maxlength="54"
+                >
+                <div class="input-actions">
+                    <button class="input-btn" onclick="pasteFromClipboard()">
+                        Boletos pendentes
+                    </button>
+                    <button class="input-btn" onclick="clearInput()">
+                        Boletos pagos
+                    </button>
+                </div>
+                <div class="error-message" id="errorMessage"></div>
             </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Validando boleto...</p>
+            </div>
+
+            <!-- <*ngIf =  class="warning-message" id="warningMessage">
+                <svg viewBox="0 0 24 24">
+                    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                </svg>
+                <span>Este boleto está vencido. Pode haver cobrança de juros.</span>
+            </div> -->
+
+            <!-- <div class="payment-row">
+                    <span class="payment-label">Valor:</span>
+                    <span class="payment-value amount" id="amount">R$ 156,75</span>
+                </div>
+                <div class="payment-row">
+                    <span class="payment-label">Vencimento:</span>
+                    <span class="payment-value" id="dueDate">15/07/2025</span>
+                </div>
+            </div> 
             
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Linha Digitável</label>
-                    <input 
-                        type="text" 
-                        class="form-input" 
-                        id="barcodeInput"
-                        placeholder="Cole ou digite o código aqui..."
-                        maxlength="54"
-                    >
-                    <div class="input-actions">
-                        <button class="input-btn" onclick="pasteFromClipboard()">
-                            Boletos pendentes
-                        </button>
-                        <button class="input-btn" onclick="clearInput()">
-                            Boletos pagos
-                        </button>
-                    </div>
-                    <div class="error-message" id="errorMessage"></div>
-                </div>
-
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <p>Validando boleto...</p>
-                </div>
-
-                <!-- <*ngIf =  class="warning-message" id="warningMessage">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
-                    </svg>
-                    <span>Este boleto está vencido. Pode haver cobrança de juros.</span>
-                </div> -->
-
-                <!-- <div class="payment-row">
-                        <span class="payment-label">Valor:</span>
-                        <span class="payment-value amount" id="amount">R$ 156,75</span>
-                    </div>
-                    <div class="payment-row">
-                        <span class="payment-label">Vencimento:</span>
-                        <span class="payment-value" id="dueDate">15/07/2025</span>
-                    </div>
-                </div> 
-                
-                **Tenho que verificar como buscar os dados do usuário logado e do boleto para exibir aqui.**
-                -->
+            **Tenho que verificar como buscar os dados do usuário logado e do boleto para exibir aqui.**
+            -->
 
 
-                <div class="action-buttons">
-                    <button class="btn btn-primary bg-indigo-600" id="payBtn" onclick="processPayment()" disabled>
-                        Pagar Boleto
-                    </button>
-                    <button class="btn btn-secondary" (click)="closeModal()">
-                        Cancelar
-                    </button>
-                </div>
+            <div class="action-buttons">
+                <button class="btn btn-primary bg-indigo-600" id="payBtn" onclick="processPayment()" disabled>
+                    Pagar Boleto
+                </button>
+                <button class="btn btn-secondary" (click)="closeModal()">
+                    Cancelar
+                </button>
             </div>
         </div>
     </div>
-</body>
+</div>
