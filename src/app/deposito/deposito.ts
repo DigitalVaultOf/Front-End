@@ -15,6 +15,7 @@ import { AlertService } from '../services/alert.service';
 })
 export class Deposito {
   @Input() deposito: any;
+  @Input() onReloadTable?: () => void;
   valorDeposito: number = 0.00;
   senha: string = '';
   mensagemErro: string | null = null;
@@ -95,6 +96,7 @@ export class Deposito {
             'Sucesso!',
             'Depósito realizado com sucesso!'
           );
+          this.onReloadTable?.();
           this.closeModal();
         } else {
           this.handleError(res?.message || 'Não foi possível realizar o depósito.');

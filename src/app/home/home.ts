@@ -38,6 +38,8 @@ import { DeletarConta } from '../deletar-conta/deletar-conta';
 import { UserService } from '../services/user.service';
 import { AlertService } from '../services/alert.service'; 
 import { ConfirmationService } from '../services/confirmation.service';
+import { Export } from '../export/export';
+
 
 @Component({
   selector: 'app-root',
@@ -93,6 +95,7 @@ export class Home implements OnInit {
   Payment = Payment;
   EditarConta = EditarConta;
   DeletarConta = DeletarConta;
+  Export = Export;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -344,14 +347,21 @@ export class Home implements OnInit {
         .centerHorizontally()
         .centerVertically(),
     });
-
+  
     const injector = this.createInjector(this.overlayRef);
     const portal = new ComponentPortal(component, null, injector);
     const componentRef = this.overlayRef.attach(portal);
+  
+    (componentRef.instance as any).onReloadTable = () => {
+      this.carregarMovimentacoes();
+      this.history();
+    };
+  
     this.overlayRef
       .backdropClick()
       .subscribe(() => componentRef.instance.closeModal());
   }
+  
 
   closeModal() {
     this.overlayRef?.dispose();
