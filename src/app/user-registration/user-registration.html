@@ -83,15 +83,12 @@
           "
           class="text-red-500 text-sm mt-1"
         >
-          <span *ngIf="registrationForm.get('cpf')?.errors?.['required']"
-            >CPF é obrigatório</span
-          >
-          <span *ngIf="registrationForm.get('cpf')?.errors?.['cpfIncompleto']"
-            >CPF deve conter 11 dígitos</span
-          >
-          <span *ngIf="registrationForm.get('cpf')?.errors?.['cpfRepetido']"
-            >CPF inválido</span
-          >
+          <span *ngIf="registrationForm.get('cpf')?.errors?.['required']">
+            CPF é obrigatório
+          </span>
+          <span *ngIf="registrationForm.get('cpf')?.errors?.['cpfInvalido']">
+            O CPF digitado é inválido
+          </span>
         </div>
       </div>
 
@@ -106,7 +103,6 @@
           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
           placeholder="********"
         />
-        <!-- Exibir erro da senha -->
         <div
           *ngIf="
             registrationForm.get('password')?.touched &&
@@ -114,12 +110,27 @@
           "
           class="text-red-500 text-sm mt-1"
         >
-          <span *ngIf="registrationForm.get('password')?.errors?.['required']"
-            >Senha é obrigatória</span
+          <div *ngIf="registrationForm.get('password')?.errors?.['required']">
+            Senha é obrigatória.
+          </div>
+          <div *ngIf="registrationForm.get('password')?.errors?.['minLength']">
+            A senha deve ter no mínimo 8 caracteres.
+          </div>
+          <div
+            *ngIf="registrationForm.get('password')?.errors?.['missingUppercase']"
           >
-          <span *ngIf="registrationForm.get('password')?.errors?.['minlength']"
-            >Senha deve ter pelo menos 6 caracteres</span
+            A senha deve conter pelo menos uma letra maiúscula.
+          </div>
+          <div
+            *ngIf="registrationForm.get('password')?.errors?.['missingSpecialChar']"
           >
+            A senha deve conter pelo menos um caractere especial (ex: !&#64;#$.,).
+          </div>
+          <div
+            *ngIf="registrationForm.get('password')?.errors?.['missingNumber']"
+          >
+            A senha deve conter pelo menos um número.
+          </div>
         </div>
       </div>
 
