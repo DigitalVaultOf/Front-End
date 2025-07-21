@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { tap, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { environment } from '../environments/environment';
+import { apigateway } from '../environments/apigateway';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +13,7 @@ export class AuthService {
   }
 
   private token: string | null = null;
-  private apiUrl = `${environment.API_URL}/auth/api/login`;
+  private apiUrl = `${apigateway.API_URL}/auth/api/login`;
 
   private isBrowser = typeof window !== 'undefined' && !!window.localStorage;
 

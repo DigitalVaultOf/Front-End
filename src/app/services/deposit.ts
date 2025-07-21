@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from '../environments/environment';
+import { apigateway } from '../environments/apigateway';
 @Injectable({
   providedIn: 'root'
 })
 export class Deposit {
 
-  private apiUrl = `${environment.API_URL}/movimentation/api/`;
+  private apiUrl = `${apigateway.API_URL}/movimentation/api/`;
 
   constructor(private http: HttpClient) { }
 

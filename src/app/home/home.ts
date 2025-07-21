@@ -158,52 +158,88 @@ export class Home implements OnInit {
     }
   }
 
-  history() {
-    this.extrato.getHistory().subscribe({
-      next: (res) => {
+ history() {
+  this.extrato.getHistory().subscribe({
+    next: (res) => {
+      setTimeout(() => {
         this.valores = res.data;
-      },
-      error: (err) => console.error('Erro ao carregar valores:', err),
-    });
-  }
+        this.cdr.detectChanges();
+      }, 0);
+    },
+    error: (err) => {
+      console.error('Erro ao carregar valores:', err);
+      setTimeout(() => {
+        this.cdr.detectChanges();
+      }, 0);
+    },
+  });
+}
 
-  carregarMovimentacoes(){
-    this.carregandoTransacoes = true; 
-    this.extrato.getHistoryPaginated(this.paginaAtual, this.itensPorPagina).subscribe({
-      next: (res) => {
-        setTimeout(() => {
-        console.log('respo', res);
-        this.movimentacoes = res.data.pages; // Atribui array de objetos à variável valores
-        this.totalItens = res.data.totalCount; // Atualiza o total de itens
-        this.totalPaginas = Math.ceil(this.totalItens / this.itensPorPagina); // Calcula o total de páginas
-        this.carregandoTransacoes = false; // Finaliza o carregamento
+carregarMovimentacoes(){
+  this.carregandoTransacoes = true; 
+  this.extrato.getHistoryPaginated(this.paginaAtual, this.itensPorPagina).subscribe({
+    next: (res) => {
+      console.log('respo', res);
+      
+      // ✅ USAR setTimeout PARA TODAS AS MUDANÇAS:
+      setTimeout(() => {
+        this.movimentacoes = res.data.pages;
+        this.totalItens = res.data.totalCount;
+        this.totalPaginas = Math.ceil(this.totalItens / this.itensPorPagina);
+        this.carregandoTransacoes = false;
+        
         console.log('totalItens:', this.totalItens);
         console.log('itensPorPagina:', this.itensPorPagina);
         console.log('totalPaginas:', this.totalPaginas);
         console.log('Paginação visível (totalPaginas > 1):', this.totalPaginas > 1);
 
-      this.cdr.detectChanges(); // Garante que a view seja atualizada
-      });},
-      error: (err) => {
-        console.error('Erro ao carregar movimentações:', err);
-        this.carregandoTransacoes = false; // Finaliza o carregamento mesmo em caso de erro
-      },
-    });
-  }
+        this.cdr.detectChanges();
+      }, 0);
+    },
+    error: (err) => {
+      console.error('Erro ao carregar movimentações:', err);
+      // ✅ USAR setTimeout TAMBÉM NO ERRO:
+      setTimeout(() => {
+        this.carregandoTransacoes = false;
+        this.cdr.detectChanges();
+      }, 0);
+    },
+  });
+}
 
   carregarMovimentacoesSemana() {
-    this.extrato.getMovimentacoesUltimaSemana().subscribe({
-      next: (res) => (this.valores = res.data),
-      error: (err) => console.error('Erro ao carregar semana:', err),
-    });
-  }
+  this.extrato.getMovimentacoesUltimaSemana().subscribe({
+    next: (res) => {
+      setTimeout(() => {
+        this.valores = res.data;
+        this.cdr.detectChanges();
+      }, 0);
+    },
+    error: (err) => {
+      console.error('Erro ao carregar semana:', err);
+      setTimeout(() => {
+        this.cdr.detectChanges();
+      }, 0);
+    },
+  });
+}
 
-  carregarMovimentacoesMes() {
-    this.extrato.carregarMovimentacoesMes().subscribe({
-      next: (res) => (this.valores = res.data),
-      error: (err) => console.error('Erro ao carregar mês:', err),
-    });
-  }
+carregarMovimentacoesMes() {
+  this.extrato.carregarMovimentacoesMes().subscribe({
+    next: (res) => {
+      setTimeout(() => {
+        this.valores = res.data;
+        this.cdr.detectChanges();
+      }, 0);
+    },
+    error: (err) => {
+      console.error('Erro ao carregar mês:', err);
+      setTimeout(() => {
+        this.cdr.detectChanges();
+      }, 0);
+    },
+  });
+}
 
   loadAccount() {
     this.user.getUser().subscribe({

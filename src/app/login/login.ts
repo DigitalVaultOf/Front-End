@@ -22,6 +22,7 @@ export class Login {
   showAccountSelection = false;
   accountOptions: string[] = [];
   selectedAccount: string = '';
+  isLoading = false;
 
   constructor(
     private auth: AuthService,
@@ -58,29 +59,29 @@ export class Login {
   }
 
   login() {
+    if (this.isLoading) return;
+
     const trimmedInput = this.loginInput.trim();
     const trimmedPassword = this.password.trim();
 
-    // Validações
-    if (!trimmedInput) {
+    // Validações iniciais
+    if (!trimmedInput || !trimmedPassword) {
       this.alertService.showWarning(
         'Campo obrigatório',
-        'Por favor, informe o número da conta, CPF ou e-mail.'
+        !trimmedInput
+          ? 'Por favor, informe o número da conta, CPF ou e-mail.'
+          : 'Por favor, informe sua senha.'
       );
       return;
     }
 
-    if (!trimmedPassword) {
-      this.alertService.showWarning(
-        'Campo obrigatório',
-        'Por favor, informe sua senha.'
-      );
-      return;
-    }
+    this.isLoading = true;
+    console.log('⏱️ Login iniciado:', new Date().toISOString());
+    const startTime = Date.now();
 
     const payload: any = { password: trimmedPassword };
 
-    // Detectar tipo de entrada
+    // Detectar tipo de entrada e configurar payload
     if (trimmedInput.includes('@')) {
       payload.email = trimmedInput;
     } else if (trimmedInput.replace(/\D/g, '').length === 11) {
@@ -89,41 +90,61 @@ export class Login {
       payload.accountNumber = trimmedInput;
     }
 
-    // Fazer login
+    // Timer para garantir máximo de 3 segundos
+    const maxTimeout = setTimeout(() => {
+      console.log(
+        '⚠️ Timeout máximo atingido:',
+        (Date.now() - startTime) / 1000,
+        'segundos'
+      );
+      this.isLoading = false;
+      this.alertService.showError(
+        'Ops! Algo deu errado...',
+        'Tempo limite de conexão excedido. Tente novamente.'
+      );
+      this.cdr.detectChanges();
+    }, 3000);
+
+    const minDelay = 1000; // 1 segundo; // Delay mínimo de 1 segundo
+
     this.auth.login(payload).subscribe({
       next: (response: any) => {
-        if (
-          !response.data.token &&
-          response.data.accountNumbers &&
-          response.data.accountNumbers.length > 0
-        ) {
-          // Múltiplas contas - mostrar seleção
-          this.accountOptions = response.data.accountNumbers;
-          this.showAccountSelection = true;
+        const elapsedTime = Date.now() - startTime;
+        console.log('✅ Login bem sucedido em:', elapsedTime / 1000, 'segundos');
+
+        const remainingDelay = Math.max(0, minDelay - elapsedTime);
+        console.log('⏳ Delay adicional:', remainingDelay / 1000, 'segundos');
+
+        setTimeout(() => {
+          clearTimeout(maxTimeout);
+
+          if (!response.data.token && response.data.accountNumbers?.length > 0) {
+            this.accountOptions = response.data.accountNumbers;
+            this.showAccountSelection = true;
+          } else {
+            this.loggedIn = true;
+            this.alertService.showSuccess('Sucesso!', 'Login realizado com sucesso!');
+            this.router.navigate(['/home']);
+          }
+          this.isLoading = false;
           this.cdr.detectChanges();
-        } else {
-          // Login direto com sucesso
-          this.loggedIn = true;
-          this.alertService.showSuccess(
-            'Sucesso!',
-            'Login realizado com sucesso!'
-          );
-          this.cdr.detectChanges();
-          this.router.navigate(['/home']);
-        }
+        }, remainingDelay);
       },
       error: (err: HttpErrorResponse) => {
-        if (err.error && err.error.data && err.error.data.accountNumbers) {
-          // Erro que contém múltiplas contas
+        const elapsedTime = Date.now() - startTime;
+        console.log('❌ Erro no login após:', elapsedTime / 1000, 'segundos');
+
+        clearTimeout(maxTimeout);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+
+        if (err.error?.data?.accountNumbers) {
           this.accountOptions = err.error.data.accountNumbers;
           this.showAccountSelection = true;
-          this.cdr.detectChanges();
         } else {
           this.alertService.showError(
             'Ops! Algo deu errado...',
-            err.error?.message ||
-              err.message ||
-              'Algo deu errado ao realizar login.'
+            err.error?.message || err.message || 'Algo deu errado ao realizar login.'
           );
         }
       },

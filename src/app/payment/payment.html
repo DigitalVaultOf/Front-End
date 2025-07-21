@@ -1,64 +1,391 @@
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+/>
+
 <div class="modal-overlay">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 class="modal-title">Pagar Boleto</h2>
-        </div>
-        
-        <div class="modal-body">
-            <div class="form-group">
-                <label class="form-label">Linha Digitável</label>
-                <input 
-                    type="text" 
-                    class="form-input" 
-                    id="barcodeInput"
-                    placeholder="Cole ou digite o código aqui..."
-                    maxlength="54"
-                >
-                <div class="input-actions">
-                    <button class="input-btn" onclick="pasteFromClipboard()">
-                        Boletos pendentes
-                    </button>
-                    <button class="input-btn" onclick="clearInput()">
-                        Boletos pagos
-                    </button>
-                </div>
-                <div class="error-message" id="errorMessage"></div>
-            </div>
-
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Validando boleto...</p>
-            </div>
-
-            <!-- <*ngIf =  class="warning-message" id="warningMessage">
-                <svg viewBox="0 0 24 24">
-                    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
-                </svg>
-                <span>Este boleto está vencido. Pode haver cobrança de juros.</span>
-            </div> -->
-
-            <!-- <div class="payment-row">
-                    <span class="payment-label">Valor:</span>
-                    <span class="payment-value amount" id="amount">R$ 156,75</span>
-                </div>
-                <div class="payment-row">
-                    <span class="payment-label">Vencimento:</span>
-                    <span class="payment-value" id="dueDate">15/07/2025</span>
-                </div>
-            </div> 
-            
-            **Tenho que verificar como buscar os dados do usuário logado e do boleto para exibir aqui.**
-            -->
-
-
-            <div class="action-buttons">
-                <button class="btn btn-primary bg-indigo-600" id="payBtn" onclick="processPayment()" disabled>
-                    Pagar Boleto
-                </button>
-                <button class="btn btn-secondary" (click)="closeModal()">
-                    Cancelar
-                </button>
-            </div>
-        </div>
+  <div class="modal">
+    <div class="modal-header">
+      <button
+        class="voltar-btn"
+        *ngIf="mostrarBotaoVoltar()"
+        (click)="voltarTela()"
+      >
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h2 class="modal-title">
+        {{ exibirListaPendentes ? 'Boletos Pendentes' : 
+           exibirListaPagos ? 'Boletos Pagos' : 'Pagar Boleto' }}
+      </h2>
+      <button class="close-btn" (click)="closeModal()">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
+
+    <div class="modal-body">
+      <!-- ✅ LISTA DE BOLETOS PENDENTES -->
+      <div *ngIf="exibirListaPendentes" class="boletos-list">
+        <div *ngIf="carregandoLista" class="loading-container">
+          <i class="fas fa-spinner fa-spin"></i>
+          <span>Carregando boletos pendentes...</span>
+        </div>
+
+        <div *ngIf="!carregandoLista && boletosPendentes.length > 0" class="boletos-grid">
+          <div *ngFor="let boleto of boletosPendentes" class="boleto-card">
+            <div class="boleto-header">
+              <div class="boleto-info">
+                <span class="boleto-number">{{ boleto.bankSlipNumber }}</span>
+                <span class="boleto-description">{{ boleto.description || 'Sem descrição' }}</span>
+              </div>
+              <div class="boleto-amount">{{ formatarValor(boleto.amount) }}</div>
+            </div>
+            
+            <div class="boleto-details">
+              <div class="detail-item">
+                <i class="fas fa-calendar me-1"></i>
+                <span>Vencimento: {{ formatarData(boleto.dueDate) }}</span>
+              </div>
+              <div class="detail-item">
+                <i class="fas fa-user me-1"></i>
+                <span>{{ boleto.customer }}</span>
+              </div>
+            </div>
+
+            <div class="boleto-actions">
+              <button 
+                class="btn btn-primary btn-sm" 
+                (click)="pagarBoletoDaLista(boleto)"
+              >
+                <i class="fas fa-credit-card me-1"></i>
+                Pagar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!carregandoLista && boletosPendentes.length === 0" class="empty-state">
+          <i class="fas fa-check-circle"></i>
+          <h3>Eba! Nada por aqui...</h3>
+          <p>{{ mensagemLista || 'Você está em dia com os pagamentos!' }}</p>
+        </div>
+      </div>
+
+      <!-- ✅ LISTA DE BOLETOS PAGOS -->
+      <div *ngIf="exibirListaPagos" class="boletos-list">
+        <div *ngIf="carregandoLista" class="loading-container">
+          <i class="fas fa-spinner fa-spin"></i>
+          <span>Carregando boletos pagos...</span>
+        </div>
+
+        <div *ngIf="!carregandoLista && boletosPagos.length > 0" class="boletos-grid">
+          <div *ngFor="let boleto of boletosPagos" class="boleto-card paid">
+            <div class="boleto-header">
+              <div class="boleto-info">
+                <span class="boleto-number">{{ boleto.bankSlipNumber }}</span>
+                <span class="boleto-description">{{ boleto.description || 'Sem descrição' }}</span>
+              </div>
+              <div class="boleto-amount paid">{{ formatarValor(boleto.amountBeforePay) }}</div>
+            </div>
+            
+            <div class="boleto-details">
+              <div class="detail-item">
+                <i class="fas fa-calendar-check me-1"></i>
+                <span>Pago em: {{ formatarData(boleto.paymentDate) }}</span>
+              </div>
+              <div class="detail-item">
+                <i class="fas fa-user me-1"></i>
+                <span>{{ boleto.customer }}</span>
+              </div>
+            </div>
+
+            <div class="boleto-status">
+              <span class="status-badge paid">
+                <i class="fas fa-check me-1"></i>
+                Pago
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!carregandoLista && boletosPagos.length === 0" class="empty-state">
+          <i class="fas fa-file-invoice"></i>
+          <h3>Nenhum boleto pago</h3>
+          <p>{{ mensagemLista || 'Você ainda não possui boletos pagos.' }}</p>
+        </div>
+      </div>
+
+      <!-- ✅ MENSAGEM DE SUCESSO - Boleto gerado -->
+      <div *ngIf="mostrarSucessoGeracao" class="flex flex-col space-y-4">
+        <div class="success-message-container">
+          <div class="success-message">
+            <i class="fas fa-check-circle me-2"></i>
+            <div class="success-content">
+              <div class="success-title">
+                Boleto de R$ {{ valorBoletoGerado | number : "1.2-2" }} gerado
+                com sucesso!
+              </div>
+              <div class="success-subtitle">
+                Clique abaixo para copiar o código do boleto
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="copy-container">
+          <button
+            class="btn-copy"
+            (click)="copiarCodigoBoleto()"
+            title="Clique para copiar o código do boleto"
+          >
+            <i class="fas fa-copy me-2"></i>
+            {{ numeroBoleto }}
+            <span class="copy-hint">Clique para copiar</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tela inicial - Número do boleto -->
+      <div
+        class="form-group"
+        *ngIf="
+          !exibirValorParcial &&
+          !exibirSenha &&
+          !exibirGerarBoleto &&
+          !mostrarSucessoGeracao &&
+          !exibirListaPendentes &&
+          !exibirListaPagos
+        "
+      >
+        <div class="floating-field">
+          <input
+            type="text"
+            class="form-input"
+            [value]="numeroBoleto"
+            (input)="onBoletoInput($event)"
+            placeholder=""
+            maxlength="18"
+            pattern="[0-9]*"
+            inputmode="numeric"
+            id="numeroBoleto"
+            required
+          />
+          <label for="numeroBoleto" 
+                 title="Digite apenas números do boleto (máx. 18 dígitos)..." 
+                 data-title="Número do boleto">
+          </label>
+        </div>
+
+        <div class="input-actions mt-2">
+          <button class="btn btn-secondary btn-sm" (click)="gerarBoleto()">
+            <i class="fas fa-file-invoice me-1"></i>
+            Gerar boleto
+          </button>
+          <button class="btn btn-secondary btn-sm" (click)="pagarRapidamente()">
+            <i class="fas fa-bolt me-1"></i>
+            Pagar rapidamente
+          </button>
+          <button
+            class="btn btn-secondary btn-sm"
+            (click)="listarBoletosPendentes()"
+          >
+            <i class="fas fa-clock me-1"></i>
+            Pendentes
+          </button>
+          <button
+            class="btn btn-secondary btn-sm"
+            (click)="listarBoletosPagos()"
+          >
+            <i class="fas fa-check me-1"></i>
+            Pagos
+          </button>
+        </div>
+
+        <div
+          class="input-validation"
+          *ngIf="numeroBoleto && numeroBoleto.length >= 1"
+        >
+          <!-- Loading da validação -->
+          <div *ngIf="validandoBoleto" class="validation-loading">
+            <i class="fas fa-spinner fa-spin me-2"></i>
+            <span>Validando boleto...</span>
+          </div>
+
+          <!-- Resultado da validação com suporte a mensagem amarela -->
+          <div
+            *ngIf="!validandoBoleto && boletoValidado"
+            class="validation-result"
+            [class.valid]="getTipoMensagemValidacao() === 'valid'"
+            [class.invalid]="getTipoMensagemValidacao() === 'invalid'"
+            [class.already-paid]="getTipoMensagemValidacao() === 'already-paid'"
+          >
+            <i
+              [class]="
+                getTipoMensagemValidacao() === 'valid' ? 'fas fa-check-circle' : 
+                getTipoMensagemValidacao() === 'already-paid' ? 'fas fa-exclamation-triangle' :
+                'fas fa-times-circle'
+              "
+            ></i>
+            <span>{{ mensagemValidacao }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tela de geração de boleto -->
+      <div *ngIf="exibirGerarBoleto" class="flex flex-col space-y-4">
+        <div class="form-group">
+          <div class="floating-field">
+            <input
+              type="number"
+              class="form-input"
+              [(ngModel)]="valorGeracao"
+              (input)="validarGeracaoBoleto()"
+              [min]="1"
+              step="0.01"
+              placeholder=""
+              id="valorGeracao"
+              required
+            />
+            <label for="valorGeracao" 
+                   title="Digite o valor do boleto..." 
+                   data-title="Valor do boleto">
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="floating-field">
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="descricaoGeracao"
+              (input)="validarGeracaoBoleto()"
+              maxlength="500"
+              placeholder=""
+              id="descricaoGeracao"
+              required
+            />
+            <label for="descricaoGeracao" 
+                   title="Descreva o boleto (ex: Mensalidade Janeiro/2025)..." 
+                   data-title="Descrição">
+            </label>
+          </div>
+        </div>
+
+        @if (mensagemErroGeracao) {
+        <span class="text-red-500 text-sm">{{ mensagemErroGeracao }}</span>
+        }
+      </div>
+
+      <!-- Tela de valor parcial -->
+      <div *ngIf="exibirValorParcial" class="flex flex-col space-y-4">
+        <div class="flex justify-between items-center">
+          <span class="text-gray-600">Valor total do boleto:</span>
+          <strong class="text-lg"
+            >R$ {{ valorBoleto | number : "1.2-2" }}</strong
+          >
+        </div>
+
+        <div class="form-group">
+          <div class="floating-field">
+            <input
+              type="number"
+              class="form-input"
+              [(ngModel)]="valorPagamento"
+              (input)="validarValorPagamento()"
+              [max]="valorBoleto"
+              [min]="valorMinimo"
+              step="0.01"
+              placeholder=""
+              id="valorPagamento"
+              required
+            />
+            <label for="valorPagamento" 
+                   title="Digite o valor que deseja pagar..." 
+                   data-title="Valor a pagar">
+            </label>
+          </div>
+
+          @if (mensagemErroValor) {
+          <span class="text-red-500 text-sm mt-1">{{ mensagemErroValor }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- Tela de senha -->
+      <div *ngIf="exibirSenha" class="flex flex-col space-y-4">
+        <div class="flex justify-between items-center">
+          <span class="text-gray-600">Valor a pagar:</span>
+          <strong class="text-lg"
+            >R$ {{ valorPagamento | number : "1.2-2" }}</strong
+          >
+        </div>
+
+        <div class="form-group">
+          <div class="floating-field">
+            <input
+              type="password"
+              class="form-input"
+              [(ngModel)]="senha"
+              (input)="onSenhaChange()"
+              placeholder=""
+              id="senha"
+              required
+            />
+            <label for="senha" 
+                   title="Digite sua senha..." 
+                   data-title="Digite sua senha">
+            </label>
+          </div>
+
+          @if (mensagemErro) {
+          <div class="text-red-600 font-semibold mt-2">
+            {{ mensagemErro }}
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Botões de ação -->
+      <div class="action-buttons" *ngIf="!exibirListaPendentes && !exibirListaPagos">
+        <button
+          [disabled]="!permitirAvancar()"
+          class="btn btn-primary bg-indigo-600"
+          (click)="avancarEtapa()"
+        >
+          <div class="button-content">
+            @if (isLoading) {
+            <svg
+              class="animate-spin h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            }
+            <span class="button-text">
+              {{ getTextoBotaoPrincipal() }}
+            </span>
+            <span *ngIf="isLoading" class="dots"></span>
+          </div>
+        </button>
+
+        <button class="btn btn-secondary" (click)="closeModal()">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

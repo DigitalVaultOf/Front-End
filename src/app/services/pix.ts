@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../environments/environment';
+import { apigateway } from '../environments/apigateway';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Observable } from 'rxjs';
@@ -13,8 +13,8 @@ export interface PixResponse<T> {
   providedIn: 'root',
 })
 export class PixS {
-  private apiUrl = `${environment.API_URL}/pix/api/`;
-  private apiUrl2 = `${environment.API_URL}/userpix/api/`;
+  private apiUrl = `${apigateway.API_URL}/pix/api/`;
+  private apiUrl2 = `${apigateway.API_URL}/userpix/api/`;
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 
