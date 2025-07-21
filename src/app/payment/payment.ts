@@ -115,19 +115,6 @@ export class Payment implements OnInit {
   }
 
   private validarBoletoAutomatico() {
-    console.log('🔵 validarBoletoAutomatico chamado!');
-
-    // 🔍 DEBUG: Estados antes da validação
-    console.log('📊 Estados ANTES da validação:', {
-      validandoBoleto: this.validandoBoleto,
-      exibirValorParcial: this.exibirValorParcial,
-      exibirSenha: this.exibirSenha,
-      exibirGerarBoleto: this.exibirGerarBoleto,
-      mostrarSucessoGeracao: this.mostrarSucessoGeracao,
-      numeroBoleto: this.numeroBoleto,
-      numeroBoletoLength: this.numeroBoleto?.length,
-    });
-
     console.log('🔄 Setando validandoBoleto = true');
     this.validandoBoleto = true;
 
