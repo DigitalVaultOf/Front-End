@@ -36,7 +36,7 @@ export class UserRegistration implements OnInit {
     private alertService: AlertService,
     private cdr: ChangeDetectorRef
   ) {}
-  
+
   // O seu ngOnInit e outros métodos permanecem os mesmos...
   ngOnInit(): void {
     this.registrationForm = this.fb.group(
@@ -44,7 +44,7 @@ export class UserRegistration implements OnInit {
         name: ['', [Validators.required, Validators.minLength(2)]],
         email: ['', [Validators.required, Validators.email]],
         cpf: ['', [Validators.required, this.cpfValidator.bind(this)]],
-        password: ['', [Validators.required, Validators.minLength(6)]],
+        password: ['', [Validators.required, this.strongPasswordValidator()]],
         confirmPassword: ['', Validators.required],
       },
       { validators: this.passwordMatchValidator }
@@ -53,16 +53,79 @@ export class UserRegistration implements OnInit {
 
   cpfValidator(control: AbstractControl): { [key: string]: any } | null {
     if (!control.value) {
-      return null;
+      return null; // Deixa passar se estiver vazio (o 'required' cuida disso)
     }
-    const cpfNumbers = control.value.replace(/\D/g, '');
-    if (cpfNumbers.length !== 11) {
-      return { cpfIncompleto: true };
+
+    // 1. Limpa a máscara, pegando apenas os números
+    const cpf = control.value.replace(/\D/g, '');
+
+    // 2. Validações básicas que você já tinha
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
+      return { cpfInvalido: true };
     }
-    if (/^(\d)\1{10}$/.test(cpfNumbers)) {
-      return { cpfRepetido: true };
+
+    // 3. Cálculo do primeiro dígito verificador
+    let soma = 0;
+    for (let i = 0; i < 9; i++) {
+      soma += parseInt(cpf.charAt(i)) * (10 - i);
     }
+    let resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) {
+      resto = 0;
+    }
+    if (resto !== parseInt(cpf.charAt(9))) {
+      return { cpfInvalido: true }; // Retorna erro se o primeiro dígito estiver incorreto
+    }
+
+    // 4. Cálculo do segundo dígito verificador
+    soma = 0;
+    for (let i = 0; i < 10; i++) {
+      soma += parseInt(cpf.charAt(i)) * (11 - i);
+    }
+    resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) {
+      resto = 0;
+    }
+    if (resto !== parseInt(cpf.charAt(10))) {
+      return { cpfInvalido: true }; // Retorna erro se o segundo dígito estiver incorreto
+    }
+
+    // 5. Se passou por todas as validações, o CPF é válido
     return null;
+  }
+
+  strongPasswordValidator(): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      if (!control.value) {
+        return null; // Se o campo estiver vazio, o 'required' cuidará disso
+      }
+
+      const password = control.value;
+      const errors: any = {};
+
+      // Regra 1: Mínimo de 8 caracteres
+      if (password.length < 8) {
+        errors.minLength = true;
+      }
+
+      // Regra 2: Pelo menos uma letra maiúscula
+      if (!/[A-Z]/.test(password)) {
+        errors.missingUppercase = true;
+      }
+
+      // Regra 3: Pelo menos um caractere especial
+      if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+        errors.missingSpecialChar = true;
+      }
+
+      // Regra 4: Pelo menos um número
+      if (!/\d/.test(password)) {
+        errors.missingNumber = true;
+      }
+
+      // Se o objeto 'errors' não estiver vazio, retorna os erros. Senão, retorna nulo (válido).
+      return Object.keys(errors).length > 0 ? errors : null;
+    };
   }
 
   passwordMatchValidator: ValidatorFn = (
@@ -70,10 +133,17 @@ export class UserRegistration implements OnInit {
   ): { [key: string]: boolean } | null => {
     const password = control.get('password');
     const confirmPassword = control.get('confirmPassword');
-    if (password && confirmPassword && password.value !== confirmPassword.value) {
+    if (
+      password &&
+      confirmPassword &&
+      password.value !== confirmPassword.value
+    ) {
       confirmPassword.setErrors({ passwordMismatch: true });
       return { passwordMismatch: true };
-    } else if (confirmPassword && confirmPassword.hasError('passwordMismatch')) {
+    } else if (
+      confirmPassword &&
+      confirmPassword.hasError('passwordMismatch')
+    ) {
       confirmPassword.setErrors(null);
     }
     return null;
@@ -87,7 +157,7 @@ export class UserRegistration implements OnInit {
       }
     });
   }
-  
+
   closeErrorModal(): void {
     this.showErrorModal = false;
     this.errorMessage = '';
@@ -112,20 +182,24 @@ export class UserRegistration implements OnInit {
       password: formValues.password,
     };
 
-    this.userService.CreateUserWithAccount(payload)
+    this.userService
+      .CreateUserWithAccount(payload)
       .pipe(
         // 2. O FINALIZE GARANTE QUE O LOADING SEMPRE SERÁ DESATIVADO
         finalize(() => {
           this.isLoading = false;
           // Forçamos a detecção para garantir que a interface (botão/spinner) seja atualizada
-          this.cdr.detectChanges(); 
+          this.cdr.detectChanges();
         })
       )
       .subscribe({
         next: (response) => {
           // 3. O 'next' agora só se preocupa com a lógica de negócio
           if (response && response.data) {
-            this.alertService.showSuccess('Sucesso!', 'Cadastro realizado com sucesso!');
+            this.alertService.showSuccess(
+              'Sucesso!',
+              'Cadastro realizado com sucesso!'
+            );
             this.router.navigate(['/login']);
           } else {
             // Erro de negócio (CPF duplicado, etc.)
