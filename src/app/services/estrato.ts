@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../environments/environment';
+import { apigateway } from '../environments/apigateway';
 
 
 export interface Movimentacao {
@@ -37,7 +37,7 @@ export interface ResponseModel<T> {
   providedIn: 'root',
 })
 export class Estrato {
-  private apiUrl = `${environment.API_URL}/movimentation/api/`;
+  private apiUrl = `${apigateway.API_URL}/movimentation/api/`;
 
   constructor(private http: HttpClient) {}
 

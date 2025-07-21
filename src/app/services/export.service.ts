@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../environments/environment';
+import { apigateway } from '../environments/apigateway';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ExportService {
-  private apiUrl = `${environment.API_URL}/api/Report/`; 
+  private apiUrl = `${apigateway.API_URL}/api/Report/`; 
 
   constructor(private http: HttpClient) {}
 
