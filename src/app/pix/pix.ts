@@ -178,6 +178,8 @@ export class Pix {
         console.log("Erro")
       }
     });
+    this.closeModal();
+    this.cdr.detectChanges();
   }
   criarPix(): void{
     const data = {
@@ -192,5 +194,7 @@ export class Pix {
         console.log(res.message)
       }
     });
+    this.closeModal();
+    this.cdr.detectChanges();
   }
 }
