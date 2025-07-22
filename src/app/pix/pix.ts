@@ -4,6 +4,7 @@ import { PixS, PixResponse } from '../services/pix';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { AlertService } from '../services/alert.service';
 
 @Component({
   selector: 'app-pix',
@@ -36,7 +37,8 @@ export class Pix {
   constructor(
     private overlayRef: OverlayRef,
     private cdr: ChangeDetectorRef,
-    private pixService: PixS
+    private pixService: PixS,
+    private alertService: AlertService
   ) {}
 
   ngOnInit(): void {
@@ -174,11 +176,13 @@ export class Pix {
     this.pixService.makePix(data).subscribe({
       next: (res) =>{
         console.log(res.data)
-      }, error: () => {
+        this.alertService.showSuccess("Sucesso ","Sucesso ao enviar pix")
+        this.closeModal();
+      }, error: (err) => {
         console.log("Erro")
+        this.alertService.showError("Error", "Error ao enviar pix")
       }
     });
-    this.closeModal();
     this.cdr.detectChanges();
   }
   criarPix(): void{
@@ -190,8 +194,11 @@ export class Pix {
     this.pixService.makePixKey(data).subscribe({
       next: (res) =>{
         console.log(res.data)
+        this.alertService.showSuccess("Sucesso ","Sucesso ao criar")
+        this.closeModal();
       }, error: (res) => {
         console.log(res.message)
+        this.alertService.showError("Error", "Error ao criar chave")
       }
     });
     this.closeModal();
