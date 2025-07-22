@@ -1,26 +1,32 @@
-import { HttpInterceptorFn } from '@angular/common/http';
-import { PLATFORM_ID, inject } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  // 1. Injeta o platformId para saber onde estamos rodando.
-  const platformId = inject(PLATFORM_ID);
-
-  // 2. Só tenta acessar o localStorage se estiver no navegador.
-  if (isPlatformBrowser(platformId)) {
-    const token = localStorage.getItem('token');
-
-    if (token) {
-      const cloned = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return next(cloned);
-    }
+  const authService = inject(AuthService);
+  
+  // Adicionar token se existir
+  const token = authService.getToken();
+  if (token) {
+    req = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`
+      }
+    });
   }
 
-  // 3. Se não estiver no navegador ou se não houver token,
-  // a requisição original continua sem o cabeçalho de autorização.
-  return next(req);
+  return next(req).pipe(
+    catchError((error: HttpErrorResponse) => {
+      // ✅ Capturar erros de token expirado/inválido
+      if (error.status === 401 || error.status === 403) {
+        console.log('🚨 Token inválido/expirado detectado pelo backend');
+        authService.logoutDueToExpiration();
+        return throwError(() => error);
+      }
+      
+      return throwError(() => error);
+    })
+  );
 };
