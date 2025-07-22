@@ -23,6 +23,6 @@ export class AiService {
 
   askQuestion(question: string): Observable<ChatbotResponseDto> {
     const payload: AskQuestionDto = { question: question };
-    return this.http.post<ChatbotResponseDto>(`${this.API_URL}/ask`, payload);
+    return this.http.post<ChatbotResponseDto>(`${this.API_URL}/Ask`, payload);
   }
 }

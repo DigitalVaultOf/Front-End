@@ -41,6 +41,7 @@ import { AlertService } from '../services/alert.service';
 import { ConfirmationService } from '../services/confirmation.service';
 import { Export } from '../export/export';
 import { OverlayManagerService } from '../services/overlay-manager.service';
+import { AiChatbot } from "../ai/ai";
 
 @Component({
   selector: 'app-root',
@@ -51,7 +52,8 @@ import { OverlayManagerService } from '../services/overlay-manager.service';
     OverlayModule,
     PortalModule,
     FontAwesomeModule,
-  ],
+    AiChatbot
+],
   templateUrl: './home.html',
   styleUrls: ['./home.scss'],
 })
