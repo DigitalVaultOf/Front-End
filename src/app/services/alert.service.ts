@@ -6,15 +6,23 @@ import {
   AlertData,
   ALERT_DATA,
 } from '../alert.component/alert.component';
+import { OverlayManagerService } from './overlay-manager.service'; // ✅ 1. ADICIONAR IMPORT
 
 @Injectable({
   providedIn: 'root',
 })
 export class AlertService {
-  constructor(private overlay: Overlay, private injector: Injector) {}
+  constructor(
+    private overlay: Overlay, 
+    private injector: Injector,
+    private overlayManager: OverlayManagerService // ✅ 2. INJETAR O SERVIÇO
+  ) {}
 
   show(data: AlertData): void {
     const overlayRef = this.overlay.create({});
+
+    // ✅ 3. REGISTRAR O ALERT NO OVERLAY MANAGER
+    this.overlayManager.registerAlert(overlayRef, `AlertService-${data.type}`);
 
     const customInjector = Injector.create({
       parent: this.injector,
@@ -35,6 +43,7 @@ export class AlertService {
       message,
     });
   }
+  
   showError(title: string, message: string) {
     this.show({
       type: 'error',
@@ -42,6 +51,7 @@ export class AlertService {
       message,
     });
   }
+  
   showWarning(title: string, message: string) {
     this.show({
       type: 'warning',

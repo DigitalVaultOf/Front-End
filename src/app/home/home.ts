@@ -11,7 +11,7 @@ import {
   Inject,
   PLATFORM_ID,
 } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { NavigationStart, RouterOutlet } from '@angular/router';
 import { Router } from '@angular/router';
 import { Transferencia } from '../transferencia/transferencia';
 import { Deposito } from '../deposito/deposito';
@@ -22,7 +22,7 @@ import { EditarConta } from '../editar-conta/editar-conta';
 import { Overlay, OverlayModule, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal, PortalModule } from '@angular/cdk/portal';
 import { AuthService } from '../services/auth.service';
-import { interval, Subscription, switchMap } from 'rxjs';
+import { filter, interval, Subscription, switchMap } from 'rxjs';
 import { User, UserI } from '../services/user';
 import { Estrato, Movimentacao, MovimentHistoryDto } from '../services/estrato';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -40,6 +40,7 @@ import { UserService } from '../services/user.service';
 import { AlertService } from '../services/alert.service';
 import { ConfirmationService } from '../services/confirmation.service';
 import { Export } from '../export/export';
+import { OverlayManagerService } from '../services/overlay-manager.service';
 
 @Component({
   selector: 'app-root',
@@ -55,7 +56,8 @@ import { Export } from '../export/export';
   styleUrls: ['./home.scss'],
 })
 export class Home implements OnInit, OnDestroy {
-  // ✅ NOVAS VARIÁVEIS PARA VERIFICAÇÃO DE TOKEN
+  private boundOnBrowserBack = this.onBrowserBack.bind(this);
+
   private tokenCheckInterval: any;
   private hasShownExpirationWarning = false; // Para evitar múltiplos avisos
 
@@ -103,16 +105,27 @@ export class Home implements OnInit, OnDestroy {
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private confirmationService: ConfirmationService,
-    private authService: AuthService, // ✅ JÁ INJETADO
-    private alertService: AlertService, // ✅ JÁ INJETADO
+    private authService: AuthService,
+    private alertService: AlertService,
     private overlay: Overlay,
     private router: Router,
     private userService: UserService,
     private user: User,
     private cdr: ChangeDetectorRef,
     private el: ElementRef,
-    private extrato: Estrato
-  ) {}
+    private extrato: Estrato,
+    private overlayManager: OverlayManagerService
+  ) {
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationStart))
+      .subscribe(() => {
+        if (this.overlayRef) {
+          console.log('🚪 Fechando overlay devido à navegação');
+          this.overlayRef.dispose();
+          this.overlayRef = undefined;
+        }
+      });
+  }
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
@@ -146,10 +159,12 @@ export class Home implements OnInit, OnDestroy {
               error: (err) => {
                 console.error('Erro ao atualizar os dados da conta.', err);
                 this.error = 'Erro ao atualizar os dados.';
-                
+
                 // ✅ VERIFICAR SE É ERRO DE TOKEN EXPIRADO
                 if (err.status === 401 || err.status === 403) {
-                  console.log('🚨 Token expirado detectado na atualização de dados');
+                  console.log(
+                    '🚨 Token expirado detectado na atualização de dados'
+                  );
                   // O interceptor já vai tratar, mas vamos garantir
                   this.stopTokenCheck();
                 }
@@ -168,15 +183,30 @@ export class Home implements OnInit, OnDestroy {
           this.router.navigate(['/login']);
         },
       });
+      window.addEventListener('popstate', this.boundOnBrowserBack);
+    }
+  }
+
+  private onBrowserBack(event: PopStateEvent): void {
+    if (this.overlayRef) {
+      console.log('⬅️ Botão voltar pressionado - fechando overlay');
+      this.overlayRef.dispose();
+      this.overlayRef = undefined;
     }
   }
 
   ngOnDestroy(): void {
-    // ✅ LIMPAR TODOS OS INTERVALS E SUBSCRIPTIONS
     this.stopTokenCheck();
-    
+
     if (this.updateSubscription) {
       this.updateSubscription.unsubscribe();
+    }
+
+    // ✅ USAR O SERVIÇO PARA FECHAR OVERLAYS
+    this.overlayManager.closeAllOverlays('componente destruído');
+
+    if (isPlatformBrowser(this.platformId)) {
+      window.removeEventListener('popstate', this.boundOnBrowserBack);
     }
   }
 
@@ -191,13 +221,16 @@ export class Home implements OnInit, OnDestroy {
       }
 
       // ✅ Avisar se token expira em 5 minutos (só uma vez)
-      if (this.authService.isTokenExpiringSoon() && !this.hasShownExpirationWarning) {
+      if (
+        this.authService.isTokenExpiringSoon() &&
+        !this.hasShownExpirationWarning
+      ) {
         this.hasShownExpirationWarning = true;
         this.alertService.showWarning(
           'Sessão Expirando',
           'Sua sessão expirará em breve...'
         );
-        
+
         // ✅ Reset do aviso após 2 minutos para poder avisar novamente se necessário
         setTimeout(() => {
           this.hasShownExpirationWarning = false;
@@ -227,13 +260,15 @@ export class Home implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Erro ao carregar valores:', err);
-        
+
         // ✅ VERIFICAR SE É ERRO DE TOKEN
         if (err.status === 401 || err.status === 403) {
-          console.log('🚨 Token expirado detectado no carregamento do histórico');
+          console.log(
+            '🚨 Token expirado detectado no carregamento do histórico'
+          );
           return; // O interceptor já vai tratar
         }
-        
+
         setTimeout(() => {
           this.cdr.detectChanges();
         }, 0);
@@ -271,13 +306,15 @@ export class Home implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Erro ao carregar movimentações:', err);
-          
+
           // ✅ VERIFICAR SE É ERRO DE TOKEN
           if (err.status === 401 || err.status === 403) {
-            console.log('🚨 Token expirado detectado no carregamento de movimentações');
+            console.log(
+              '🚨 Token expirado detectado no carregamento de movimentações'
+            );
             return; // O interceptor já vai tratar
           }
-          
+
           // ✅ USAR setTimeout TAMBÉM NO ERRO:
           setTimeout(() => {
             this.carregandoTransacoes = false;
@@ -297,13 +334,13 @@ export class Home implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Erro ao carregar semana:', err);
-        
+
         // ✅ VERIFICAR SE É ERRO DE TOKEN
         if (err.status === 401 || err.status === 403) {
           console.log('🚨 Token expirado detectado no carregamento da semana');
           return;
         }
-        
+
         setTimeout(() => {
           this.cdr.detectChanges();
         }, 0);
@@ -321,13 +358,13 @@ export class Home implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Erro ao carregar mês:', err);
-        
+
         // ✅ VERIFICAR SE É ERRO DE TOKEN
         if (err.status === 401 || err.status === 403) {
           console.log('🚨 Token expirado detectado no carregamento do mês');
           return;
         }
-        
+
         setTimeout(() => {
           this.cdr.detectChanges();
         }, 0);
@@ -344,13 +381,13 @@ export class Home implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Erro ao carregar dados da conta:', err);
-        
+
         // ✅ VERIFICAR SE É ERRO DE TOKEN
         if (err.status === 401 || err.status === 403) {
           console.log('🚨 Token expirado detectado no carregamento da conta');
           // O interceptor já vai tratar
         }
-      }
+      },
     });
   }
 
@@ -418,9 +455,9 @@ export class Home implements OnInit, OnDestroy {
 
     this.confirmationService.show(title, message).subscribe((result) => {
       if (result) {
-        // ✅ PARAR VERIFICAÇÃO DE TOKEN ANTES DO LOGOUT
         this.stopTokenCheck();
-        
+
+        // ✅ O AuthService já vai fechar todos os overlays
         this.authService.logout();
         this.alertService.showSuccess(
           'Sucesso!',
@@ -459,23 +496,24 @@ export class Home implements OnInit, OnDestroy {
                     'Sucesso!',
                     'Sua conta foi desativada. Você será desconectado em breve...'
                   );
-                  
-                  // ✅ PARAR VERIFICAÇÃO DE TOKEN ANTES DO LOGOUT
+
                   this.stopTokenCheck();
-                  
+
                   setTimeout(() => {
+                    // ✅ O AuthService já vai fechar todos os overlays
                     this.authService.logout();
                     this.router.navigate(['/login']);
                   }, 2000);
                 }
               },
               error: (err) => {
-                // ✅ VERIFICAR SE É ERRO DE TOKEN
                 if (err.status === 401 || err.status === 403) {
-                  console.log('🚨 Token expirado detectado na exclusão da conta');
-                  return; // O interceptor já vai tratar
+                  console.log(
+                    '🚨 Token expirado detectado na exclusão da conta'
+                  );
+                  return;
                 }
-                
+
                 this.alertService.showError(
                   'Ops! Algo deu errado...',
                   err.error?.message || 'Não foi possível desativar a conta.'
@@ -502,6 +540,9 @@ export class Home implements OnInit, OnDestroy {
         .centerHorizontally()
         .centerVertically(),
     });
+
+    // ✅ REGISTRAR O OVERLAY NO SERVIÇO
+    this.overlayManager.registerOverlay(this.overlayRef, component.name);
 
     const injector = this.createInjector(this.overlayRef);
     const portal = new ComponentPortal(component, null, injector);
