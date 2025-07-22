@@ -74,12 +74,12 @@
 
         <div class="action-buttons">
           <button
-            [disabled]="!pixKey && !name"
+            [disabled]="!going && !amount"
             class="btn btn-primary bg-indigo-600"
             id="payBtn"
             (click)="enviarPix()"
           >
-            {{ chaveEmEdicao ? "Atualizar" : "Salvar" }}
+            {{ "Enviar" }}
           </button>
 
           <button (click)="modo = 'menu'" class="btn btn-secondary">
