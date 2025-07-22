@@ -1,26 +1,37 @@
-import { HttpInterceptorFn } from '@angular/common/http';
-import { PLATFORM_ID, inject } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  // 1. Injeta o platformId para saber onde estamos rodando.
-  const platformId = inject(PLATFORM_ID);
+  const authService = inject(AuthService);
 
-  // 2. Só tenta acessar o localStorage se estiver no navegador.
-  if (isPlatformBrowser(platformId)) {
-    const token = localStorage.getItem('token');
-
-    if (token) {
-      const cloned = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return next(cloned);
-    }
+  // Adicionar token se existir
+  const token = authService.getToken();
+  if (token) {
+    req = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   }
 
-  // 3. Se não estiver no navegador ou se não houver token,
-  // a requisição original continua sem o cabeçalho de autorização.
-  return next(req);
+  return next(req).pipe(
+    catchError((error: HttpErrorResponse) => {
+      const isAuthRoute =
+        req.url.includes('/auth/api/login') ||
+        req.url.includes('/auth/api/register') ||
+        req.url.includes('/auth/api/forgot') || // caso tenha
+        req.url.includes('/auth/api/reset');    // caso tenha
+
+      // ✅ Só trata como sessão expirada se não for rota pública
+      if ((error.status === 401 || error.status === 403) && !isAuthRoute) {
+        console.warn('🚨 Token inválido/expirado detectado pelo backend');
+        authService.logoutDueToExpiration(); // já redireciona e alerta
+      }
+
+      return throwError(() => error);
+    })
+  );
 };
