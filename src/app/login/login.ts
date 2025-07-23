@@ -23,6 +23,7 @@ export class Login {
   accountOptions: string[] = [];
   selectedAccount: string = '';
   isLoading = false;
+  private isSubmitting = false;
 
   constructor(
     private auth: AuthService,
@@ -59,21 +60,30 @@ export class Login {
   }
 
   login() {
-    if (this.isLoading) return;
+    if (this.isLoading || this.isSubmitting) return;
 
     const trimmedInput = this.loginInput.trim();
     const trimmedPassword = this.password.trim();
 
     // Validações iniciais
-    if (!trimmedInput || !trimmedPassword) {
-      this.alertService.showWarning(
-        'Campo obrigatório',
-        !trimmedInput
-          ? 'Por favor, informe o número da conta, CPF ou e-mail.'
-          : 'Por favor, informe sua senha.'
-      );
-      return;
-    }
+     if (!trimmedInput || !trimmedPassword) {
+    // ✅ PREVENIR SPAM DE ALERTS
+    this.isSubmitting = true;
+    
+    this.alertService.showWarning(
+      'Campo(s) obrigatório(s)!',
+      !trimmedInput
+        ? 'Por favor, informe o número da conta, CPF ou e-mail.'
+        : 'Por favor, informe sua senha.'
+    );
+    
+    // ✅ RESETAR APÓS 2 SEGUNDOS
+    setTimeout(() => {
+      this.isSubmitting = false;
+    }, 2000);
+    
+    return;
+  }
 
     this.isLoading = true;
     console.log('⏱️ Login iniciado:', new Date().toISOString());
@@ -110,7 +120,11 @@ export class Login {
     this.auth.login(payload).subscribe({
       next: (response: any) => {
         const elapsedTime = Date.now() - startTime;
-        console.log('✅ Login bem sucedido em:', elapsedTime / 1000, 'segundos');
+        console.log(
+          '✅ Login bem sucedido em:',
+          elapsedTime / 1000,
+          'segundos'
+        );
 
         const remainingDelay = Math.max(0, minDelay - elapsedTime);
         console.log('⏳ Delay adicional:', remainingDelay / 1000, 'segundos');
@@ -118,12 +132,18 @@ export class Login {
         setTimeout(() => {
           clearTimeout(maxTimeout);
 
-          if (!response.data.token && response.data.accountNumbers?.length > 0) {
+          if (
+            !response.data.token &&
+            response.data.accountNumbers?.length > 0
+          ) {
             this.accountOptions = response.data.accountNumbers;
             this.showAccountSelection = true;
           } else {
             this.loggedIn = true;
-            this.alertService.showSuccess('Sucesso!', 'Login realizado com sucesso!');
+            this.alertService.showSuccess(
+              'Sucesso!',
+              'Login realizado com sucesso!'
+            );
             this.router.navigate(['/home']);
           }
           this.isLoading = false;
@@ -144,7 +164,9 @@ export class Login {
         } else {
           this.alertService.showError(
             'Ops! Algo deu errado...',
-            err.error?.message || err.message || 'Algo deu errado ao realizar login.'
+            err.error?.message ||
+              err.message ||
+              'Algo deu errado ao realizar login.'
           );
         }
       },

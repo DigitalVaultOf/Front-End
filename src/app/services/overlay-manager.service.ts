@@ -6,6 +6,8 @@ interface ManagedOverlay {
   source?: string;
   type: 'modal' | 'alert' | 'other';
   priority: number; // 1 = alta (não fechar), 2 = normal, 3 = baixa (fechar primeiro)
+  id: string; // ✅ NOVO: ID único para evitar duplicatas
+  registeredAt: Date; // ✅ NOVO: Timestamp do registro
 }
 
 @Injectable({
@@ -13,6 +15,7 @@ interface ManagedOverlay {
 })
 export class OverlayManagerService {
   private activeOverlays: ManagedOverlay[] = [];
+  private detachmentSubscriptions = new Map<string, any>(); // ✅ CONTROLAR SUBSCRIPTIONS
 
   registerOverlay(
     overlayRef: OverlayRef, 
@@ -20,72 +23,263 @@ export class OverlayManagerService {
     type: 'modal' | 'alert' | 'other' = 'modal',
     priority: number = 2
   ): void {
-    console.log(`📝 Registrando overlay ${type}${source ? ` de ${source}` : ''} (prioridade: ${priority})`);
+    const overlayId = this.generateOverlayId();
+    
+    // ✅ PREVENÇÃO TOTAL DE DUPLICATAS DE ALERTS
+    if (type === 'alert' && source) {
+      // Remover alerts similares existentes
+      const existingAlerts = this.activeOverlays.filter(overlay => 
+        overlay.type === 'alert' && overlay.source === source
+      );
+      
+      if (existingAlerts.length > 0) {
+        console.log(`🧹 Removendo ${existingAlerts.length} alerts duplicados de ${source}`);
+        existingAlerts.forEach(existing => {
+          try {
+            if (existing.ref && existing.ref.hasAttached()) {
+              existing.ref.dispose();
+            }
+          } catch (error) {
+            console.warn(`Erro ao remover alert duplicado:`, error);
+          }
+        });
+        
+        // Remover da lista
+        this.activeOverlays = this.activeOverlays.filter(overlay => 
+          !existingAlerts.includes(overlay)
+        );
+      }
+      
+      // ✅ VERIFICAR CONFLITOS ENTRE TIPOS DE ALERT (mais rigoroso)
+      const conflictingAlerts = this.activeOverlays.filter(overlay => 
+        overlay.type === 'alert' && 
+        overlay.source !== source &&
+        (Date.now() - overlay.registeredAt.getTime()) < 5000 // 5 segundos
+      );
+      
+      if (conflictingAlerts.length > 0) {
+        console.log(`🔄 Removendo ${conflictingAlerts.length} alerts conflitantes`);
+        conflictingAlerts.forEach(conflicting => {
+          try {
+            if (conflicting.ref && conflicting.ref.hasAttached()) {
+              conflicting.ref.dispose();
+            }
+          } catch (error) {
+            console.warn(`Erro ao remover alert conflitante:`, error);
+          }
+        });
+        
+        // Remover da lista
+        this.activeOverlays = this.activeOverlays.filter(overlay => 
+          !conflictingAlerts.includes(overlay)
+        );
+      }
+    }
+    
+    console.log(`📝 Registrando overlay ${type}${source ? ` de ${source}` : ''} (prioridade: ${priority}) [ID: ${overlayId}]`);
     
     const managedOverlay: ManagedOverlay = {
       ref: overlayRef,
       source,
       type,
-      priority
+      priority,
+      id: overlayId,
+      registeredAt: new Date()
     };
     
     this.activeOverlays.push(managedOverlay);
     
+    // ✅ REMOVER SUBSCRIPTION ANTERIOR SE EXISTIR
+    if (this.detachmentSubscriptions.has(overlayId)) {
+      try {
+        const oldSubscription = this.detachmentSubscriptions.get(overlayId);
+        if (oldSubscription && typeof oldSubscription.unsubscribe === 'function') {
+          oldSubscription.unsubscribe();
+        }
+      } catch (error) {
+        console.warn(`Erro ao limpar subscription anterior ${overlayId}:`, error);
+      }
+    }
+    
     // ✅ Remover da lista quando o overlay for fechado naturalmente
-    overlayRef.detachments().subscribe(() => {
-      this.removeOverlay(overlayRef, source);
-    });
+    try {
+      const subscription = overlayRef.detachments().subscribe(() => {
+        this.removeOverlay(overlayRef, source, overlayId);
+      });
+      
+      this.detachmentSubscriptions.set(overlayId, subscription);
+    } catch (error) {
+      console.error(`❌ Erro ao criar subscription de detachment para ${overlayId}:`, error);
+    }
   }
 
-  private removeOverlay(overlayRef: OverlayRef, source?: string): void {
-    const index = this.activeOverlays.findIndex(overlay => overlay.ref === overlayRef);
-    if (index > -1) {
-      console.log(`🗑️ Removendo overlay${source ? ` de ${source}` : ''} da lista`);
-      this.activeOverlays.splice(index, 1);
+  private removeOverlay(overlayRef: OverlayRef, source?: string, id?: string): void {
+    try {
+      const index = this.activeOverlays.findIndex(overlay => 
+        overlay.ref === overlayRef || (id && overlay.id === id)
+      );
+      
+      if (index > -1) {
+        const overlay = this.activeOverlays[index];
+        console.log(`🗑️ Removendo overlay${source ? ` de ${source}` : ''} da lista [ID: ${overlay.id}]`);
+        this.activeOverlays.splice(index, 1);
+        
+        // ✅ LIMPAR SUBSCRIPTION COM VERIFICAÇÃO SEGURA
+        if (overlay.id && this.detachmentSubscriptions.has(overlay.id)) {
+          try {
+            const subscription = this.detachmentSubscriptions.get(overlay.id);
+            if (subscription && typeof subscription.unsubscribe === 'function') {
+              subscription.unsubscribe();
+            }
+            this.detachmentSubscriptions.delete(overlay.id);
+          } catch (error) {
+            console.warn(`Erro ao limpar subscription ${overlay.id}:`, error);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('❌ Erro ao remover overlay:', error);
     }
+  }
+
+  private generateOverlayId(): string {
+    return `overlay_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
   }
 
   closeAllOverlays(reason?: string, includeAlerts: boolean = false): void {
-    // ✅ Filtrar overlays baseado no tipo
-    const overlaysToClose = this.activeOverlays.filter(overlay => {
-      if (!includeAlerts && overlay.type === 'alert') {
-        console.log(`⏭️ Mantendo overlay de alert: ${overlay.source || 'desconhecido'}`);
-        return false;
-      }
-      return true;
-    });
+    try {
+      // ✅ Filtrar overlays baseado no tipo
+      const overlaysToClose = this.activeOverlays.filter(overlay => {
+        if (!overlay || !overlay.ref) return false;
+        
+        if (!includeAlerts && overlay.type === 'alert') {
+          console.log(`⏭️ Mantendo overlay de alert: ${overlay.source || 'desconhecido'} [ID: ${overlay.id}]`);
+          return false;
+        }
+        return true;
+      });
 
-    const count = overlaysToClose.length;
-    
-    if (count > 0) {
-      console.log(`🧹 Fechando ${count} overlays${reason ? ` (${reason})` : ''}`);
+      const count = overlaysToClose.length;
       
-      // ✅ Ordenar por prioridade (prioridade maior = fecha primeiro)
-      overlaysToClose.sort((a, b) => b.priority - a.priority);
-      
-      // ✅ Fechar overlays selecionados
-      overlaysToClose.forEach((overlay, index) => {
-        if (overlay.ref && !overlay.ref.hasAttached()) {
-          console.log(`  └─ Overlay ${index + 1} (${overlay.type}): já desconectado`);
-        } else if (overlay.ref) {
-          console.log(`  └─ Overlay ${index + 1} (${overlay.type}): fechando...`);
+      if (count > 0) {
+        console.log(`🧹 Fechando ${count} overlays${reason ? ` (${reason})` : ''}`);
+        
+        // ✅ Ordenar por prioridade (prioridade maior = fecha primeiro)
+        overlaysToClose.sort((a, b) => b.priority - a.priority);
+        
+        // ✅ Fechar overlays selecionados
+        overlaysToClose.forEach((overlay, index) => {
           try {
-            overlay.ref.dispose();
+            if (!overlay.ref) {
+              console.log(`  └─ Overlay ${index + 1} (${overlay.type}): ref inválido [ID: ${overlay.id}]`);
+              return;
+            }
+
+            if (!overlay.ref.hasAttached()) {
+              console.log(`  └─ Overlay ${index + 1} (${overlay.type}): já desconectado [ID: ${overlay.id}]`);
+            } else {
+              console.log(`  └─ Overlay ${index + 1} (${overlay.type}): fechando... [ID: ${overlay.id}]`);
+              overlay.ref.dispose();
+            }
+            
+            // ✅ LIMPAR SUBSCRIPTION COM VERIFICAÇÃO SEGURA
+            if (overlay.id && this.detachmentSubscriptions.has(overlay.id)) {
+              try {
+                const subscription = this.detachmentSubscriptions.get(overlay.id);
+                if (subscription && typeof subscription.unsubscribe === 'function') {
+                  subscription.unsubscribe();
+                }
+                this.detachmentSubscriptions.delete(overlay.id);
+              } catch (error) {
+                console.warn(`Erro ao limpar subscription ${overlay.id}:`, error);
+              }
+            }
           } catch (error) {
             console.warn(`  └─ Erro ao fechar overlay ${index + 1}:`, error);
           }
-        }
-      });
-      
-      // ✅ Remover overlays fechados da lista
-      this.activeOverlays = this.activeOverlays.filter(overlay => 
-        !overlaysToClose.includes(overlay)
-      );
-    }
+        });
+        
+        // ✅ Remover overlays fechados da lista
+        this.activeOverlays = this.activeOverlays.filter(overlay => 
+          !overlaysToClose.includes(overlay)
+        );
+      }
 
-    // ✅ LIMPEZA ADICIONAL: Remover backdrop restante (exceto se houver alerts)
-    if (includeAlerts || this.activeOverlays.filter(o => o.type === 'alert').length === 0) {
-      this.forceCleanupBackdrops(reason);
+      // ✅ LIMPEZA ADICIONAL: Remover backdrop restante (exceto se houver alerts)
+      if (includeAlerts || this.activeOverlays.filter(o => o && o.type === 'alert').length === 0) {
+        this.forceCleanupBackdrops(reason);
+      }
+    } catch (error) {
+      console.error('❌ Erro ao fechar overlays:', error);
+    }
+  }
+
+  closeModalsOnly(reason?: string): void {
+    try {
+      const modals = this.activeOverlays.filter(overlay => 
+        overlay && overlay.ref && overlay.type === 'modal'
+      );
+      
+      if (modals.length > 0) {
+        console.log(`🚪 Fechando ${modals.length} modais${reason ? ` (${reason})` : ''}`);
+        
+        modals.forEach((overlay, index) => {
+          try {
+            if (!overlay.ref) {
+              console.log(`  └─ Modal ${index + 1}: ref inválido [ID: ${overlay.id}]`);
+              return;
+            }
+
+            console.log(`  └─ Modal ${index + 1}: fechando... [ID: ${overlay.id}]`);
+            overlay.ref.dispose();
+            
+            // ✅ LIMPAR SUBSCRIPTION COM VERIFICAÇÃO SEGURA
+            if (overlay.id && this.detachmentSubscriptions.has(overlay.id)) {
+              try {
+                const subscription = this.detachmentSubscriptions.get(overlay.id);
+                if (subscription && typeof subscription.unsubscribe === 'function') {
+                  subscription.unsubscribe();
+                }
+                this.detachmentSubscriptions.delete(overlay.id);
+              } catch (error) {
+                console.warn(`Erro ao limpar subscription ${overlay.id}:`, error);
+              }
+            }
+          } catch (error) {
+            console.warn(`  └─ Erro ao fechar modal ${index + 1}:`, error);
+          }
+        });
+        
+        // ✅ Remover modais fechados da lista
+        this.activeOverlays = this.activeOverlays.filter(overlay => 
+          !modals.includes(overlay)
+        );
+      }
+    } catch (error) {
+      console.error('❌ Erro ao fechar modais:', error);
+    }
+  }
+
+  registerAlert(overlayRef: OverlayRef, source?: string): void {
+    this.registerOverlay(overlayRef, source, 'alert', 1); // Prioridade alta (não fechar)
+  }
+
+  // ✅ NOVO: Método para limpar alerts duplicados por fonte
+  clearDuplicateAlerts(source: string): void {
+    const duplicateAlerts = this.activeOverlays.filter(overlay => 
+      overlay.type === 'alert' && overlay.source === source
+    );
+    
+    if (duplicateAlerts.length > 1) {
+      console.log(`🧹 Removendo ${duplicateAlerts.length - 1} alerts duplicados de ${source}`);
+      
+      // Manter apenas o mais recente
+      duplicateAlerts
+        .sort((a, b) => a.registeredAt.getTime() - b.registeredAt.getTime())
+        .slice(0, -1) // Todos exceto o último
+        .forEach(overlay => {
+          overlay.ref.dispose();
+        });
     }
   }
 
@@ -111,7 +305,6 @@ export class OverlayManagerService {
       
       // Remover backdrops apenas se não forem de alerts
       backdrops.forEach((backdrop, index) => {
-        // ✅ Verificar se o backdrop não pertence a um alert
         const parentPane = backdrop.nextElementSibling;
         const isAlertBackdrop = parentPane?.classList.contains('alert-overlay') || 
                                parentPane?.querySelector('.alert-container') ||
@@ -138,7 +331,6 @@ export class OverlayManagerService {
         }
       });
 
-      // ✅ Só alterar body se não houver mais overlays
       const remainingBackdrops = document.querySelectorAll('.cdk-overlay-backdrop');
       if (remainingBackdrops.length === 0) {
         document.body.classList.remove('cdk-overlay-open');
@@ -151,41 +343,77 @@ export class OverlayManagerService {
     return this.activeOverlays.length;
   }
 
-  // ✅ NOVO: Método específico para fechar apenas modais
-  closeModalsOnly(reason?: string): void {
-    const modals = this.activeOverlays.filter(overlay => overlay.type === 'modal');
-    
-    if (modals.length > 0) {
-      console.log(`🚪 Fechando ${modals.length} modais${reason ? ` (${reason})` : ''}`);
-      
-      modals.forEach((overlay, index) => {
-        if (overlay.ref) {
-          console.log(`  └─ Modal ${index + 1}: fechando...`);
-          try {
-            overlay.ref.dispose();
-          } catch (error) {
-            console.warn(`  └─ Erro ao fechar modal ${index + 1}:`, error);
-          }
+  logActiveOverlays(): void {
+    try {
+      console.log(`📊 Overlays ativos: ${this.activeOverlays.length}`);
+      this.activeOverlays.forEach((overlay, index) => {
+        if (!overlay) {
+          console.log(`  └─ Overlay ${index + 1}: INVÁLIDO`);
+          return;
         }
+        
+        const status = overlay.ref && overlay.ref.hasAttached ? 
+          (overlay.ref.hasAttached() ? 'ativo' : 'desconectado') : 
+          'ref inválido';
+          
+        console.log(`  └─ Overlay ${index + 1}: ${overlay.type} (${overlay.source || 'desconhecido'}) [ID: ${overlay.id || 'sem-id'}] - ${status}`);
       });
-      
-      // ✅ Remover modais fechados da lista
-      this.activeOverlays = this.activeOverlays.filter(overlay => 
-        !modals.includes(overlay)
-      );
+    } catch (error) {
+      console.error('❌ Erro ao listar overlays ativos:', error);
     }
   }
 
-  // ✅ NOVO: Registrar overlay de alert
-  registerAlert(overlayRef: OverlayRef, source?: string): void {
-    this.registerOverlay(overlayRef, source, 'alert', 1); // Prioridade alta (não fechar)
+  // ✅ NOVO: Método para debuggar subscriptions
+  logSubscriptions(): void {
+    try {
+      console.log(`📡 Subscriptions ativas: ${this.detachmentSubscriptions.size}`);
+      Array.from(this.detachmentSubscriptions.keys()).forEach((id, index) => {
+        const subscription = this.detachmentSubscriptions.get(id);
+        const status = subscription && typeof subscription.unsubscribe === 'function' ? 'válida' : 'inválida';
+        console.log(`  └─ Subscription ${index + 1}: [ID: ${id}] - ${status}`);
+      });
+    } catch (error) {
+      console.error('❌ Erro ao listar subscriptions:', error);
+    }
   }
 
-  // ✅ MÉTODO PARA DEBUG
-  logActiveOverlays(): void {
-    console.log(`📊 Overlays ativos: ${this.activeOverlays.length}`);
-    this.activeOverlays.forEach((overlay, index) => {
-      console.log(`  └─ Overlay ${index + 1}: ${overlay.type} (${overlay.source || 'desconhecido'}) - ${overlay.ref.hasAttached() ? 'ativo' : 'desconectado'}`);
-    });
+  // ✅ NOVO: Método para limpeza geral (útil para debugging)
+  forceCleanupAll(): void {
+    console.log('🧹 Limpeza forçada de todos os overlays e subscriptions');
+    
+    try {
+      // Limpar todos os overlays
+      this.activeOverlays.forEach(overlay => {
+        try {
+          if (overlay.ref && overlay.ref.hasAttached()) {
+            overlay.ref.dispose();
+          }
+        } catch (error) {
+          console.warn(`Erro ao limpar overlay ${overlay.id}:`, error);
+        }
+      });
+      
+      // Limpar todas as subscriptions
+      this.detachmentSubscriptions.forEach((subscription, id) => {
+        try {
+          if (subscription && typeof subscription.unsubscribe === 'function') {
+            subscription.unsubscribe();
+          }
+        } catch (error) {
+          console.warn(`Erro ao limpar subscription ${id}:`, error);
+        }
+      });
+      
+      // Reset das listas
+      this.activeOverlays = [];
+      this.detachmentSubscriptions.clear();
+      
+      // Limpeza do DOM
+      this.forceCleanupBackdrops('limpeza forçada');
+      
+      console.log('✅ Limpeza forçada concluída');
+    } catch (error) {
+      console.error('❌ Erro na limpeza forçada:', error);
+    }
   }
 }

@@ -1,3 +1,4 @@
+// auth-interceptor.ts - VERSÃO CORRIGIDA
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError } from 'rxjs/operators';
@@ -22,13 +23,23 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       const isAuthRoute =
         req.url.includes('/auth/api/login') ||
         req.url.includes('/auth/api/register') ||
-        req.url.includes('/auth/api/forgot') || // caso tenha
-        req.url.includes('/auth/api/reset');    // caso tenha
+        req.url.includes('/auth/api/forgot') ||
+        req.url.includes('/auth/api/reset');
 
-      // ✅ Só trata como sessão expirada se não for rota pública
-      if ((error.status === 401 || error.status === 403) && !isAuthRoute) {
+      // ✅ SÓ TRATAR COMO SESSÃO EXPIRADA SE:
+      // 1. Não for rota de autenticação
+      // 2. Usuário estava realmente logado (tinha token)
+      // 3. Token estava sendo enviado na requisição
+      const wasLoggedIn = !!token; // Se tinha token, estava logado
+      const shouldTreatAsExpired = (error.status === 401 || error.status === 403) 
+        && !isAuthRoute 
+        && wasLoggedIn;
+
+      if (shouldTreatAsExpired) {
         console.warn('🚨 Token inválido/expirado detectado pelo backend');
-        authService.logoutDueToExpiration(); // já redireciona e alerta
+        authService.logoutDueToExpiration();
+      } else if ((error.status === 401 || error.status === 403) && isAuthRoute) {
+        console.log('🔐 Erro de autenticação em rota de login (normal)');
       }
 
       return throwError(() => error);

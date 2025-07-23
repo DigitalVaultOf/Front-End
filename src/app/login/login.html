@@ -1,111 +1,91 @@
-<div class="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-  <div
-    *ngIf="!showAccountSelection && !loggedIn"
-    class="bg-white shadow-xl rounded-2xl w-full max-w-md p-8"
-  >
-    <h2 class="text-2xl font-bold text-center text-blue-700 mb-6">Login</h2>
+<div class="login-container">
+  <div *ngIf="!showAccountSelection && !loggedIn" class="login-card">
+    <div class="login-header">
+      <h2>Bem-vindo!</h2>
+      <p>Acesse sua conta para continuar</p>
+    </div>
 
     <form (ngSubmit)="login()" novalidate>
-      <div class="mb-4">
-        <label for="account" class="block text-sm font-medium text-gray-700"
-          >Conta</label
-        >
+      <div class="form-group">
+        <label for="account">Conta, CPF ou E-mail</label>
         <input
           type="text"
           id="account"
           name="account"
           [(ngModel)]="loginInput"
           (input)="formatInput($event)"
-          class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
-          placeholder="Número da Conta, CPF ou E-mail"
+          class="form-control"
+          placeholder="Digite sua credencial"
+          required
         />
       </div>
 
-      <div class="mb-6">
-        <label for="senha" class="block text-sm font-medium text-gray-700"
-          >Senha</label
-        >
+      <div class="form-group">
+        <label for="senha">Senha</label>
         <input
           type="password"
           id="senha"
           name="senha"
           [(ngModel)]="password"
-          class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600"
-          placeholder="********"
+          class="form-control"
+          placeholder="•••••••••"
+          required
         />
       </div>
 
-      <button
-        type="submit"
-        [disabled]="isLoading"
-        (click)="login()"
-        class="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition-colors relative"
-      >
-        <div class="flex items-center justify-center gap-2">
+      <button type="submit" [disabled]="isLoading" class="btn-primary">
+        <div class="button-content">
           @if (isLoading) {
-            <svg
-              class="animate-spin h-5 w-5 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
+          <svg
+            class="animate-spin h-5 w-5 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
           }
           <span class="relative">
-            {{ isLoading ? 'Entrando' : 'Entrar' }}
+            {{ isLoading ? "Entrando" : "Entrar" }}
             @if (isLoading) {
-              <span class="dots"></span>
+            <span class="dots"></span>
             }
           </span>
         </div>
       </button>
     </form>
 
-    <p class="mt-4 text-sm text-center text-gray-600">
-      Não tem uma conta?
-      <a href="/user-registration" class="text-blue-600 hover:underline"
-        >Registrar</a
-      >
+    <p class="login-footer">
+      Não tem uma conta? <a href="/user-registration">Registre-se agora</a>
     </p>
   </div>
 
-  <div
-    *ngIf="showAccountSelection"
-    class="bg-white shadow-xl rounded-2xl w-full max-w-md p-8"
-  >
-    <h2 class="text-2xl font-bold text-center text-blue-700 mb-6">
-      Escolha a Conta
-    </h2>
+  <div *ngIf="showAccountSelection" class="login-card">
+    <div class="login-header">
+      <h2>Escolha a Conta</h2>
+      <p>Encontramos múltiplas contas vinculadas.</p>
+    </div>
 
     <div class="space-y-4">
       <div *ngFor="let account of accountOptions">
-        <button
-          (click)="selectAccount(account)"
-          class="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition-colors"
-        >
-          {{ account }}
+        <button (click)="selectAccount(account)" class="btn-primary">
+          Conta: {{ account }}
         </button>
       </div>
     </div>
 
-    <button
-      (click)="logout()"
-      class="mt-4 w-full bg-red-600 text-white py-2 rounded-xl hover:bg-red-700 transition-colors"
-    >
-      Sair
-    </button>
+    <button (click)="logout()" class="btn-danger mt-6">Voltar</button>
   </div>
 </div>

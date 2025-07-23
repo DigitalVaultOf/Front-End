@@ -1,10 +1,160 @@
-// ...existing styles...
+// Importa a fonte da sua tela Home para manter a consistência
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
+// Variáveis de cor para fácil manutenção, baseadas no seu design da Home
+$primary-purple: #8b5fbf;
+$secondary-purple: #6366f1;
+$text-primary: #1a1a1a;
+$text-secondary: #64748b;
+$background-light: #fafbfc;
+$white: #ffffff;
+$border-light: #e2e8f0;
+
+// Estilo base do container da página de login
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: $background-light;
+  font-family: "Montserrat", sans-serif;
+  padding: 1rem;
+}
+
+// O card principal, inspirado no .card-info da home
+.login-card {
+  background: $white;
+  padding: 2.5rem 2rem;
+  border-radius: 24px;
+  box-shadow: 0 8px 40px rgba($primary-purple, 0.12);
+  border: 1px solid rgba($primary-purple, 0.1);
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+}
+
+// Cabeçalho do card
+.login-header {
+  margin-bottom: 2rem;
+
+  h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: $secondary-purple;
+    margin: 0;
+  }
+
+  p {
+    margin-top: 0.5rem;
+    color: $text-secondary;
+    font-size: 1rem;
+  }
+}
+
+// Estilo para os grupos de formulário (label + input)
+.form-group {
+  margin-bottom: 1.5rem;
+  text-align: left;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: $text-primary;
+  }
+}
+
+// Inputs modernizados
+.form-control {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid $border-light;
+  border-radius: 12px;
+  background-color: $background-light;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-purple;
+    box-shadow: 0 0 0 3px rgba($secondary-purple, 0.2);
+  }
+
+  &::placeholder {
+    color: #94a3b8;
+  }
+}
+
+// BOTÃO PRIMÁRIO - A MÁGICA ACONTECE AQUI!
+.btn-primary {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: none;
+  border-radius: 12px;
+  color: $white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative; // Para o spinner e os pontos
+  
+  // O degradê roxo da sua tela home
+  background: linear-gradient(135deg, $primary-purple 0%, $secondary-purple 100%);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba($secondary-purple, 0.25);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  // Estilo para o conteúdo do botão (spinner + texto)
+  .button-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+}
+
+// Botão secundário/perigo (para Sair)
+.btn-danger {
+  @extend .btn-primary; // Herda todos os estilos do btn-primary
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 6px 20px rgba(#dc2626, 0.25);
+  }
+}
+
+// Rodapé do card (link para registro)
+.login-footer {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: $text-secondary;
+
+  a {
+    color: $primary-purple;
+    font-weight: 600;
+    text-decoration: none;
+    transition: text-decoration 0.3s ease;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Animação dos pontos de carregamento
 .dots {
   position: absolute;
   display: inline-block;
   left: 100%;
-  margin-left: -1px; // Reduzido para colar mais no texto
+  margin-left: 2px;
   
   &::after {
     content: '';
@@ -18,15 +168,4 @@
   50% { content: '..'; }
   75% { content: '...'; }
   100% { content: ''; }
-}
-
-button {
-  &:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
-  
-  .flex {
-    position: relative;
-  }
 }

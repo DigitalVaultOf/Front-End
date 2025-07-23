@@ -15,13 +15,14 @@ export class AuthService {
   private token: string | null = null;
   private apiUrl = `${apigateway.API_URL}/auth/api/login`;
   private isBrowser = typeof window !== 'undefined' && !!window.localStorage;
+  private isLoggingOut = false; // ✅ ADICIONAR ESTA PROPRIEDADE
 
   constructor(
     private overlay: Overlay,
     private http: HttpClient,
     private router: Router,
     private alertService: AlertService,
-    private overlayManager: OverlayManagerService 
+    private overlayManager: OverlayManagerService
   ) {
     if (this.isBrowser) {
       this.token = localStorage.getItem('token');
@@ -70,7 +71,6 @@ export class AuthService {
     return now >= expiration;
   }
 
-  // ✅ MODIFICADO: Verificar se está logado E se token é válido
   isLoggedIn(): boolean {
     if (!this.isBrowser) return false;
 
@@ -82,20 +82,25 @@ export class AuthService {
 
     // ✅ Verificar se token está expirado
     if (this.isTokenExpired(token)) {
-      this.handleExpiredToken();
+      // ✅ SÓ MOSTRAR ALERT SE ESTAVA REALMENTE LOGADO
+      this.handleExpiredToken(true); // true = foi detectado automaticamente
       return false;
     }
 
     return true;
   }
 
-  // ✅ NOVO: Tratar token expirado
-  private handleExpiredToken(): void {
+  private handleExpiredToken(autoDetected: boolean = false): void {
     this.logout();
-    this.alertService.showWarning(
-      'Sessão Expirada',
-      'Sua sessão expirou. Por favor, faça login novamente.'
-    );
+
+    // ✅ SÓ MOSTRAR ALERT SE FOI DETECÇÃO AUTOMÁTICA (usuário estava navegando)
+    if (autoDetected) {
+      this.alertService.showWarning(
+        'Sessão Expirada',
+        'Sua sessão expirou. Por favor, faça login novamente.'
+      );
+    }
+
     this.router.navigate(['/login']);
   }
 
@@ -120,34 +125,44 @@ export class AuthService {
     }
   }
 
-// ✅ MODIFICAR ESTE MÉTODO NO AuthService:
 logoutDueToExpiration(): void {
-  // ✅ FECHAR APENAS MODAIS, PRESERVAR ALERTS
-  this.overlayManager.closeModalsOnly('token expirado');
+  console.log('🚨 logoutDueToExpiration chamado');
   
+  if (this.isLoggingOut) {
+    console.log('⚠️ Logout já em andamento, ignorando chamada dupla');
+    return;
+  }
+  
+  // ✅ VERIFICAR SE REALMENTE ESTAVA LOGADO
+  const wasLoggedIn = this.isBrowser && localStorage.getItem('token');
+  if (!wasLoggedIn) {
+    console.log('⚠️ logoutDueToExpiration chamado mas usuário não estava logado');
+    return;
+  }
+  
+  this.isLoggingOut = true;
+  
+  this.overlayManager.closeModalsOnly('token expirado');
   this.logout();
   
-  // ✅ PEQUENO DELAY PARA GARANTIR QUE O ALERT APAREÇA
   setTimeout(() => {
     this.alertService.showWarning(
       'Sessão Expirada',
       'Sua sessão expirou. Por favor, faça login novamente.'
     );
+    this.isLoggingOut = false;
   }, 100);
   
   this.router.navigate(['/login']);
 }
 
-// ✅ MODIFICAR LOGOUT NORMAL:
-logout(): void {
-  if (this.isBrowser) {
-    // ✅ FECHAR APENAS MODAIS NO LOGOUT MANUAL
-    this.overlayManager.closeModalsOnly('logout manual');
-    
-    localStorage.removeItem('token');
-    this.token = null;
+  logout(): void {
+    if (this.isBrowser) {
+      this.overlayManager.closeModalsOnly('logout manual');
+      localStorage.removeItem('token');
+      this.token = null;
+    }
   }
-}
 
   getToken(): string | null {
     if (!this.isBrowser) return null;
@@ -159,7 +174,7 @@ logout(): void {
 
     // ✅ Verificar expiração ao pegar token
     if (this.isTokenExpired(token)) {
-      this.handleExpiredToken();
+      this.handleExpiredToken(true); // Foi detecção automática
       return null;
     }
 
