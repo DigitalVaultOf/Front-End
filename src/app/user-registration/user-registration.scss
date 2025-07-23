@@ -1,37 +1,200 @@
-.modal-error{
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+// Importa a fonte padrão da aplicação para manter a consistência
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+// Variáveis de cor baseadas no seu design da Home
+$primary-purple: #8b5fbf;
+$secondary-purple: #6366f1;
+$danger-red: #ef4444;
+$danger-red-dark: #dc2626;
+$text-primary: #1a1a1a;
+$text-secondary: #64748b;
+$background-light: #fafbfc;
+$white: #ffffff;
+$border-light: #e2e8f0;
+
+// Estilo base do container da página
+.registration-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: $background-light;
+  font-family: "Montserrat", sans-serif;
+  padding: 2rem 1rem; // Adiciona mais espaço em telas pequenas
+}
+
+// O card principal de cadastro
+.registration-card {
+  background: $white;
+  padding: 2.5rem 2rem;
+  border-radius: 24px;
+  box-shadow: 0 8px 40px rgba($primary-purple, 0.12);
+  border: 1px solid rgba($primary-purple, 0.1);
+  width: 100%;
+  max-width: 480px; // Um pouco maior para caber todos os campos confortavelmente
+  text-align: center;
+}
+
+// Cabeçalho do card
+.registration-header {
+  margin-bottom: 2rem;
+
+  h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: $secondary-purple;
+    margin: 0;
+  }
+
+  p {
+    margin-top: 0.5rem;
+    color: $text-secondary;
+    font-size: 1rem;
+  }
+}
+
+// Estilo para os grupos de formulário (label + input)
+.form-group {
+  margin-bottom: 1.25rem;
+  text-align: left;
+}
+
+// Inputs modernizados (reaproveitado do login)
+.form-control {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid $border-light;
+  border-radius: 12px;
+  background-color: $background-light;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-purple;
+    box-shadow: 0 0 0 3px rgba($secondary-purple, 0.2);
+  }
+}
+
+// Estilo para mensagens de erro de validação
+.form-error-message {
+  color: $danger-red;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  display: block;
+}
+
+// Estilo melhorado para a lista de critérios de senha
+.password-criteria {
+  list-style-type: none;
+  padding: 0;
+  margin: 0.75rem 0 0 0;
+  font-size: 0.8rem;
+  text-align: left;
+  color: $text-secondary;
+
+  li {
+    margin-bottom: 0.25rem;
+  }
+}
+
+// Botão primário com o degradê roxo
+.btn-primary {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: none;
+  border-radius: 12px;
+  color: $white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  background: linear-gradient(135deg, $primary-purple 0%, $secondary-purple 100%);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba($secondary-purple, 0.25);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    background: linear-gradient(135deg, lighten($primary-purple, 10%), lighten($secondary-purple, 10%));
+    transform: none;
+    box-shadow: none;
+  }
+
+  // Flexbox para alinhar spinner e texto
+  .button-content {
     display: flex;
-    justify-content: center;
     align-items: center;
-    z-index: 1000;
+    justify-content: center;
+    gap: 0.5rem;
+  }
 }
-.modal-content{
-    background-color: #fff;
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    width: 90%;
-    text-align: center;
-    animation: fadeIn 0.3s ease-in-out;
+
+// Botão de perigo (para o modal)
+.btn-danger {
+  @extend .btn-primary; // Herda todos os estilos
+  background: linear-gradient(135deg, $danger-red 0%, $danger-red-dark 100%);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 6px 20px rgba($danger-red-dark, 0.25);
+  }
 }
-button[type="submit"]:disabled {
-  background-color: #60a5fa; // Um azul mais claro
-  cursor: not-allowed;
+
+// Rodapé do card (link para login)
+.registration-footer {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: $text-secondary;
+
+  a {
+    color: $primary-purple;
+    font-weight: 600;
+    text-decoration: none;
+    transition: text-decoration 0.3s ease;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
+
+// Estilização do Modal de Erro
+.modal-error {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+  @extend .registration-card; // Reaproveita o estilo do card principal
+  max-width: 400px;
+  
+  h3 {
+    color: $danger-red;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  p {
+    color: $text-secondary;
+    margin-bottom: 2rem;
+  }
+}
+
 @keyframes fadeIn {
-    
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
