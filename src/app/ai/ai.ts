@@ -20,8 +20,9 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../services/auth.service';
-import { UserService } from '../services/user.service';
+import { GetUserDto, UserService } from '../services/user.service';
 import { ConfirmationService } from '../services/confirmation.service';
+import { UserI } from '../services/user';
 
 interface ChatMessage {
   id: string;
@@ -79,14 +80,14 @@ interface ChatMessage {
         </div>
 
         <!-- Messages Container -->
-        <div 
-          class="messages-container" 
+        <div
+          class="messages-container"
           #messagesContainer
           (scroll)="onUserScroll($event)"
         >
           <div class="welcome-message" *ngIf="messages.length === 0">
             <fa-icon [icon]="faRobot" class="welcome-icon"></fa-icon>
-            <h4>Olá! 👋</h4>
+            <h4>Olá, {{ primeiroNome | titlecase }} 👋</h4>
             <p>
               Me chamo Nova, sou sua assistente virtual e irei te auxiliar com
               suas dúvidas bancárias. Como posso te ajudar hoje?
@@ -574,16 +575,31 @@ interface ChatMessage {
 
       /* Mobile Responsive */
       @media (max-width: 480px) {
-        .chat-window {
-          width: calc(100vw - 40px);
-          height: calc(100vh - 140px);
-          right: 20px;
-          left: 20px;
+        .chat-container {
+          right: 0;
+          left: 0;
+          bottom: 0;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          z-index: 1000;
         }
 
-        .chat-container {
+        .chat-window {
+          position: fixed;
+          bottom: 80px;
+          width: 100vw;
+          height: calc(100vh - 140px);
+          border-radius: 0;
+          right: 0;
+          left: 0;
+          max-width: 100vw;
+        }
+
+        .chat-toggle-btn {
+          position: fixed;
+          bottom: 20px;
           right: 20px;
-          left: auto;
         }
       }
     `,
@@ -592,7 +608,7 @@ interface ChatMessage {
 export class AiChatbot implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('messagesContainer') messagesContainer!: ElementRef;
   @ViewChild('messageInput') messageInput!: ElementRef;
-
+  accountData: GetUserDto | null = null;
   // Icons
   faRobot = faRobot;
   faTimes = faTimes;
@@ -638,6 +654,13 @@ export class AiChatbot implements OnInit, OnDestroy, AfterViewChecked {
     this.loadMessagesFromStorage();
 
     this.userService.GetUserById().subscribe((userData) => {
+      this.accountData = {
+        id: userData.id,
+        email: userData.email,
+        cpf: userData.cpf,
+        accountNumber: userData.accountNumber,
+        name: userData.name,
+      };
       this.userInitials = userData?.name?.substring(0, 1).toUpperCase() || 'U';
     });
   }
@@ -654,30 +677,44 @@ export class AiChatbot implements OnInit, OnDestroy, AfterViewChecked {
   // ✅ NOVO MÉTODO: CONTROLE INTELIGENTE DE SCROLL
   private handleAutoScroll(): void {
     const currentMessageCount = this.messages.length;
-    
+
     // Só fazer scroll automático se:
     // 1. Deve fazer scroll (nova mensagem ou chat acabou de abrir)
     // 2. Usuário não está scrollando manualmente
     // 3. Houve mudança no número de mensagens
-    if (this.shouldScrollToBottom && !this.isUserScrolling && currentMessageCount !== this.lastMessageCount) {
+    if (
+      this.shouldScrollToBottom &&
+      !this.isUserScrolling &&
+      currentMessageCount !== this.lastMessageCount
+    ) {
       this.scrollToBottom();
       this.lastMessageCount = currentMessageCount;
     }
   }
 
+    get primeiroNome(): string {
+  const nomeCompleto = this.accountData?.name;
+  if (!nomeCompleto) return 'Usuário';
+  return nomeCompleto.split(' ')[0];
+}
+
   // ✅ NOVO MÉTODO: DETECTAR SCROLL MANUAL DO USUÁRIO
   onUserScroll(event: Event): void {
     const element = event.target as HTMLElement;
     const threshold = 100; // pixels do final
-    
+
     // Verificar se usuário está próximo do final
-    const isNearBottom = element.scrollTop + element.clientHeight >= element.scrollHeight - threshold;
-    
+    const isNearBottom =
+      element.scrollTop + element.clientHeight >=
+      element.scrollHeight - threshold;
+
     // Se usuário scrollou para cima (longe do final), parar scroll automático
     if (!isNearBottom) {
       this.isUserScrolling = true;
       this.shouldScrollToBottom = false;
-      console.log('🔍 Usuário navegando no histórico - scroll automático pausado');
+      console.log(
+        '🔍 Usuário navegando no histórico - scroll automático pausado'
+      );
     } else {
       // Se usuário voltou para perto do final, reativar scroll automático
       this.isUserScrolling = false;
@@ -693,7 +730,7 @@ export class AiChatbot implements OnInit, OnDestroy, AfterViewChecked {
       // ✅ REATIVAR SCROLL AUTOMÁTICO AO ABRIR
       this.shouldScrollToBottom = true;
       this.isUserScrolling = false;
-      
+
       // Focus no input quando abrir
       setTimeout(() => {
         if (this.messageInput) {
@@ -759,7 +796,7 @@ export class AiChatbot implements OnInit, OnDestroy, AfterViewChecked {
       next: (response: ChatbotResponseDto) => {
         // ✅ GARANTIR SCROLL PARA NOVA RESPOSTA
         this.shouldScrollToBottom = true;
-        
+
         this.messages = this.messages.filter((m) => m.id !== loadingMessage.id);
 
         const aiResponse: ChatMessage = {
@@ -781,7 +818,7 @@ export class AiChatbot implements OnInit, OnDestroy, AfterViewChecked {
 
         // ✅ GARANTIR SCROLL PARA MENSAGEM DE ERRO
         this.shouldScrollToBottom = true;
-        
+
         this.messages = this.messages.filter((m) => m.id !== loadingMessage.id);
 
         const errorMessage: ChatMessage = {
@@ -839,18 +876,19 @@ export class AiChatbot implements OnInit, OnDestroy, AfterViewChecked {
   // ✅ MÉTODO PARA LIMPAR HISTÓRICO
   clearChatHistory(): void {
     const title = 'Limpar histórico';
-    const message = 'Tem certeza que deseja limpar todo o histórico de conversas com a Nova?';
-    
+    const message =
+      'Tem certeza que deseja limpar todo o histórico de conversas com a Nova?';
+
     this.confirmationService.show(title, message).subscribe((result) => {
       if (result) {
         this.messages = [];
         localStorage.removeItem(this.STORAGE_KEY);
-        
+
         // ✅ RESETAR CONTROLES DE SCROLL
         this.shouldScrollToBottom = true;
         this.isUserScrolling = false;
         this.lastMessageCount = 0;
-        
+
         console.log('🗑️ Histórico do chat da Nova limpo');
       }
     });
