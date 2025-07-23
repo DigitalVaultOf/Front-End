@@ -1,0 +1,355 @@
+// export.scss - DESIGN INSPIRADO NA HOME
+
+// ✅ IMPORT MONTSERRAT (se não estiver global)
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+
+// ✅ BACKDROP MODERNO
+.export-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+// ✅ MODAL PRINCIPAL
+.export-modal {
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(139, 95, 191, 0.2);
+  border: 1px solid rgba(139, 95, 191, 0.1);
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: "Montserrat", sans-serif;
+}
+
+// ✅ HEADER DO MODAL
+.export-header {
+  background: linear-gradient(135deg, #8b5fbf 0%, #6366f1 100%);
+  padding: 2rem;
+  text-align: center;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+
+  // Efeito de brilho sutil
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: shimmer 3s infinite;
+  }
+
+  .export-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    backdrop-filter: blur(10px);
+
+    .header-icon {
+      font-size: 1.5rem;
+      color: #ffffff;
+    }
+  }
+
+  .export-title {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .export-subtitle {
+    margin: 0;
+    font-size: 0.95rem;
+    opacity: 0.9;
+    font-weight: 400;
+  }
+}
+
+// ✅ OPÇÕES DE EXPORT
+.export-options {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.export-option {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: "Montserrat", sans-serif;
+  text-align: left;
+  width: 100%;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(139, 95, 191, 0.15);
+    border-color: rgba(139, 95, 191, 0.3);
+  }
+
+  &:active {
+    transform: translateY(-2px);
+  }
+
+  // ✅ ÍCONE DA OPÇÃO
+  .option-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  // ✅ CONTEÚDO DA OPÇÃO
+  .option-content {
+    flex: 1;
+
+    h3 {
+      margin: 0 0 0.25rem 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: #64748b;
+      font-weight: 400;
+    }
+  }
+
+  // ✅ SETA DA OPÇÃO
+  .option-arrow {
+    color: #94a3b8;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    transform: translateX(-5px);
+  }
+
+  // ✅ EFEITO HOVER NA SETA
+  &:hover .option-arrow {
+    color: #8b5fbf;
+    transform: translateX(0);
+  }
+
+  // ✅ ESTILOS ESPECÍFICOS PARA PDF
+  &.pdf {
+    .option-icon {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: #ffffff;
+
+      .pdf-icon {
+        font-size: 1.25rem;
+      }
+    }
+
+    &:hover {
+      border-color: rgba(239, 68, 68, 0.3);
+      
+      .option-icon {
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  // ✅ ESTILOS ESPECÍFICOS PARA EXCEL
+  &.excel {
+    .option-icon {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+
+      .excel-icon {
+        font-size: 1.25rem;
+      }
+    }
+
+    &:hover {
+      border-color: rgba(16, 185, 129, 0.3);
+      
+      .option-icon {
+        transform: scale(1.1);
+      }
+    }
+  }
+}
+
+// ✅ FOOTER DO MODAL
+.export-footer {
+  padding: 1.5rem 2rem 2rem;
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.btn-close {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 500;
+  color: #64748b;
+
+  .close-icon {
+    font-size: 0.875rem;
+  }
+
+  &:hover {
+    border-color: #8b5fbf;
+    color: #8b5fbf;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// ✅ ANIMAÇÕES
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+// ✅ RESPONSIVIDADE
+@media (max-width: 640px) {
+  .export-backdrop {
+    padding: 0.5rem;
+  }
+
+  .export-modal {
+    max-width: 100%;
+    margin: 0.5rem;
+  }
+
+  .export-header {
+    padding: 1.5rem;
+
+    .export-icon {
+      width: 56px;
+      height: 56px;
+
+      .header-icon {
+        font-size: 1.25rem;
+      }
+    }
+
+    .export-title {
+      font-size: 1.25rem;
+    }
+
+    .export-subtitle {
+      font-size: 0.875rem;
+    }
+  }
+
+  .export-options {
+    padding: 1.5rem;
+    gap: 0.75rem;
+  }
+
+  .export-option {
+    padding: 1.25rem;
+
+    .option-icon {
+      width: 40px;
+      height: 40px;
+
+      .pdf-icon,
+      .excel-icon {
+        font-size: 1rem;
+      }
+    }
+
+    .option-content {
+      h3 {
+        font-size: 1rem;
+      }
+
+      p {
+        font-size: 0.8rem;
+      }
+    }
+  }
+
+  .export-footer {
+    padding: 1.25rem 1.5rem 1.5rem;
+  }
+
+  .btn-close {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.875rem;
+  }
+}
+
+// ✅ ACESSIBILIDADE
+@media (prefers-reduced-motion: reduce) {
+  .export-modal,
+  .export-backdrop,
+  .export-option,
+  .btn-close {
+    animation: none;
+    transition: none;
+  }
+}

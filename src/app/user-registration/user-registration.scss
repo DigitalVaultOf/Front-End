@@ -1,37 +1,712 @@
-.modal-error{
-    position: fixed;
+// user-registration.scss - REDESIGN INSPIRADO NA HOME
+
+// ✅ IMPORT MONTSERRAT
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+
+// ✅ VARIÁVEIS DO TEMA
+$primary-gradient: linear-gradient(135deg, #8b5fbf 0%, #6366f1 100%);
+$primary-color: #8b5fbf;
+$primary-hover: #7c52a8;
+$secondary-color: #f8fafc;
+$border-color: #e2e8f0;
+$text-primary: #1a1a1a;
+$text-secondary: #64748b;
+$text-muted: #94a3b8;
+$success-color: #10b981;
+$warning-color: #f59e0b;
+$error-color: #ef4444;
+$info-color: #3b82f6;
+$border-radius-sm: 8px;
+$border-radius-md: 12px;
+$border-radius-lg: 16px;
+$border-radius-xl: 20px;
+
+// ✅ CONTAINER PRINCIPAL
+.registration-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  font-family: "Montserrat", sans-serif;
+  position: relative;
+
+  // Efeito de partículas de fundo
+  &::before {
+    content: '';
+    position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+      radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 2px, transparent 2px);
+    background-size: 50px 50px;
+    animation: backgroundMove 20s linear infinite;
+  }
+}
+
+// ✅ WRAPPER
+.registration-wrapper {
+  width: 100%;
+  max-width: 520px;
+  position: relative;
+  z-index: 1;
+}
+
+// ✅ HEADER ELEGANTE
+.registration-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #ffffff;
+
+  .header-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
     display: flex;
-    justify-content: center;
     align-items: center;
-    z-index: 1000;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+
+    .icon {
+      font-size: 2rem;
+    }
+  }
+
+  .header-content {
+    .header-title {
+      margin: 0 0 0.5rem 0;
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .header-subtitle {
+      margin: 0;
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-weight: 400;
+      text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+    }
+  }
 }
-.modal-content{
-    background-color: #fff;
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    width: 90%;
+
+// ✅ CARD PRINCIPAL
+.registration-card {
+  background: #ffffff;
+  border-radius: $border-radius-xl;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// ✅ SEÇÕES
+.registration-section,
+.security-section,
+.completion-section {
+  padding: 2rem;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid $border-color;
+  }
+
+  .section-header {
+    margin-bottom: 1.5rem;
     text-align: center;
-    animation: fadeIn 0.3s ease-in-out;
+
+    .section-title {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: $text-primary;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+
+      .section-icon {
+        font-size: 1.1rem;
+        color: $primary-color;
+      }
+    }
+
+    .section-description {
+      margin: 0;
+      font-size: 0.9rem;
+      color: $text-muted;
+      font-style: italic;
+    }
+  }
 }
-button[type="submit"]:disabled {
-  background-color: #60a5fa; // Um azul mais claro
-  cursor: not-allowed;
+
+// ✅ SEÇÃO SEGURANÇA
+.security-section {
+  background: $secondary-color;
 }
+
+// ✅ FORMULÁRIOS
+.registration-form,
+.security-form {
+  .form-group {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: $text-secondary;
+      font-size: 0.9rem;
+
+      .label-icon {
+        font-size: 0.85rem;
+        color: $primary-color;
+      }
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 2px solid $border-color;
+      border-radius: $border-radius-md;
+      font-size: 0.95rem;
+      font-family: "Montserrat", sans-serif;
+      font-weight: 400;
+      box-sizing: border-box;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: #ffffff;
+
+      &::placeholder {
+        color: $text-muted;
+        font-style: italic;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 0 4px rgba(139, 95, 191, 0.1);
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+// ✅ INPUT DE SENHA COM TOGGLE
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .form-input {
+    padding-right: 3rem;
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: $text-muted;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: $border-radius-sm;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: $primary-color;
+      background: rgba(139, 95, 191, 0.1);
+    }
+  }
+}
+
+// ✅ MENSAGENS DE ERRO
+.error-messages {
+  margin-top: 0.5rem;
+
+  .error-message {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: $border-radius-sm;
+    color: $error-color;
+    font-size: 0.8rem;
+    font-weight: 500;
+
+    .error-icon {
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+  }
+}
+
+// ✅ CRITÉRIOS DE SENHA
+.password-criteria {
+  margin-top: 0.75rem;
+  padding: 1rem;
+  background: rgba(59, 130, 246, 0.05);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: $border-radius-md;
+
+  h4 {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $text-primary;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .criteria-icon {
+      color: $info-color;
+      font-size: 0.8rem;
+    }
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    .criteria-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.8rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .criteria-status {
+        font-size: 0.7rem;
+        flex-shrink: 0;
+      }
+
+      &.invalid {
+        color: $error-color;
+
+        .criteria-status {
+          color: $error-color;
+        }
+      }
+
+      &.valid {
+        color: $success-color;
+
+        .criteria-status {
+          color: $success-color;
+        }
+      }
+    }
+  }
+}
+
+// ✅ CARD INFORMATIVO
+.info-card {
+  background: rgba(16, 185, 129, 0.05);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: $border-radius-lg;
+  padding: 1.25rem;
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  .info-icon {
+    color: $success-color;
+    font-size: 1.25rem;
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+  }
+
+  .info-content {
+    h4 {
+      margin: 0 0 0.5rem 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: $text-primary;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 1rem;
+      color: $text-secondary;
+      font-size: 0.85rem;
+
+      li {
+        margin-bottom: 0.25rem;
+      }
+    }
+  }
+}
+
+// ✅ BOTÕES
+.btn-primary {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  border: none;
+  border-radius: $border-radius-md;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.3px;
+  background: $primary-gradient;
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(139, 95, 191, 0.3);
+
+  .btn-icon {
+    font-size: 0.9rem;
+
+    &.spinning {
+      animation: spin 1s linear infinite;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 95, 191, 0.4);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+// ✅ LINKS DE FINALIZAÇÃO
+.completion-links {
+  text-align: center;
+  margin-top: 1.5rem;
+
+  p {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+    color: $text-secondary;
+  }
+
+  .link-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: $primary-color;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+
+    .link-icon {
+      font-size: 0.8rem;
+    }
+
+    &:hover {
+      color: $primary-hover;
+      text-decoration: underline;
+    }
+  }
+}
+
+// ✅ INFORMAÇÕES DE SEGURANÇA
+.security-info {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: $border-radius-lg;
+  padding: 1.25rem;
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+
+  .security-icon {
+    font-size: 1.25rem;
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+    opacity: 0.9;
+  }
+
+  .security-content {
+    h4 {
+      margin: 0 0 0.25rem 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+  }
+}
+
+// ✅ MODAL DE ERRO
+.error-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease-out;
+
+  .modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+  }
+
+  .modal-content {
+    background: #ffffff;
+    border-radius: $border-radius-xl;
+    box-shadow: 0 20px 60px rgba(239, 68, 68, 0.3);
+    border: 1px solid rgba(239, 68, 68, 0.1);
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    z-index: 1;
+    animation: modalSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    .modal-header {
+      padding: 2rem 2rem 1rem;
+      text-align: center;
+
+      .modal-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+
+        &.error {
+          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+          color: #ffffff;
+        }
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: $text-primary;
+      }
+    }
+
+    .modal-body {
+      padding: 0 2rem 1rem;
+      text-align: center;
+
+      p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: $text-secondary;
+        line-height: 1.5;
+      }
+    }
+
+    .modal-footer {
+      padding: 1rem 2rem 2rem;
+
+      .btn-primary {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+
+        &:hover:not(:disabled) {
+          box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        }
+      }
+    }
+  }
+}
+
+// ✅ ANIMAÇÕES
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @keyframes fadeIn {
-    
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes backgroundMove {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ✅ RESPONSIVIDADE
+@media (max-width: 768px) {
+  .registration-container {
+    padding: 1rem 0.5rem;
+  }
+
+  .registration-wrapper {
+    max-width: 100%;
+  }
+
+  .registration-header {
+    margin-bottom: 1.5rem;
+
+    .header-icon {
+      width: 60px;
+      height: 60px;
+
+      .icon {
+        font-size: 1.5rem;
+      }
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+
+    .header-content {
+      .header-title {
+        font-size: 2rem;
+      }
+
+      .header-subtitle {
+        font-size: 1rem;
+      }
     }
+  }
+
+  .registration-section,
+  .security-section,
+  .completion-section {
+    padding: 1.5rem;
+  }
+
+  .info-card {
+    flex-direction: column;
+    text-align: center;
+
+    .info-icon {
+      align-self: center;
+      margin-top: 0;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .registration-container {
+    padding: 0.5rem;
+  }
+
+  .registration-header {
+    .header-content {
+      .header-title {
+        font-size: 1.75rem;
+      }
+
+      .header-subtitle {
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  .registration-section,
+  .security-section,
+  .completion-section {
+    padding: 1.25rem;
+  }
+
+  .form-input {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .security-info {
+    flex-direction: column;
+    text-align: center;
+
+    .security-icon {
+      align-self: center;
+      margin-top: 0;
+    }
+  }
+
+  .error-modal .modal-content {
+    margin: 0.5rem;
+  }
+}
+
+// ✅ ACESSIBILIDADE
+@media (prefers-reduced-motion: reduce) {
+  .registration-card,
+  .form-input,
+  .btn-primary,
+  .error-modal .modal-content {
+    animation: none;
+    transition: none;
+  }
+
+  .registration-container::before {
+    animation: none;
+  }
 }

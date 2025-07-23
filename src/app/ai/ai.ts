@@ -175,7 +175,7 @@ interface ChatMessage {
         position: fixed;
         bottom: 20px;
         right: 20px;
-        z-index: 1000;
+        z-index: 9999;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui,
           sans-serif;
       }
@@ -574,7 +574,7 @@ interface ChatMessage {
       }
 
       /* Mobile Responsive */
-      @media (max-width: 480px) {
+      @media (max-width: 1160px) {
         .chat-container {
           right: 0;
           left: 0;
@@ -582,26 +582,64 @@ interface ChatMessage {
           width: 100%;
           display: flex;
           justify-content: center;
-          z-index: 1000;
+          z-index: 9999; // para ficar acima do restante se necessário
         }
 
         .chat-window {
-          position: fixed;
-          bottom: 80px;
-          width: 100vw;
-          height: calc(100vh - 140px);
-          border-radius: 0;
-          right: 0;
-          left: 0;
-          max-width: 100vw;
+          width: 90vw;
+          height: calc(100vh - 160px); // ligeiramente menor
+          bottom: 100px; // já deixa espaço para o botão
+          right: auto;
+          left: auto;
+          margin: 0 auto;
+          border-radius: 12px;
         }
 
         .chat-toggle-btn {
           position: fixed;
-          bottom: 20px;
+          bottom: 50px;
           right: 20px;
+          z-index: 9999 !important; // para ficar acima do restante se necessário
         }
       }
+      @media (max-width: 1024px) {
+        .chat-window {
+          width: 90vw;
+          height: calc(100vh - 160px);
+        }
+        .chat-toggle-btn {
+          position: fixed;
+          bottom: 250px;
+          right: 20px;
+          z-index: 9999 !important; // para ficar acima do restante se necessário
+        }
+      }
+      @media (max-width: 450px) {
+  .chat-toggle-btn {
+    bottom: 220px !important; // Força sobrepor o JS
+    right: 20px;
+    z-index: 9999 !important;
+  }
+
+  .chat-window {
+    width: 95vw;
+    height: calc(100vh - 160px);
+    bottom: 240px !important;
+    border-radius: 12px;
+    right: auto;
+    left: auto;
+    margin: 0 auto;
+  }
+
+  .chat-container {
+    bottom: 200px !important; // força o container a acompanhar o botão
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+  }
+}
+
     `,
   ],
 })
@@ -650,6 +688,8 @@ export class AiChatbot implements OnInit, OnDestroy, AfterViewChecked {
   ) {}
 
   ngOnInit() {
+    window.addEventListener('scroll', this.handlePageScroll);
+
     // ✅ CARREGAR MENSAGENS SALVAS AO INICIALIZAR
     this.loadMessagesFromStorage();
 
@@ -666,8 +706,27 @@ export class AiChatbot implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   ngOnDestroy() {
-    // Cleanup se necessário
+    window.removeEventListener('scroll', this.handlePageScroll);
   }
+
+  handlePageScroll = () => {
+  // ✅ Ignora scroll manual em telas pequenas
+  if (window.innerWidth <= 450) return;
+
+  const scrollBottom =
+    window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
+
+  const btn = document.querySelector('.chat-toggle-btn') as HTMLElement;
+
+  if (btn) {
+    if (scrollBottom) {
+      btn.style.bottom = '100px';
+    } else {
+      btn.style.bottom = '20px';
+    }
+  }
+};
+
 
   ngAfterViewChecked() {
     // ✅ SÓ FAZER SCROLL AUTOMÁTICO EM SITUAÇÕES ESPECÍFICAS
@@ -692,11 +751,11 @@ export class AiChatbot implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
-    get primeiroNome(): string {
-  const nomeCompleto = this.accountData?.name;
-  if (!nomeCompleto) return 'Usuário';
-  return nomeCompleto.split(' ')[0];
-}
+  get primeiroNome(): string {
+    const nomeCompleto = this.accountData?.name;
+    if (!nomeCompleto) return 'Usuário';
+    return nomeCompleto.split(' ')[0];
+  }
 
   // ✅ NOVO MÉTODO: DETECTAR SCROLL MANUAL DO USUÁRIO
   onUserScroll(event: Event): void {

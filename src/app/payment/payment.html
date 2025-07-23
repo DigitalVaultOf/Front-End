@@ -1,152 +1,190 @@
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-/>
+<!-- payment.html - REDESIGN INSPIRADO NA HOME -->
 
-<div class="modal-overlay">
-  <div class="modal">
-    <div class="modal-header">
+<!-- ✅ BACKDROP MODERNO -->
+<div class="payment-backdrop">
+  
+  <!-- ✅ MODAL PRINCIPAL -->
+  <div class="payment-modal">
+    
+    <!-- ✅ HEADER COM GRADIENTE -->
+    <div class="payment-header">
       <button
-        class="voltar-btn"
+        class="back-btn"
         *ngIf="mostrarBotaoVoltar()"
         (click)="voltarTela()"
       >
-        <i class="fa-solid fa-arrow-left"></i>
+        <fa-icon [icon]="faArrowLeft"></fa-icon>
       </button>
-      <h2 class="modal-title">
-        {{ exibirListaPendentes ? 'Boletos Pendentes' : 
-           exibirListaPagos ? 'Boletos Pagos' : 'Pagar Boleto' }}
-      </h2>
+      
+      <div class="header-icon">
+        <fa-icon [icon]="getHeaderIcon()" class="icon"></fa-icon>
+      </div>
+      
+      <div class="header-content">
+        <h2 class="header-title">{{ getHeaderTitle() }}</h2>
+        <p class="header-subtitle">{{ getHeaderSubtitle() }}</p>
+      </div>
+      
       <button class="close-btn" (click)="closeModal()">
-        <i class="fas fa-times"></i>
+        <fa-icon [icon]="faTimes"></fa-icon>
       </button>
     </div>
 
-    <div class="modal-body">
+    <!-- ✅ CONTEÚDO PRINCIPAL -->
+    <div class="payment-content">
+      
       <!-- ✅ LISTA DE BOLETOS PENDENTES -->
-      <div *ngIf="exibirListaPendentes" class="boletos-list">
-        <div *ngIf="carregandoLista" class="loading-container">
-          <i class="fas fa-spinner fa-spin"></i>
-          <span>Carregando boletos pendentes...</span>
+      <div *ngIf="exibirListaPendentes" class="boletos-section">
+        
+        <div *ngIf="carregandoLista" class="loading-state">
+          <div class="loading-icon">
+            <fa-icon [icon]="faSpinner" class="spinning"></fa-icon>
+          </div>
+          <h3>Carregando boletos...</h3>
+          <p>Buscando seus boletos pendentes</p>
         </div>
 
         <div *ngIf="!carregandoLista && boletosPendentes.length > 0" class="boletos-grid">
-          <div *ngFor="let boleto of boletosPendentes" class="boleto-card">
-            <div class="boleto-header">
-              <div class="boleto-info">
-                <span class="boleto-number">{{ boleto.bankSlipNumber }}</span>
-                <span class="boleto-description">{{ boleto.description || 'Sem descrição' }}</span>
+          <div *ngFor="let boleto of boletosPendentes" class="boleto-card pending">
+            <div class="card-header">
+              <div class="card-icon pending">
+                <fa-icon [icon]="faFileInvoiceDollar"></fa-icon>
               </div>
-              <div class="boleto-amount">{{ formatarValor(boleto.amount) }}</div>
+              <div class="card-amount pending">
+                {{ formatarValor(boleto.amount) }}
+              </div>
             </div>
             
-            <div class="boleto-details">
-              <div class="detail-item">
-                <i class="fas fa-calendar me-1"></i>
-                <span>Vencimento: {{ formatarData(boleto.dueDate) }}</span>
-              </div>
-              <div class="detail-item">
-                <i class="fas fa-user me-1"></i>
-                <span>{{ boleto.customer }}</span>
+            <div class="card-content">
+              <div class="card-title">{{ boleto.bankSlipNumber }}</div>
+              <div class="card-description">{{ boleto.description || 'Sem descrição' }}</div>
+              
+              <div class="card-details">
+                <div class="detail-row">
+                  <fa-icon [icon]="faCalendar" class="detail-icon"></fa-icon>
+                  <span>Vencimento: {{ formatarData(boleto.dueDate) }}</span>
+                </div>
+                <div class="detail-row">
+                  <fa-icon [icon]="faUser" class="detail-icon"></fa-icon>
+                  <span>{{ boleto.customer }}</span>
+                </div>
               </div>
             </div>
 
-            <div class="boleto-actions">
+            <div class="card-footer">
               <button 
-                class="btn btn-primary btn-sm" 
+                class="btn-card primary" 
                 (click)="pagarBoletoDaLista(boleto)"
               >
-                <i class="fas fa-credit-card me-1"></i>
-                Pagar
+                <fa-icon [icon]="faCreditCard" class="btn-icon"></fa-icon>
+                <span>Pagar</span>
               </button>
             </div>
           </div>
         </div>
 
         <div *ngIf="!carregandoLista && boletosPendentes.length === 0" class="empty-state">
-          <i class="fas fa-check-circle"></i>
+          <div class="empty-icon success">
+            <fa-icon [icon]="faCheckCircle"></fa-icon>
+          </div>
           <h3>Eba! Nada por aqui...</h3>
           <p>{{ mensagemLista || 'Você está em dia com os pagamentos!' }}</p>
         </div>
       </div>
 
       <!-- ✅ LISTA DE BOLETOS PAGOS -->
-      <div *ngIf="exibirListaPagos" class="boletos-list">
-        <div *ngIf="carregandoLista" class="loading-container">
-          <i class="fas fa-spinner fa-spin"></i>
-          <span>Carregando boletos pagos...</span>
+      <div *ngIf="exibirListaPagos" class="boletos-section">
+        
+        <div *ngIf="carregandoLista" class="loading-state">
+          <div class="loading-icon">
+            <fa-icon [icon]="faSpinner" class="spinning"></fa-icon>
+          </div>
+          <h3>Carregando boletos...</h3>
+          <p>Buscando seu histórico de pagamentos</p>
         </div>
 
         <div *ngIf="!carregandoLista && boletosPagos.length > 0" class="boletos-grid">
           <div *ngFor="let boleto of boletosPagos" class="boleto-card paid">
-            <div class="boleto-header">
-              <div class="boleto-info">
-                <span class="boleto-number">{{ boleto.bankSlipNumber }}</span>
-                <span class="boleto-description">{{ boleto.description || 'Sem descrição' }}</span>
+            <div class="card-header">
+              <div class="card-icon paid">
+                <fa-icon [icon]="faCheckCircle"></fa-icon>
               </div>
-              <div class="boleto-amount paid">{{ formatarValor(boleto.amountBeforePay) }}</div>
+              <div class="card-amount paid">
+                {{ formatarValor(boleto.amountBeforePay) }}
+              </div>
             </div>
             
-            <div class="boleto-details">
-              <div class="detail-item">
-                <i class="fas fa-calendar-check me-1"></i>
-                <span>Pago em: {{ formatarData(boleto.paymentDate) }}</span>
-              </div>
-              <div class="detail-item">
-                <i class="fas fa-user me-1"></i>
-                <span>{{ boleto.customer }}</span>
+            <div class="card-content">
+              <div class="card-title">{{ boleto.bankSlipNumber }}</div>
+              <div class="card-description">{{ boleto.description || 'Sem descrição' }}</div>
+              
+              <div class="card-details">
+                <div class="detail-row">
+                  <fa-icon [icon]="faCalendarCheck" class="detail-icon"></fa-icon>
+                  <span>Pago em: {{ formatarData(boleto.paymentDate) }}</span>
+                </div>
+                <div class="detail-row">
+                  <fa-icon [icon]="faUser" class="detail-icon"></fa-icon>
+                  <span>{{ boleto.customer }}</span>
+                </div>
               </div>
             </div>
 
-            <div class="boleto-status">
-              <span class="status-badge paid">
-                <i class="fas fa-check me-1"></i>
-                Pago
-              </span>
+            <div class="card-footer">
+              <div class="status-badge paid">
+                <fa-icon [icon]="faCheck" class="status-icon"></fa-icon>
+                <span>Pago</span>
+              </div>
             </div>
           </div>
         </div>
 
         <div *ngIf="!carregandoLista && boletosPagos.length === 0" class="empty-state">
-          <i class="fas fa-file-invoice"></i>
+          <div class="empty-icon info">
+            <fa-icon [icon]="faFileInvoice"></fa-icon>
+          </div>
           <h3>Nenhum boleto pago</h3>
           <p>{{ mensagemLista || 'Você ainda não possui boletos pagos.' }}</p>
         </div>
       </div>
 
-      <!-- ✅ MENSAGEM DE SUCESSO - Boleto gerado -->
-      <div *ngIf="mostrarSucessoGeracao" class="flex flex-col space-y-4">
-        <div class="success-message-container">
-          <div class="success-message">
-            <i class="fas fa-check-circle me-2"></i>
-            <div class="success-content">
-              <div class="success-title">
-                Boleto de R$ {{ valorBoletoGerado | number : "1.2-2" }} gerado
-                com sucesso!
-              </div>
-              <div class="success-subtitle">
-                Clique abaixo para copiar o código do boleto
-              </div>
-            </div>
+      <!-- ✅ TELA DE SUCESSO - BOLETO GERADO -->
+      <div *ngIf="mostrarSucessoGeracao" class="success-section">
+        <div class="success-card">
+          <div class="success-icon">
+            <fa-icon [icon]="faCheckCircle"></fa-icon>
+          </div>
+          <div class="success-content">
+            <h3>Boleto Gerado com Sucesso!</h3>
+            <p>Seu boleto de <strong>R$ {{ valorBoletoGerado | number : "1.2-2" }}</strong> foi criado</p>
           </div>
         </div>
 
-        <div class="copy-container">
+        <div class="copy-section">
+          <label class="copy-label">
+            <fa-icon [icon]="faCopy" class="label-icon"></fa-icon>
+            Código do Boleto
+          </label>
           <button
-            class="btn-copy"
+            class="copy-button"
             (click)="copiarCodigoBoleto()"
             title="Clique para copiar o código do boleto"
           >
-            <i class="fas fa-copy me-2"></i>
-            {{ numeroBoleto }}
-            <span class="copy-hint">Clique para copiar</span>
+            <span class="copy-code">{{ numeroBoleto }}</span>
+            <div class="copy-action">
+              <fa-icon [icon]="faCopy" class="copy-icon"></fa-icon>
+              <span>Copiar</span>
+            </div>
           </button>
+          <div class="copy-hint">
+            <fa-icon [icon]="faInfoCircle" class="hint-icon"></fa-icon>
+            <span>Clique no código acima para copiar</span>
+          </div>
         </div>
       </div>
 
-      <!-- Tela inicial - Número do boleto -->
+      <!-- ✅ TELA INICIAL - NÚMERO DO BOLETO -->
       <div
-        class="form-group"
         *ngIf="
           !exibirValorParcial &&
           !exibirSenha &&
@@ -155,237 +193,318 @@
           !exibirListaPendentes &&
           !exibirListaPagos
         "
+        class="payment-section"
       >
-        <div class="floating-field">
+        <div class="section-header">
+          <h3 class="section-title">
+            <fa-icon [icon]="faBarcode" class="section-icon"></fa-icon>
+            Dados do Boleto
+          </h3>
+          <p class="section-description">Digite o número ou escolha uma opção</p>
+        </div>
+
+        <div class="form-group">
+          <label for="numeroBoleto">
+            <fa-icon [icon]="faHashtag" class="label-icon"></fa-icon>
+            Número do Boleto
+          </label>
           <input
             type="text"
+            id="numeroBoleto"
             class="form-input"
             [value]="numeroBoleto"
             (input)="onBoletoInput($event)"
-            placeholder=""
+            placeholder="Digite apenas números (máx. 18 dígitos)"
             maxlength="18"
             pattern="[0-9]*"
             inputmode="numeric"
-            id="numeroBoleto"
-            required
           />
-          <label for="numeroBoleto" 
-                 title="Digite apenas números do boleto (máx. 18 dígitos)..." 
-                 data-title="Número do boleto">
-          </label>
-        </div>
+          
+          <!-- ✅ VALIDAÇÃO -->
+          <div *ngIf="numeroBoleto && numeroBoleto.length >= 1" class="input-validation">
+            <div *ngIf="validandoBoleto" class="validation-loading">
+              <fa-icon [icon]="faSpinner" class="spinning validation-icon"></fa-icon>
+              <span>Validando boleto...</span>
+            </div>
 
-        <div class="input-actions mt-2">
-          <button class="btn btn-secondary btn-sm" (click)="gerarBoleto()">
-            <i class="fas fa-file-invoice me-1"></i>
-            Gerar boleto
-          </button>
-          <button class="btn btn-secondary btn-sm" (click)="pagarRapidamente()">
-            <i class="fas fa-bolt me-1"></i>
-            Pagar rapidamente
-          </button>
-          <button
-            class="btn btn-secondary btn-sm"
-            (click)="listarBoletosPendentes()"
-          >
-            <i class="fas fa-clock me-1"></i>
-            Pendentes
-          </button>
-          <button
-            class="btn btn-secondary btn-sm"
-            (click)="listarBoletosPagos()"
-          >
-            <i class="fas fa-check me-1"></i>
-            Pagos
-          </button>
-        </div>
-
-        <div
-          class="input-validation"
-          *ngIf="numeroBoleto && numeroBoleto.length >= 1"
-        >
-          <!-- Loading da validação -->
-          <div *ngIf="validandoBoleto" class="validation-loading">
-            <i class="fas fa-spinner fa-spin me-2"></i>
-            <span>Validando boleto...</span>
+            <div
+              *ngIf="!validandoBoleto && boletoValidado"
+              class="validation-result"
+              [class.valid]="getTipoMensagemValidacao() === 'valid'"
+              [class.invalid]="getTipoMensagemValidacao() === 'invalid'"
+              [class.already-paid]="getTipoMensagemValidacao() === 'already-paid'"
+            >
+              <fa-icon 
+                [icon]="getValidationIcon()" 
+                class="validation-icon"
+              ></fa-icon>
+              <span>{{ mensagemValidacao }}</span>
+            </div>
           </div>
+        </div>
 
-          <!-- Resultado da validação com suporte a mensagem amarela -->
-          <div
-            *ngIf="!validandoBoleto && boletoValidado"
-            class="validation-result"
-            [class.valid]="getTipoMensagemValidacao() === 'valid'"
-            [class.invalid]="getTipoMensagemValidacao() === 'invalid'"
-            [class.already-paid]="getTipoMensagemValidacao() === 'already-paid'"
-          >
-            <i
-              [class]="
-                getTipoMensagemValidacao() === 'valid' ? 'fas fa-check-circle' : 
-                getTipoMensagemValidacao() === 'already-paid' ? 'fas fa-exclamation-triangle' :
-                'fas fa-times-circle'
-              "
-            ></i>
-            <span>{{ mensagemValidacao }}</span>
+        <!-- ✅ AÇÕES RÁPIDAS -->
+        <div class="quick-actions">
+          <h4 class="actions-title">
+            <fa-icon [icon]="faSigning" class="actions-icon"></fa-icon>
+            Ações Rápidas
+          </h4>
+          
+          <div class="actions-grid">
+            <button class="action-btn" (click)="gerarBoleto()">
+              <div class="action-icon primary">
+                <fa-icon [icon]="faFileInvoice"></fa-icon>
+              </div>
+              <div class="action-content">
+                <h5>Gerar Boleto</h5>
+                <p>Criar novo boleto</p>
+              </div>
+            </button>
+
+            <button class="action-btn" (click)="pagarRapidamente()">
+              <div class="action-icon warning">
+                <fa-icon [icon]="faBolt"></fa-icon>
+              </div>
+              <div class="action-content">
+                <h5>Pagar Rapidamente</h5>
+                <p>Último boleto pendente</p>
+              </div>
+            </button>
+
+            <button class="action-btn" (click)="listarBoletosPendentes()">
+              <div class="action-icon info">
+                <fa-icon [icon]="faClock"></fa-icon>
+              </div>
+              <div class="action-content">
+                <h5>Boletos Pendentes</h5>
+                <p>Ver lista completa</p>
+              </div>
+            </button>
+
+            <button class="action-btn" (click)="listarBoletosPagos()">
+              <div class="action-icon success">
+                <fa-icon [icon]="faCheckCircle"></fa-icon>
+              </div>
+              <div class="action-content">
+                <h5>Boletos Pagos</h5>
+                <p>Histórico de pagamentos</p>
+              </div>
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- Tela de geração de boleto -->
-      <div *ngIf="exibirGerarBoleto" class="flex flex-col space-y-4">
+      <!-- ✅ TELA DE GERAÇÃO DE BOLETO -->
+      <div *ngIf="exibirGerarBoleto" class="payment-section">
+        <div class="section-header">
+          <h3 class="section-title">
+            <fa-icon [icon]="faFileInvoice" class="section-icon"></fa-icon>
+            Gerar Novo Boleto
+          </h3>
+          <p class="section-description">Preencha as informações do boleto</p>
+        </div>
+
         <div class="form-group">
-          <div class="floating-field">
+          <label for="valorGeracao">
+            <fa-icon [icon]="faMoneyBillAlt" class="label-icon"></fa-icon>
+            Valor do Boleto
+          </label>
+          <div class="money-input-container">
+            <span class="currency-symbol">R$</span>
             <input
               type="number"
-              class="form-input"
+              id="valorGeracao"
+              class="form-input money"
               [(ngModel)]="valorGeracao"
               (input)="validarGeracaoBoleto()"
               [min]="1"
               step="0.01"
-              placeholder=""
-              id="valorGeracao"
-              required
+              placeholder="0,00"
             />
-            <label for="valorGeracao" 
-                   title="Digite o valor do boleto..." 
-                   data-title="Valor do boleto">
-            </label>
           </div>
         </div>
 
         <div class="form-group">
-          <div class="floating-field">
-            <input
-              type="text"
-              class="form-input"
-              [(ngModel)]="descricaoGeracao"
-              (input)="validarGeracaoBoleto()"
-              maxlength="500"
-              placeholder=""
-              id="descricaoGeracao"
-              required
-            />
-            <label for="descricaoGeracao" 
-                   title="Descreva o boleto (ex: Mensalidade Janeiro/2025)..." 
-                   data-title="Descrição">
-            </label>
+          <label for="descricaoGeracao">
+            <fa-icon [icon]="faComment" class="label-icon"></fa-icon>
+            Descrição
+          </label>
+          <input
+            type="text"
+            id="descricaoGeracao"
+            class="form-input"
+            [(ngModel)]="descricaoGeracao"
+            (input)="validarGeracaoBoleto()"
+            maxlength="500"
+            placeholder="Ex: Mensalidade Janeiro/2025"
+          />
+          <div class="input-hint">
+            <fa-icon [icon]="faInfoCircle" class="hint-icon"></fa-icon>
+            <span>A descrição aparecerá no boleto gerado</span>
           </div>
         </div>
 
-        @if (mensagemErroGeracao) {
-        <span class="text-red-500 text-sm">{{ mensagemErroGeracao }}</span>
-        }
+        <div *ngIf="mensagemErroGeracao" class="error-message">
+          <fa-icon [icon]="faExclamationTriangle" class="error-icon"></fa-icon>
+          <span>{{ mensagemErroGeracao }}</span>
+        </div>
       </div>
 
-      <!-- Tela de valor parcial -->
-      <div *ngIf="exibirValorParcial" class="flex flex-col space-y-4">
-        <div class="flex justify-between items-center">
-          <span class="text-gray-600">Valor total do boleto:</span>
-          <strong class="text-lg"
-            >R$ {{ valorBoleto | number : "1.2-2" }}</strong
-          >
+      <!-- ✅ TELA DE VALOR PARCIAL -->
+      <div *ngIf="exibirValorParcial" class="payment-section">
+        <div class="section-header">
+          <h3 class="section-title">
+            <fa-icon [icon]="faCalculator" class="section-icon"></fa-icon>
+            Valor do Pagamento
+          </h3>
+          <p class="section-description">Defina o valor que deseja pagar</p>
+        </div>
+
+        <!-- ✅ RESUMO DO BOLETO -->
+        <div class="boleto-summary">
+          <div class="summary-header">
+            <fa-icon [icon]="faReceipt" class="summary-icon"></fa-icon>
+            <h4>Resumo do Boleto</h4>
+          </div>
+          <div class="summary-content">
+            <div class="summary-row">
+              <span class="label">Valor total:</span>
+              <span class="value total">R$ {{ valorBoleto | number : "1.2-2" }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="label">Número:</span>
+              <span class="value">{{ numeroBoleto }}</span>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
-          <div class="floating-field">
+          <label for="valorPagamento">
+            <fa-icon [icon]="faMoneyBillAlt" class="label-icon"></fa-icon>
+            Valor a Pagar
+          </label>
+          <div class="money-input-container">
+            <span class="currency-symbol">R$</span>
             <input
               type="number"
-              class="form-input"
+              id="valorPagamento"
+              class="form-input money"
               [(ngModel)]="valorPagamento"
               (input)="validarValorPagamento()"
               [max]="valorBoleto"
               [min]="valorMinimo"
               step="0.01"
-              placeholder=""
-              id="valorPagamento"
-              required
+              placeholder="0,00"
             />
-            <label for="valorPagamento" 
-                   title="Digite o valor que deseja pagar..." 
-                   data-title="Valor a pagar">
-            </label>
           </div>
+          
+          <div *ngIf="mensagemErroValor" class="error-message">
+            <fa-icon [icon]="faExclamationTriangle" class="error-icon"></fa-icon>
+            <span>{{ mensagemErroValor }}</span>
+          </div>
+        </div>
 
-          @if (mensagemErroValor) {
-          <span class="text-red-500 text-sm mt-1">{{ mensagemErroValor }}</span>
-          }
+        <!-- ✅ INFORMAÇÕES -->
+        <div class="info-card">
+          <div class="info-icon">
+            <fa-icon [icon]="faInfoCircle"></fa-icon>
+          </div>
+          <div class="info-content">
+            <h4>Informações de Pagamento</h4>
+            <ul>
+              <li>Valor mínimo: R$ {{ valorMinimo }},00</li>
+              <li>Valor máximo: R$ {{ valorBoleto | number:'1.2-2' }}</li>
+              <li>Processamento imediato</li>
+            </ul>
+          </div>
         </div>
       </div>
 
-      <!-- Tela de senha -->
-      <div *ngIf="exibirSenha" class="flex flex-col space-y-4">
-        <div class="flex justify-between items-center">
-          <span class="text-gray-600">Valor a pagar:</span>
-          <strong class="text-lg"
-            >R$ {{ valorPagamento | number : "1.2-2" }}</strong
-          >
+      <!-- ✅ TELA DE CONFIRMAÇÃO COM SENHA -->
+      <div *ngIf="exibirSenha" class="payment-section">
+        <div class="section-header">
+          <h3 class="section-title">
+            <fa-icon [icon]="faShieldAlt" class="section-icon"></fa-icon>
+            Confirmação do Pagamento
+          </h3>
+          <p class="section-description">Digite sua senha para confirmar</p>
+        </div>
+
+        <!-- ✅ RESUMO FINAL -->
+        <div class="payment-summary">
+          <div class="summary-header">
+            <fa-icon [icon]="faReceipt" class="summary-icon"></fa-icon>
+            <h4>Resumo Final</h4>
+          </div>
+          <div class="summary-content">
+            <div class="summary-row">
+              <span class="label">Valor a pagar:</span>
+              <span class="value highlight">R$ {{ valorPagamento | number : "1.2-2" }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="label">Boleto:</span>
+              <span class="value">{{ numeroBoleto }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="label">Processamento:</span>
+              <span class="value">Imediato</span>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
-          <div class="floating-field">
-            <input
-              type="password"
-              class="form-input"
-              [(ngModel)]="senha"
-              (input)="onSenhaChange()"
-              placeholder=""
-              id="senha"
-              required
-            />
-            <label for="senha" 
-                   title="Digite sua senha..." 
-                   data-title="Digite sua senha">
-            </label>
+          <label for="senha">
+            <fa-icon [icon]="faLock" class="label-icon"></fa-icon>
+            Senha de Confirmação
+          </label>
+          <input
+            type="password"
+            id="senha"
+            class="form-input"
+            [(ngModel)]="senha"
+            (input)="onSenhaChange()"
+            placeholder="Digite sua senha"
+          />
+          
+          <div *ngIf="mensagemErro" class="error-message">
+            <fa-icon [icon]="faExclamationTriangle" class="error-icon"></fa-icon>
+            <span>{{ mensagemErro }}</span>
           </div>
+        </div>
 
-          @if (mensagemErro) {
-          <div class="text-red-600 font-semibold mt-2">
-            {{ mensagemErro }}
+        <!-- ✅ SEGURANÇA -->
+        <div class="security-card">
+          <div class="security-icon">
+            <fa-icon [icon]="faUserShield"></fa-icon>
           </div>
-          }
+          <div class="security-content">
+            <h4>Pagamento Seguro</h4>
+            <p>Transação protegida com criptografia de ponta a ponta</p>
+          </div>
         </div>
       </div>
 
-      <!-- Botões de ação -->
-      <div class="action-buttons" *ngIf="!exibirListaPendentes && !exibirListaPagos">
-        <button
-          [disabled]="!permitirAvancar()"
-          class="btn btn-primary bg-indigo-600"
-          (click)="avancarEtapa()"
-        >
-          <div class="button-content">
-            @if (isLoading) {
-            <svg
-              class="animate-spin h-5 w-5 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-            }
-            <span class="button-text">
-              {{ getTextoBotaoPrincipal() }}
-            </span>
-            <span *ngIf="isLoading" class="dots"></span>
-          </div>
-        </button>
-
-        <button class="btn btn-secondary" (click)="closeModal()">
-          Cancelar
-        </button>
-      </div>
     </div>
+
+    <!-- ✅ FOOTER COM BOTÕES -->
+    <div class="payment-footer" *ngIf="!exibirListaPendentes && !exibirListaPagos">
+      <button class="btn-action secondary" (click)="closeModal()">
+        <fa-icon [icon]="faArrowLeft" class="btn-icon"></fa-icon>
+        <span>Cancelar</span>
+      </button>
+      
+      <button
+        class="btn-action primary"
+        [disabled]="!permitirAvancar()"
+        (click)="avancarEtapa()"
+      >
+        <fa-icon [icon]="isLoading ? faSpinner : getActionIcon()" 
+                 class="btn-icon" 
+                 [class.spinning]="isLoading"></fa-icon>
+        <span>{{ getTextoBotaoPrincipal() }}</span>
+      </button>
+    </div>
+
   </div>
+
 </div>

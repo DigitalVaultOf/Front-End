@@ -1,81 +1,155 @@
-$success-color: #28a745;
-$error-color: #dc3545;
-$warning-color: #eb830c;
+/* alert.component.scss - ANIMAÇÃO CORRIGIDA */
 
-.alert-modal {
-  display: flex;
-  align-items: center;
+// ✅ VARIÁVEIS DE CORES
+$success-color: #10b981;
+$error-color: #ef4444;
+$warning-color: #f59e0b;
+
+// ✅ CONTAINER PRINCIPAL - ANIMAÇÃO OTIMIZADA
+.alert-container {
   position: fixed;
   top: 20px;
   right: 20px;
   min-width: 300px;
   max-width: 400px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-left: 5px solid;
-  padding: 1rem;
-  z-index: 2000; // Garante que fique acima de outros modais
-
-  // Animação de entrada e saída
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  border-left: 5px solid #ddd;
+  z-index: 2000;
+  overflow: hidden;
+  
+  // ✅ ESTADO INICIAL - COMPLETAMENTE FORA DA TELA DIREITA
   opacity: 0;
-  transform: translateX(100%);
-  transition: opacity 0.3s ease-out, transform 0.4s ease-out;
-
+  transform: translateX(calc(100% + 40px)) scale(0.8);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); /* Efeito suave com bounce */
+  will-change: transform, opacity;
+  
+  // ✅ ESTADO ABERTO - ENTRADA SUAVE DA DIREITA
   &.open {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateX(0) scale(1);
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
+  
+  // ✅ ESTADO FECHANDO - SAÍDA FLUÍDA PARA DIREITA
+  &.closing {
+    opacity: 0;
+    transform: translateX(calc(100% + 40px)) scale(0.9);
+    transition: all 0.4s cubic-bezier(0.6, 0.04, 0.98, 0.335); /* ease-out suave */
+  }
+}
+
+// ✅ CONTEÚDO - ANIMAÇÕES INTERNAS
+.alert-content {
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  position: relative;
 }
 
 .alert-icon {
-  font-size: 1.8rem;
-  margin-right: 1rem;
+  flex-shrink: 0;
+  font-size: 24px;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.alert-content {
-  flex-grow: 1;
-  h3 {
-    margin: 0 0 0.25rem 0;
-    font-size: 1rem;
-  }
-  p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #555;
+.alert-text {
+  flex: 1;
+}
+
+.alert-title {
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0 0 5px 0;
+  color: #333;
+  transition: all 0.4s ease;
+}
+
+.alert-message {
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.4;
+  color: #666;
+  transition: all 0.4s ease;
+}
+
+.alert-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  color: #999;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  
+  &:hover {
+    color: #666;
+    background: rgba(0, 0, 0, 0.05);
+    transform: scale(1.1);
   }
 }
 
-// Estilos específicos para cada tipo
-.alert-sucesso {
+// ✅ CORES POR TIPO
+.alert-success {
   border-left-color: $success-color;
-  .alert-icon {
-    color: $success-color;
-  }
+  .alert-icon { color: $success-color; }
 }
 
-.alert-erro {
+.alert-error {
   border-left-color: $error-color;
-  .alert-icon {
-    color: $error-color;
-  }
+  .alert-icon { color: $error-color; }
 }
 
 .alert-warning {
   border-left-color: $warning-color;
+  .alert-icon { color: $warning-color; }
+}
+
+// ✅ ANIMAÇÕES DURANTE FECHAMENTO
+.alert-container.closing {
   .alert-icon {
-    color: $warning-color;
+    transform: scale(0.8) rotate(-5deg);
+  }
+  
+  .alert-title,
+  .alert-message {
+    opacity: 0.4;
+    transform: translateX(10px);
   }
 }
 
-.close-btn {
-  background: none;
-  border: none;
-  color: #aaa;
-  cursor: pointer;
-  font-size: 1.2rem;
-  align-self: flex-start;
-  &:hover {
-    color: #555;
+// ✅ HOVER SUTIL
+.alert-container:hover:not(.closing) {
+  transform: translateX(-5px) scale(1.02);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+// ✅ RESPONSIVIDADE
+@media (max-width: 480px) {
+  .alert-container {
+    left: 20px;
+    right: 20px;
+    min-width: auto;
+    max-width: none;
+    
+    // Estados móveis
+    &:not(.open) {
+      transform: translateX(100vw) scale(0.8);
+    }
+    
+    &.open {
+      transform: translateX(0) scale(1);
+    }
+    
+    &.closing {
+      transform: translateX(100vw) scale(0.9);
+    }
   }
 }

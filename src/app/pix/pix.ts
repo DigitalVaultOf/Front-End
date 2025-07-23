@@ -5,15 +5,63 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { AlertService } from '../services/alert.service';
+// ✅ 1. Importar o UserService
+import { UserService } from '../services/user.service';
+// pix.ts - ADICIONAR ESTES IMPORTS
+
+import {
+  faQrcode,
+  faTimes,
+  faCheckCircle,
+  faExclamationCircle,
+  faKey,
+  faCopy,
+  faPaperPlane,
+  faPlus,
+  faChevronRight,
+  faArrowLeft,
+  faExchangeAlt,
+  faDollarSign,
+  faShieldAlt,
+  faLock,
+  faCheck,
+  faArrowRight,
+  faTag,
+  faLightbulb,
+  faSave,
+  faExclamationTriangle
+} from '@fortawesome/free-solid-svg-icons';
+import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 
 @Component({
   selector: 'app-pix',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, FaIconComponent],
   templateUrl: './pix.html',
   styleUrl: './pix.scss',
 })
 export class Pix {
+  faQrcode = faQrcode;
+  faTimes = faTimes;
+  faCheckCircle = faCheckCircle;
+  faExclamationCircle = faExclamationCircle;
+  faKey = faKey;
+  faCopy = faCopy;
+  faPaperPlane = faPaperPlane;
+  faPlus = faPlus;
+  faChevronRight = faChevronRight;
+  faArrowLeft = faArrowLeft;
+  faExchangeAlt = faExchangeAlt;
+  faDollarSign = faDollarSign;
+  faShieldAlt = faShieldAlt;
+  faLock = faLock;
+  faCheck = faCheck;
+  faArrowRight = faArrowRight;
+  faTag = faTag;
+  faLightbulb = faLightbulb;
+  faSave = faSave;
+  faExclamationTriangle = faExclamationTriangle;
+
   @Input() chavePix: string = '';
   valorPix: number | null = null;
   senha: string = '';
@@ -31,6 +79,9 @@ export class Pix {
   name: string = "";
   pixKey: string = "";
   bank: string = "NovaBank";
+  
+  // ✅ 2. Adicionar a propriedade para o nome do usuário
+  userName: string = '';
 
   private http = inject(HttpClient);
 
@@ -38,10 +89,26 @@ export class Pix {
     private overlayRef: OverlayRef,
     private cdr: ChangeDetectorRef,
     private pixService: PixS,
-    private alertService: AlertService
+    private alertService: AlertService,
+    // ✅ 3. Injetar o UserService no construtor
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
+    // ✅ 4. Buscar o nome do usuário
+    this.userService.GetUserById().subscribe({
+      next: (user) => {
+        // Pega o primeiro nome e capitaliza a primeira letra
+        const primeiroNome = user.name.split(' ')[0];
+        this.userName = primeiroNome.charAt(0).toUpperCase() + primeiroNome.slice(1).toLowerCase();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Erro ao buscar nome do usuário:', err);
+        this.userName = 'Usuário'; // Fallback em caso de erro
+      }
+    });
+
     this.pixService.hasPix().subscribe({
       next: (res) => {
         this.temPix = res.data;
@@ -67,6 +134,7 @@ export class Pix {
     });
   }
 
+  // O restante do seu código permanece igual...
   confirmarPix() {
     if (!this.exibirSenha) {
       this.exibirSenha = true;

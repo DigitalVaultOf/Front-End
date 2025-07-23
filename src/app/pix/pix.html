@@ -1,153 +1,297 @@
-<!-- Modal for boleto payment -->
-<div class="modal-overlay">
-  <div class="modal">
-    <div class="modal-header">
-      <h2 class="modal-title">Pix</h2>
+<!-- pix.html - REDESIGN INSPIRADO NA HOME -->
+
+<!-- ✅ BACKDROP MODERNO COM BLUR -->
+<div class="pix-backdrop">
+  
+  <!-- ✅ MODAL PRINCIPAL -->
+  <div class="pix-modal">
+    
+    <!-- ✅ HEADER COM GRADIENTE -->
+    <div class="pix-header">
+      <div class="header-icon">
+        <fa-icon [icon]="faQrcode" class="icon"></fa-icon>
+      </div>
+      <div class="header-content">
+        <h2 class="header-title">PIX</h2>
+        <p class="header-subtitle" *ngIf="modo === 'menu'">Transferências instantâneas</p>
+        <p class="header-subtitle" *ngIf="modo === 'transferencia'">Nova transferência</p>
+        <p class="header-subtitle" *ngIf="modo === 'chave'">Criar chave PIX</p>
+      </div>
+      <button class="close-btn" (click)="closeModal()">
+        <fa-icon [icon]="faTimes"></fa-icon>
+      </button>
     </div>
 
+    <!-- ✅ MODO: MENU PRINCIPAL -->
     <ng-container *ngIf="modo === 'menu'">
+      <div class="pix-content">
         
-        <div class="action-buttons flex flex-col items-center space-y-2 max-w-xs mx-auto">
-          <button
-          *ngIf="temPix"
-          class="bg-indigo-600 text-white rounded-md py-2 mt-8 font-semibold hover:bg-indigo-700 transition w-full"
-          (click)="modo = 'transferencia'"
-        >
-          Transferência
-        </button>
+        <!-- ✅ STATUS DA CHAVE PIX -->
+        <div class="pix-status" *ngIf="temPix">
+          <div class="status-card success">
+            <div class="status-icon">
+              <fa-icon [icon]="faCheckCircle"></fa-icon>
+            </div>
+            <div class="status-content">
+              <h3>Chave PIX Ativa</h3>
+              <p>{{ userName }}, sua chave PIX é:</p>
+              <div class="pix-key">
+                <fa-icon [icon]="faKey" class="key-icon"></fa-icon>
+                <span class="key-value">{{ chave }}</span>
+                <button class="copy-btn" title="Copiar chave">
+                  <fa-icon [icon]="faCopy"></fa-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <button
-          *ngIf="temPix === false"
-          class="bg-blue-600 text-white rounded-md py-2 mt-8 font-semibold hover:bg-blue-700 transition w-full"
-          (click)="modo = 'chave'"
-        >
-          Criar Chave Pix
-        </button>
+        <div class="pix-status" *ngIf="temPix === false">
+          <div class="status-card warning">
+            <div class="status-icon">
+              <fa-icon [icon]="faExclamationCircle"></fa-icon>
+            </div>
+            <div class="status-content">
+              <h3>Sem Chave PIX</h3>
+              <p>Você ainda não possui uma chave PIX. Crie uma para receber transferências!</p>
+            </div>
+          </div>
+        </div>
 
-        <button
-          (click)="closeModal()"
-          class="mt-2 text-gray-600 hover:text-gray-900"
-        >
-          Cancelar
+        <!-- ✅ OPÇÕES DE AÇÃO -->
+        <div class="pix-actions">
+          
+          <!-- ✅ FAZER TRANSFERÊNCIA -->
+          <button 
+            class="action-card" 
+            (click)="modo = 'transferencia'"
+            *ngIf="temPix"
+          >
+            <div class="action-icon transfer">
+              <fa-icon [icon]="faPaperPlane"></fa-icon>
+            </div>
+            <div class="action-content">
+              <h3>Fazer Transferência</h3>
+              <p>Envie dinheiro via PIX</p>
+            </div>
+            <div class="action-arrow">
+              <fa-icon [icon]="faChevronRight"></fa-icon>
+            </div>
+          </button>
+
+          <!-- ✅ CRIAR CHAVE PIX -->
+          <button 
+            class="action-card" 
+            (click)="modo = 'chave'"
+          >
+            <div class="action-icon create">
+              <fa-icon [icon]="faPlus"></fa-icon>
+            </div>
+            <div class="action-content">
+              <h3>{{ temPix ? 'Nova Chave PIX' : 'Criar Chave PIX' }}</h3>
+              <p>{{ temPix ? 'Adicione uma nova chave' : 'Configure sua primeira chave' }}</p>
+            </div>
+            <div class="action-arrow">
+              <fa-icon [icon]="faChevronRight"></fa-icon>
+            </div>
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- ✅ FOOTER -->
+      <div class="pix-footer">
+        <button class="btn-action secondary" (click)="closeModal()">
+          <fa-icon [icon]="faArrowLeft" class="btn-icon"></fa-icon>
+          <span>Voltar</span>
         </button>
       </div>
     </ng-container>
 
-    <div class="modal-body">
-      <div class="form-group" *ngIf="modo === 'transferencia'">
-        <label *ngIf="!exibirSenha" class="form-label">Enviar Pix</label>
-        <input
-          *ngIf="!exibirSenha"
-          type="text"
-          placeholder="Chave Pix (e-mail, telefone ou CPF)"
-          [(ngModel)]="going"
-          class="form-input"
-        />
-        <input
-          *ngIf="!exibirSenha"
-          type="number"
-          placeholder="Digite o valor"
-          [(ngModel)]="amount"
-          [min]="0"
-          [step]="0.01"
-          class="form-input"
-        />
-
-        <div *ngIf="exibirSenha" class="flex flex-col space-y-2">
-          <div>
-            Enviar <strong>R$ {{ valorPix | number : "1.2-2" }}</strong> para
-            <strong>{{ chavePix }}</strong>
+    <!-- ✅ MODO: TRANSFERÊNCIA -->
+    <ng-container *ngIf="modo === 'transferencia'">
+      <div class="pix-content">
+        
+        <!-- ✅ ETAPA 1: DADOS DA TRANSFERÊNCIA -->
+        <div class="transfer-section" *ngIf="!exibirSenha">
+          <div class="section-header">
+            <h3 class="section-title">
+              <fa-icon [icon]="faExchangeAlt" class="section-icon"></fa-icon>
+              Dados da Transferência
+            </h3>
           </div>
 
-          <input
-            type="password"
-            placeholder="Digite sua senha"
-            [(ngModel)]="senha"
-            (input)="mensagemErro = null"
-            class="form-input"
-          />
+          <div class="form-group">
+            <label for="chavePix">
+              <fa-icon [icon]="faKey" class="label-icon"></fa-icon>
+              Chave PIX do Destinatário
+            </label>
+            <input
+              type="text"
+              id="chavePix"
+              placeholder="E-mail, telefone ou CPF"
+              [(ngModel)]="going"
+              class="form-input"
+            />
+          </div>
 
-          <div *ngIf="mensagemErro" class="text-red-600 font-semibold mt-2">
-            {{ mensagemErro }}
+          <div class="form-group">
+            <label for="valor">
+              <fa-icon [icon]="faDollarSign" class="label-icon"></fa-icon>
+              Valor da Transferência
+            </label>
+            <input
+              type="number"
+              id="valor"
+              placeholder="R$ 0,00"
+              [(ngModel)]="amount"
+              [min]="0"
+              [step]="0.01"
+              class="form-input money"
+            />
           </div>
         </div>
 
-        <div class="action-buttons">
-          <button
-            [disabled]="!going && !amount"
-            class="btn btn-primary bg-indigo-600"
-            id="payBtn"
-            (click)="enviarPix()"
-          >
-            {{ "Enviar" }}
-          </button>
+        <!-- ✅ ETAPA 2: CONFIRMAÇÃO -->
+        <div class="transfer-section" *ngIf="exibirSenha">
+          <div class="section-header">
+            <h3 class="section-title">
+              <fa-icon [icon]="faShieldAlt" class="section-icon"></fa-icon>
+              Confirmar Transferência
+            </h3>
+          </div>
 
-          <button (click)="modo = 'menu'" class="btn btn-secondary">
-            Voltar ao menu
-          </button>
+          <div class="transfer-summary">
+            <div class="summary-card">
+              <div class="summary-row">
+                <span class="label">Destinatário:</span>
+                <span class="value">{{ chavePix }}</span>
+              </div>
+              <div class="summary-row">
+                <span class="label">Valor:</span>
+                <span class="value highlight">R$ {{ valorPix | number : "1.2-2" }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="senha">
+              <fa-icon [icon]="faLock" class="label-icon"></fa-icon>
+              Senha de Confirmação
+            </label>
+            <input
+              type="password"
+              id="senha"
+              placeholder="Digite sua senha"
+              [(ngModel)]="senha"
+              (input)="mensagemErro = null"
+              class="form-input"
+            />
+            <div *ngIf="mensagemErro" class="error-message">
+              <fa-icon [icon]="faExclamationTriangle" class="error-icon"></fa-icon>
+              {{ mensagemErro }}
+            </div>
+          </div>
         </div>
+
       </div>
 
-      <div class="form-group" *ngIf="modo === 'chave'">
-        <label *ngIf="!exibirSenha" class="form-label">Minha chave pix</label>
-        <ul class="space-y-1 text-sm text-gray-700 mb-4">
-          <li *ngFor="let chave of chaves">
-            <span>{{ chave.tipo }}: {{ chave.valor }}</span>
-            <button
-              class="ml-2 text-blue-600 hover:underline"
-              (click)="selecionarChaveParaEditar(chave)"
-            >
-              Editar
-            </button>
-          </li>
-        </ul>
-
-        <input
-          type="text"
-          placeholder="Nome da chave"
-          [(ngModel)]="name"
-          class="form-input"
-        />
-
-        <input
-          type="text"
-          placeholder="Nova chave Pix"
-          [(ngModel)]="pixKey"
-          class="form-input"
-        />
-
-        <div *ngIf="exibirSenha" class="flex flex-col space-y-2">
-          <div>
-            Enviar <strong>R$ {{ valorPix | number : "1.2-2" }}</strong> para
-            <strong>{{ chavePix }}</strong>
-          </div>
-
-          <input
-            type="password"
-            placeholder="Digite sua senha"
-            [(ngModel)]="senha"
-            (input)="mensagemErro = null"
-            class="form-input"
-          />
-
-          <div *ngIf="mensagemErro" class="text-red-600 font-semibold mt-2">
-            {{ mensagemErro }}
-          </div>
-        </div>
-
-        <div class="action-buttons">
-          <button
-            class="btn btn-primary bg-indigo-600"
-            id="payBtn"
-            (click)="criarPix()"
-          >
-            {{ exibirSenha ? "Enviar Pix" : "Confirmar" }}
-          </button>
-          <button (click)="modo = 'menu'" class="btn btn-secondary">
-            Voltar ao menu
-          </button>
-        </div>
+      <!-- ✅ FOOTER -->
+      <div class="pix-footer">
+        <button class="btn-action secondary" (click)="modo = 'menu'">
+          <fa-icon [icon]="faArrowLeft" class="btn-icon"></fa-icon>
+          <span>Voltar</span>
+        </button>
+        
+        <button
+          class="btn-action primary"
+          [disabled]="!going || !amount"
+          (click)="enviarPix()"
+        >
+          <fa-icon [icon]="exibirSenha ? faCheck : faArrowRight" class="btn-icon"></fa-icon>
+          <span>{{ exibirSenha ? "Confirmar" : "Avançar" }}</span>
+        </button>
       </div>
-    </div>
+    </ng-container>
+
+    <!-- ✅ MODO: CRIAR CHAVE -->
+    <ng-container *ngIf="modo === 'chave'">
+      <div class="pix-content">
+        
+        <div class="key-section">
+          <div class="section-header">
+            <h3 class="section-title">
+              <fa-icon [icon]="faPlus" class="section-icon"></fa-icon>
+              Nova Chave PIX
+            </h3>
+            <p class="section-description">Configure uma nova chave para receber transferências</p>
+          </div>
+
+          <div class="form-group">
+            <label for="nomeChave">
+              <fa-icon [icon]="faTag" class="label-icon"></fa-icon>
+              Nome da Chave
+            </label>
+            <input
+              type="text"
+              id="nomeChave"
+              placeholder="Ex: Pessoal, Trabalho, Freelancer"
+              [(ngModel)]="name"
+              class="form-input"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="valorChave">
+              <fa-icon [icon]="faKey" class="label-icon"></fa-icon>
+              Chave PIX
+            </label>
+            <input
+              type="text"
+              id="valorChave"
+              placeholder="E-mail, telefone ou CPF"
+              [(ngModel)]="pixKey"
+              class="form-input"
+            />
+          </div>
+
+          <!-- ✅ DICAS PARA CHAVE PIX -->
+          <div class="pix-tips">
+            <div class="tip-card">
+              <fa-icon [icon]="faLightbulb" class="tip-icon"></fa-icon>
+              <div class="tip-content">
+                <h4>Dicas para sua chave PIX:</h4>
+                <ul>
+                  <li>Use um e-mail que você sempre acessa</li>
+                  <li>CPF é uma opção segura e única</li>
+                  <li>Telefone deve incluir DDD (11999999999)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ✅ FOOTER -->
+      <div class="pix-footer">
+        <button class="btn-action secondary" (click)="modo = 'menu'">
+          <fa-icon [icon]="faArrowLeft" class="btn-icon"></fa-icon>
+          <span>Voltar</span>
+        </button>
+        
+        <button
+          class="btn-action primary"
+          [disabled]="!name || !pixKey"
+          (click)="criarPix()"
+        >
+          <fa-icon [icon]="faSave" class="btn-icon"></fa-icon>
+          <span>Salvar Chave</span>
+        </button>
+      </div>
+    </ng-container>
+
   </div>
+
 </div>

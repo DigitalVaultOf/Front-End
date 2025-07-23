@@ -1,72 +1,210 @@
-<!-- Modal for boleto payment -->
-  <div class="modal-overlay">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 class="modal-title">Transferência</h2>
-        </div>
-        
-        <div class="modal-body">
-            <div class="form-group">
-                <label *ngIf="!exibirSenha" class="form-label">Digite o valor da transferência</label>
-                <input
-                  *ngIf="!exibirSenha"
-                  type="number"
-                  [(ngModel)]="amount"
-                  [min] = "0"
-                  #valorInput = "ngModel"
-                  [step]="0.10"
-                  placeholder="0,00"
-                  class="form-input"
-                  (keydown) = "preventNegativeInput($event)"
-                  (paste) = "onPaste($event)"
-                />
-                
-                <label *ngIf="!exibirSenha" class="form-label">Digite o numero da conta</label>
-                <input
-                  *ngIf="!exibirSenha"
-                  [(ngModel)]="accountNumberTo"
-                  placeholder="Número da conta"
-                  class="form-input" 
-                />
+<!-- transferencia.html - REDESIGN INSPIRADO NA HOME -->
 
-                <label *ngIf="!exibirSenha" class="form-label">Descrição da transferencia</label>
-                <input
-                  *ngIf="!exibirSenha"
-                  [(ngModel)]="description"
-                  placeholder="Descrição da transferência"
-                  class="form-input"
-                />
-
-                <div *ngIf="exibirSenha" class="flex flex-col space-y-2">
-                  <div class="font-semibold text-gray-700">
-                    Você está transferindo <strong>R$ {{ amount | number:'1.2-2' }}</strong> para a conta <strong>{{ accountNumberTo }}</strong>.
-                  </div>
-            
-                  <input
-                    type="password"
-                    placeholder="Digite sua senha"
-                    [(ngModel)]="password"
-                    (input)="mensagemErro = null"
-                    class="form-input"
-                  />
-            
-                  <div *ngIf="mensagemErro" class="text-red-600 font-semibold mt-1">
-                    {{ mensagemErro }}
-                  </div>
-                </div>
-
-            <div class="action-buttons">
-              <button
-                (click)="transferir()"
-                disabled
-                [disabled]="!exibirSenha ? (!amount || !accountNumberTo) : !password"
-                class="btn btn-primary bg-indigo-600" id="payBtn"
-              > {{ exibirSenha ? 'Transferir' : 'Confirmar valor' }} </button>
-
-                <button class="btn btn-secondary" (click)="closeModal()">
-                    Cancelar
-                </button>
-            </div>
-        </div>
+<!-- ✅ BACKDROP MODERNO COM BLUR -->
+<div class="transfer-backdrop">
+  
+  <!-- ✅ MODAL PRINCIPAL -->
+  <div class="transfer-modal">
+    
+    <!-- ✅ HEADER COM GRADIENTE -->
+    <div class="transfer-header">
+      <div class="header-icon">
+        <fa-icon [icon]="faExchangeAlt" class="icon"></fa-icon>
+      </div>
+      <div class="header-content">
+        <h2 class="header-title">Transferência</h2>
+        <p class="header-subtitle" *ngIf="!exibirSenha">Preencha os dados da transferência</p>
+        <p class="header-subtitle" *ngIf="exibirSenha">Confirme sua senha para continuar</p>
+      </div>
+      <button class="close-btn" (click)="closeModal()">
+        <fa-icon [icon]="faTimes"></fa-icon>
+      </button>
     </div>
+
+    <!-- ✅ CONTEÚDO PRINCIPAL -->
+    <div class="transfer-content">
+      
+      <!-- ✅ ETAPA 1: DADOS DA TRANSFERÊNCIA -->
+      <div class="transfer-section" *ngIf="!exibirSenha">
+        <div class="section-header">
+          <h3 class="section-title">
+            <fa-icon [icon]="faFileInvoiceDollar" class="section-icon"></fa-icon>
+            Dados da Transferência
+          </h3>
+          <p class="section-description">Preencha as informações necessárias</p>
+        </div>
+
+        <!-- ✅ VALOR DA TRANSFERÊNCIA -->
+        <div class="form-group">
+          <label for="amount">
+            <fa-icon [icon]="faMoneyBillAlt" class="label-icon"></fa-icon>
+            Valor da Transferência
+          </label>
+          <div class="money-input-container">
+            <span class="currency-symbol">R$</span>
+            <input
+              type="number"
+              id="amount"
+              [(ngModel)]="amount"
+              [min]="0"
+              [step]="0.10"
+              #valorInput="ngModel"
+              placeholder="0,00"
+              class="form-input money"
+              (keydown)="preventNegativeInput($event)"
+              (paste)="onPaste($event)"
+            />
+          </div>
+        </div>
+
+        <!-- ✅ NÚMERO DA CONTA -->
+        <div class="form-group">
+          <label for="accountNumberTo">
+            <fa-icon [icon]="faCreditCard" class="label-icon"></fa-icon>
+            Conta de Destino
+          </label>
+          <input
+            type="text"
+            id="accountNumberTo"
+            [(ngModel)]="accountNumberTo"
+            placeholder="Número da conta de destino"
+            class="form-input"
+          />
+        </div>
+
+        <!-- ✅ DESCRIÇÃO -->
+        <div class="form-group">
+          <label for="description">
+            <fa-icon [icon]="faComment" class="label-icon"></fa-icon>
+            Descrição <span class="optional">(opcional)</span>
+          </label>
+          <input
+            type="text"
+            id="description"
+            [(ngModel)]="description"
+            placeholder="Ex: Pagamento aluguel, Empréstimo..."
+            class="form-input"
+            maxlength="100"
+          />
+          <div class="input-hint">
+            <fa-icon [icon]="faInfoCircle" class="hint-icon"></fa-icon>
+            <span>A descrição aparecerá no extrato de ambas as contas</span>
+          </div>
+        </div>
+
+        <!-- ✅ INFORMAÇÕES DA TRANSFERÊNCIA -->
+        <div class="info-card">
+          <div class="info-icon">
+            <fa-icon [icon]="faInfoCircle"></fa-icon>
+          </div>
+          <div class="info-content">
+            <h4>Informações da Transferência</h4>
+            <ul>
+              <li>Valor mínimo: R$ 1,00</li>
+              <li>Processamento imediato</li>
+              <li>Disponível entre contas do mesmo banco</li>
+              <li>Sem taxas adicionais</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ ETAPA 2: CONFIRMAÇÃO COM SENHA -->
+      <div class="transfer-section" *ngIf="exibirSenha">
+        <div class="section-header">
+          <h3 class="section-title">
+            <fa-icon [icon]="faShieldAlt" class="section-icon"></fa-icon>
+            Confirmação da Transferência
+          </h3>
+        </div>
+
+        <!-- ✅ RESUMO DA TRANSFERÊNCIA -->
+        <div class="transfer-summary">
+          <div class="summary-card">
+            <div class="summary-header">
+              <fa-icon [icon]="faReceipt" class="summary-icon"></fa-icon>
+              <h4>Resumo da Transferência</h4>
+            </div>
+            <div class="summary-content">
+              <div class="summary-row">
+                <span class="label">Valor:</span>
+                <span class="value highlight">R$ {{ amount | number:'1.2-2' }}</span>
+              </div>
+              <div class="summary-row">
+                <span class="label">Conta de destino:</span>
+                <span class="value">{{ accountNumberTo }}</span>
+              </div>
+              <div class="summary-row" *ngIf="description">
+                <span class="label">Descrição:</span>
+                <span class="value description">{{ description }}</span>
+              </div>
+              <div class="summary-row">
+                <span class="label">Taxa:</span>
+                <span class="value">R$ 0,00</span>
+              </div>
+              <div class="summary-row">
+                <span class="label">Processamento:</span>
+                <span class="value">Imediato</span>
+              </div>
+              <div class="summary-row total">
+                <span class="label">Total a transferir:</span>
+                <span class="value">R$ {{ amount | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ CAMPO DE SENHA -->
+        <div class="form-group">
+          <label for="password">
+            <fa-icon [icon]="faLock" class="label-icon"></fa-icon>
+            Senha de Confirmação
+          </label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Digite sua senha"
+            [(ngModel)]="password"
+            (input)="mensagemErro = null"
+            class="form-input"
+          />
+          <div *ngIf="mensagemErro" class="error-message">
+            <fa-icon [icon]="faExclamationTriangle" class="error-icon"></fa-icon>
+            {{ mensagemErro }}
+          </div>
+        </div>
+
+        <!-- ✅ SEGURANÇA -->
+        <div class="security-card">
+          <div class="security-icon">
+            <fa-icon [icon]="faUserShield"></fa-icon>
+          </div>
+          <div class="security-content">
+            <h4>Transferência Segura</h4>
+            <p>Todas as operações são protegidas com criptografia de ponta a ponta</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ✅ FOOTER COM BOTÕES -->
+    <div class="transfer-footer">
+      <button class="btn-action secondary" (click)="closeModal()">
+        <fa-icon [icon]="faArrowLeft" class="btn-icon"></fa-icon>
+        <span>Cancelar</span>
+      </button>
+      
+      <button
+        class="btn-action primary"
+        [disabled]="!exibirSenha ? (!amount || !accountNumberTo || amount <= 0) : !password"
+        (click)="transferir()"
+      >
+        <fa-icon [icon]="exibirSenha ? faCheck : faArrowRight" class="btn-icon"></fa-icon>
+        <span>{{ exibirSenha ? 'Transferir' : 'Continuar' }}</span>
+      </button>
+    </div>
+
+  </div>
+
 </div>

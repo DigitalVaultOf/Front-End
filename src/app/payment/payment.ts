@@ -6,15 +6,75 @@ import { FormsModule } from '@angular/forms';
 import { ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AlertService } from '../services/alert.service';
+import {
+  faCreditCard,
+  faFileInvoiceDollar,
+  faArrowLeft,
+  faTimes,
+  faSpinner,
+  faUser,
+  faCalendar,
+  faCalendarCheck,
+  faCheckCircle,
+  faFileInvoice,
+  faCopy,
+  faInfoCircle,
+  faBarcode,
+  faHashtag,
+  faSigning,
+  faBolt,
+  faClock,
+  faCheck,
+  faMoneyBillAlt,
+  faComment,
+  faCalculator,
+  faReceipt,
+  faLock,
+  faShieldAlt,
+  faUserShield,
+  faExclamationTriangle,
+  faCheckSquare,
+  faPlay,
+} from '@fortawesome/free-solid-svg-icons';
+import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 
 @Component({
   selector: 'app-payment',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FaIconComponent],
   templateUrl: './payment.html',
   styleUrls: ['./payment.scss'],
 })
 export class Payment implements OnInit {
+  faCreditCard = faCreditCard;
+  faFileInvoiceDollar = faFileInvoiceDollar;
+  faArrowLeft = faArrowLeft;
+  faTimes = faTimes;
+  faSpinner = faSpinner;
+  faUser = faUser;
+  faCalendar = faCalendar;
+  faCalendarCheck = faCalendarCheck;
+  faCheckCircle = faCheckCircle;
+  faFileInvoice = faFileInvoice;
+  faCopy = faCopy;
+  faInfoCircle = faInfoCircle;
+  faBarcode = faBarcode;
+  faHashtag = faHashtag;
+  faSigning = faSigning;
+  faBolt = faBolt;
+  faClock = faClock;
+  faCheck = faCheck;
+  faMoneyBillAlt = faMoneyBillAlt;
+  faComment = faComment;
+  faCalculator = faCalculator;
+  faReceipt = faReceipt;
+  faLock = faLock;
+  faShieldAlt = faShieldAlt;
+  faUserShield = faUserShield;
+  faExclamationTriangle = faExclamationTriangle;
+  faCheckSquare = faCheckSquare;
+  faPlay = faPlay;
+
   @Input() isOpen = false;
   @Output() paymentSuccess = new EventEmitter<any>();
   @Input() payment: any;
@@ -73,6 +133,53 @@ export class Payment implements OnInit {
       this.senhaIncorreta = false;
       this.cdr.detectChanges();
     }, 0);
+  }
+
+   getHeaderIcon() {
+    if (this.exibirListaPendentes) return this.faClock;
+    if (this.exibirListaPagos) return this.faCheckCircle;
+    if (this.exibirGerarBoleto) return this.faFileInvoice;
+    if (this.mostrarSucessoGeracao) return this.faCheckCircle;
+    if (this.exibirValorParcial) return this.faCalculator;
+    if (this.exibirSenha) return this.faShieldAlt;
+    return this.faCreditCard;
+  }
+
+  getHeaderTitle(): string {
+    if (this.exibirListaPendentes) return 'Boletos Pendentes';
+    if (this.exibirListaPagos) return 'Boletos Pagos';
+    if (this.exibirGerarBoleto) return 'Gerar Boleto';
+    if (this.mostrarSucessoGeracao) return 'Boleto Gerado';
+    if (this.exibirValorParcial) return 'Valor do Pagamento';
+    if (this.exibirSenha) return 'Confirmar Pagamento';
+    return 'Pagar Boleto';
+  }
+
+  getHeaderSubtitle(): string {
+    if (this.exibirListaPendentes) return 'Seus boletos em aberto';
+    if (this.exibirListaPagos) return 'Histórico de pagamentos';
+    if (this.exibirGerarBoleto) return 'Criar novo boleto';
+    if (this.mostrarSucessoGeracao) return 'Pronto para pagamento';
+    if (this.exibirValorParcial) return 'Defina o valor a pagar';
+    if (this.exibirSenha) return 'Digite sua senha';
+    return 'Digite o número ou escolha uma opção';
+  }
+
+  // ✅ MÉTODO PARA ÍCONE DE VALIDAÇÃO
+  getValidationIcon() {
+    const tipo = this.getTipoMensagemValidacao();
+    if (tipo === 'valid') return this.faCheckCircle;
+    if (tipo === 'already-paid') return this.faExclamationTriangle;
+    return this.faTimes;
+  }
+
+  // ✅ MÉTODO PARA ÍCONE DO BOTÃO DE AÇÃO
+  getActionIcon() {
+    if (this.exibirGerarBoleto) return this.faFileInvoice;
+    if (this.mostrarSucessoGeracao) return this.faPlay;
+    if (this.exibirValorParcial) return this.faCheck;
+    if (this.exibirSenha) return this.faCreditCard;
+    return this.faPlay;
   }
 
   // ✅ MÉTODO 1 - DETECTAR MUDANÇAS NO INPUT:
@@ -376,7 +483,9 @@ export class Payment implements OnInit {
           this.boletosPendentes = [];
           this.mensagemLista = 'Erro ao carregar boletos pendentes';
           this.carregandoLista = false;
-          this.handleError(err.error?.message || 'Erro ao listar boletos pendentes');
+          this.handleError(
+            err.error?.message || 'Erro ao listar boletos pendentes'
+          );
           this.cdr.detectChanges();
         }, 0);
       },
@@ -406,7 +515,9 @@ export class Payment implements OnInit {
           this.boletosPagos = [];
           this.mensagemLista = 'Erro ao carregar boletos pagos';
           this.carregandoLista = false;
-          this.handleError(err.error?.message || 'Erro ao listar boletos pagos');
+          this.handleError(
+            err.error?.message || 'Erro ao listar boletos pagos'
+          );
           this.cdr.detectChanges();
         }, 0);
       },
@@ -430,25 +541,23 @@ export class Payment implements OnInit {
   }
 
   // ✅ FORMATAR DATA BRASILEIRA COM HORÁRIO
-formatarData(data: string): string {
-  if (!data) return '-';
+  formatarData(data: string): string {
+    if (!data) return '-';
 
-  const date = new Date(data);
+    const date = new Date(data);
 
-  // Subtrai 3 horas (UTC-3)
-  date.setHours(date.getHours() - 3);
+    // Subtrai 3 horas (UTC-3)
+    date.setHours(date.getHours() - 3);
 
-  return date.toLocaleString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  });
-}
-
-
+    return date.toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+  }
 
   // ✅ FORMATAR VALOR MONETÁRIO
   formatarValor(valor: number): string {
@@ -830,21 +939,18 @@ formatarData(data: string): string {
         // ✅ VOLTANDO DA TELA DE SUCESSO → IR PARA TELA INICIAL
         this.mostrarSucessoGeracao = false;
         this.valorBoletoGerado = 0;
-
       } else if (this.exibirListaPendentes) {
         // ✅ NOVA: VOLTANDO DA LISTA PENDENTES
         this.exibirListaPendentes = false;
         this.boletosPendentes = [];
         this.carregandoLista = false;
         this.mensagemLista = '';
-
       } else if (this.exibirListaPagos) {
         // ✅ NOVA: VOLTANDO DA LISTA PAGOS
         this.exibirListaPagos = false;
         this.boletosPagos = [];
         this.carregandoLista = false;
         this.mensagemLista = '';
-
       } else if (this.exibirSenha) {
         if (this.veioDoPagementRapido) {
           // ✅ VOLTAR PARA TELA INICIAL (do pagamento rápido):
@@ -861,7 +967,6 @@ formatarData(data: string): string {
           this.mensagemErro = null;
           this.senhaIncorreta = false;
         }
-
       } else if (this.exibirValorParcial) {
         // ✅ VOLTANDO DA TELA DE VALOR → VERIFICAR DE ONDE VEIO
         this.exibirValorParcial = false;
@@ -874,13 +979,15 @@ formatarData(data: string): string {
           console.log('✅ Voltando da tela de valor para sucesso');
         } else {
           // ✅ VEIO DA TELA INICIAL → VOLTAR PARA INICIAL (preservar validação)
-          console.log('✅ Voltando da tela de valor para inicial, preservando validação:', {
-            boletoValidado: this.boletoValidado,
-            boletoValido: this.boletoValido,
-            mensagemValidacao: this.mensagemValidacao,
-          });
+          console.log(
+            '✅ Voltando da tela de valor para inicial, preservando validação:',
+            {
+              boletoValidado: this.boletoValidado,
+              boletoValido: this.boletoValido,
+              mensagemValidacao: this.mensagemValidacao,
+            }
+          );
         }
-
       } else if (this.exibirGerarBoleto) {
         // ✅ VOLTANDO DA TELA DE GERAR → IR PARA TELA INICIAL
         this.exibirGerarBoleto = false;

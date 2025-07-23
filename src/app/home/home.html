@@ -1,66 +1,110 @@
-<header>
-  <h1 style="color: #fff">NovaBankTech</h1>
-  <nav>
-    <div class="dropdown-container">
-      <a (click)="toggleDropdown($event)" class="dropdown-toggle">
-        <fa-icon [icon]="faCog" style="color: white"></fa-icon>
-        <span style="color: #ffffff">Configurações</span>
-        <fa-icon
-          [icon]="faChevronDown"
-          style="color: white"
-          [class.rotated]="isDropdownOpen"
-        ></fa-icon>
+<!-- home.html - VERSÃO COMPLETA CORRIGIDA -->
+
+<!-- ✅ HEADER MELHORADO -->
+<header class="main-header">
+  <div class="header-content">
+    <!-- ✅ LOGO -->
+    <div class="logo-section">
+      <a href="/home" class="logo-link">
+        <img
+          src="/logo-novabanktech.webp"
+          alt="NovaBankTech"
+          class="logo-img"
+        />
       </a>
-
-      <div class="dropdown-menu" [class.show]="isDropdownOpen">
-        <a class="dropdown-item" (click)="openModal(EditarConta)">
-          <fa-icon [icon]="faEdit" style="color: white"></fa-icon>
-          <span>Editar Conta</span>
-          <fa-icon
-            class="item-chevron"
-            [icon]="faChevronRight"
-            style="color: white"
-          ></fa-icon>
-        </a>
-
-        <a class="dropdown-item-excluir" (click)="abrirModalExclusao()">
-          <fa-icon [icon]="faTrash" style="color: white"></fa-icon>
-          <span>Desativar Conta</span>
-          <fa-icon
-            class="item-chevron"
-            [icon]="faChevronRight"
-            style="color: white"
-          ></fa-icon>
-        </a>
-
-        <a class="dropdown-item" (click)="logout()">
-          <fa-icon [icon]="faSignOutAlt" style="color: white"></fa-icon>
-          <span>Sair</span>
-          <fa-icon
-            class="item-chevron"
-            [icon]="faChevronRight"
-            style="color: white"
-          ></fa-icon>
-        </a>
-      </div>
     </div>
-  </nav>
+
+    <!-- ✅ TÍTULO ELEGANTE -->
+    <div class="header-title">
+      <h2 class="welcome-text">
+        <span class="welcome-line1">Seja bem-vindo(a) à</span>
+        <span class="welcome-line2">NovaBankTech</span>
+      </h2>
+    </div>
+
+    <!-- ✅ NAVEGAÇÃO COM DROPDOWN CORRIGIDO -->
+    <nav class="header-nav">
+      <div class="dropdown-container">
+        <button
+          #dropdownToggle
+          (click)="toggleDropdown($event)"
+          class="dropdown-toggle"
+          [attr.aria-expanded]="isDropdownOpen"
+          aria-label="Menu de configurações"
+        >
+          <fa-icon [icon]="faCog" class="settings-icon"></fa-icon>
+          <span class="settings-text">Configurações</span>
+          <fa-icon
+            [icon]="faChevronDown"
+            class="chevron-icon"
+            [class.rotated]="isDropdownOpen"
+          ></fa-icon>
+        </button>
+
+        <div #dropdownMenu class="dropdown-menu" [class.show]="isDropdownOpen">
+          <a class="dropdown-item" (click)="openModal(EditarConta)">
+            <fa-icon [icon]="faEdit"></fa-icon>
+            <span>Editar Conta</span>
+            <fa-icon class="item-chevron" [icon]="faChevronRight"></fa-icon>
+          </a>
+
+          <a class="dropdown-item danger" (click)="abrirModalExclusao()">
+            <fa-icon [icon]="faTrash"></fa-icon>
+            <span>Desativar Conta</span>
+            <fa-icon class="item-chevron" [icon]="faChevronRight"></fa-icon>
+          </a>
+
+          <a class="dropdown-item" (click)="logout()">
+            <fa-icon [icon]="faSignOutAlt"></fa-icon>
+            <span>Sair</span>
+            <fa-icon class="item-chevron" [icon]="faChevronRight"></fa-icon>
+          </a>
+        </div>
+      </div>
+    </nav>
+  </div>
 </header>
 
 <main>
+  <!-- ✅ SEÇÃO DE SALDO COM VISIBILIDADE -->
   <section class="saldo-card">
     <h1>Olá, {{ primeiroNome | titlecase }}</h1>
+
+    <!-- ✅ CONTA COM BOTÃO DE VISIBILIDADE -->
     <p>
-      Você está logado na conta: <b>{{ accountData?.accountNumber }}</b>
+      Você está logado na conta:
+      <b>{{ contaExibida }}</b>
+      <!-- ✅ BOTÃO PARA ESCONDER/MOSTRAR CONTA -->
+      <button
+        (click)="toggleContaVisibilidade()"
+        class="btn-visibilidade conta"
+        [attr.aria-label]="
+          contaVisivel ? 'Esconder número da conta' : 'Mostrar número da conta'
+        "
+      >
+        <fa-icon
+          [icon]="contaVisivel ? faOlho : faOlhoFechado"
+          size="sm"
+        ></fa-icon>
+      </button>
     </p>
-    <h2>
-      <b>Saldo em conta: {{ saldoFormatado }} </b>
-    </h2>
-    <div>
-      <fa-icon [icon]="faOlho" style="color: rgb(43, 43, 43)"></fa-icon>
+
+    <!-- ✅ SALDO COM BOTÃO DE VISIBILIDADE -->
+    <div class="saldo-container">
+      <h2>
+        <b>Saldo em conta {{ saldoExibido }}</b>
+      </h2>
+      <button
+        (click)="toggleSaldoVisibilidade()"
+        class="btn-visibilidade saldo"
+        [attr.aria-label]="saldoVisivel ? 'Esconder saldo' : 'Mostrar saldo'"
+      >
+        <fa-icon [icon]="saldoVisivel ? faOlho : faOlhoFechado"></fa-icon>
+      </button>
     </div>
   </section>
 
+  <!-- ✅ AÇÕES FINANCEIRAS -->
   @if (showContent) {
   <section class="actions">
     <div class="action">
@@ -117,6 +161,7 @@
     </div>
   </section>
 
+  <!-- ✅ HISTÓRICO DE TRANSAÇÕES -->
   <section class="card-info">
     <!-- Cabeçalho da seção modernizado -->
     <div class="historico-header">
@@ -125,117 +170,147 @@
         <button (click)="history()">Todos</button>
         <button (click)="carregarMovimentacoesSemana()">Semana</button>
         <button (click)="carregarMovimentacoesMes()">Mês</button>
-        <button (click)="openModal(Export)">Exportar</button>
+        <div class="grupo-exportar-expandir">
+          <button (click)="openModal(Export)">
+            <fa-icon [icon]="faFileExport"></fa-icon>
+            Exportar
+          </button>
+
+          <button (click)="toggleHistorico()" class="btn-toggle">
+            <fa-icon
+              [icon]="faChevronDown"
+              [class.rotated]="historicoExpandido"
+            ></fa-icon>
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- Container das transações modernizado -->
-    <div class="transacoes-container">
-      <div *ngIf="carregandoTransacoes" class="loading">
-        Carregando transações...
-      </div>
+    <div
+      class="transacoes-wrapper"
+      [ngClass]="{
+        expandido: historicoExpandido,
+        colapsado: !historicoExpandido
+      }"
+    >
+      <div class="transacoes-container">
+        <div *ngIf="carregandoTransacoes" class="loading">
+          Carregando transações...
+        </div>
 
-      <ul
-        *ngIf="!carregandoTransacoes && movimentacoes.length > 0"
-        class="transacoes-lista"
-      >
-        <li *ngFor="let item of movimentacoes" class="transacao-item">
-          <div class="transacao-info">
-            <div class="transacao-tipo">{{ item.movimentTypeEnum }}</div>
-            <div class="transacao-data">
-              {{ item.dateTimeMoviment | date : "dd/MM/yyyy HH:mm" }}
-            </div>
-          </div>
-          <div class="transacao-valor">
-            {{ item.amount | currency : "BRL" }}
-          </div>
-        </li>
-      </ul>
-
-      <div
-        *ngIf="!carregandoTransacoes && valores.length === 0"
-        class="sem-transacoes"
-      >
-        Nenhuma transação encontrada para o período selecionado.
-      </div>
-    </div>
-
-    <!-- Paginação modernizada -->
-    <div *ngIf="totalPaginas > 1" class="paginacao-footer">
-      <div class="paginacao-wrapper">
-        <!-- Botão Anterior -->
-        <button
-          (click)="irParaPaginaAnterior()"
-          [disabled]="paginaAtual === 1"
-          class="btn-navegacao anterior"
+        <ul
+          *ngIf="
+            !carregandoTransacoes && movimentacoes && movimentacoes.length > 0
+          "
+          class="transacoes-lista"
         >
-          <fa-icon [icon]="faChevronLeft"></fa-icon>
-          <span>Anterior</span>
-        </button>
+          <li *ngFor="let item of movimentacoes" class="transacao-item">
+            <div class="transacao-info">
+              <div class="transacao-tipo">{{ item.movimentTypeEnum }}</div>
+              <div class="transacao-data">
+                {{ item.dateTimeMoviment | date : "dd/MM/yyyy HH:mm" }}
+              </div>
+            </div>
+            <div class="transacao-valor">
+              {{ item.amount | currency : "BRL" }}
+            </div>
+          </li>
+        </ul>
 
-        <!-- Container dos Números -->
-        <div class="numeros-container">
-          <!-- Primeira página -->
+        <div
+          *ngIf="
+            !carregandoTransacoes &&
+            (!movimentacoes || movimentacoes.length === 0)
+          "
+          class="sem-transacoes"
+        >
+          Nenhuma transação encontrada para o período selecionado.
+        </div>
+      </div>
+
+      
+    </div>
+    <!-- Paginação modernizada -->
+      <div
+        *ngIf="totalPaginas > 1 && historicoExpandido"
+        class="paginacao-footer"
+      >
+        <div class="paginacao-wrapper">
+          <!-- Botão Anterior -->
           <button
-            *ngIf="paginaAtual > 3"
-            (click)="irParaPagina(1)"
-            class="btn-numero"
+            (click)="irParaPaginaAnterior()"
+            [disabled]="paginaAtual === 1"
+            class="btn-navegacao anterior"
           >
-            1
+            <fa-icon [icon]="faChevronLeft"></fa-icon>
+            <span>Anterior</span>
           </button>
 
-          <!-- Reticências iniciais -->
-          <span *ngIf="paginaAtual > 4" class="reticencias">...</span>
+          <!-- Container dos Números -->
+          <div class="numeros-container">
+            <!-- Primeira página -->
+            <button
+              *ngIf="paginaAtual > 3"
+              (click)="irParaPagina(1)"
+              class="btn-numero"
+            >
+              1
+            </button>
 
-          <!-- Páginas visíveis -->
+            <!-- Reticências iniciais -->
+            <span *ngIf="paginaAtual > 4" class="reticencias">...</span>
+
+            <!-- Páginas visíveis -->
+            <button
+              *ngFor="let pagina of getPaginasVisiveis()"
+              (click)="irParaPagina(pagina)"
+              [class.ativa]="pagina === paginaAtual"
+              class="btn-numero"
+            >
+              {{ pagina }}
+            </button>
+
+            <!-- Reticências finais -->
+            <span *ngIf="paginaAtual < totalPaginas - 3" class="reticencias">
+              ...
+            </span>
+
+            <!-- Última página -->
+            <button
+              *ngIf="paginaAtual < totalPaginas - 2"
+              (click)="irParaPagina(totalPaginas)"
+              class="btn-numero"
+            >
+              {{ totalPaginas }}
+            </button>
+          </div>
+
+          <!-- Botão Próxima -->
           <button
-            *ngFor="let pagina of getPaginasVisiveis()"
-            (click)="irParaPagina(pagina)"
-            [class.ativa]="pagina === paginaAtual"
-            class="btn-numero"
+            (click)="irParaProximaPagina()"
+            [disabled]="paginaAtual === totalPaginas"
+            class="btn-navegacao proximo"
           >
-            {{ pagina }}
-          </button>
-
-          <!-- Reticências finais -->
-          <span *ngIf="paginaAtual < totalPaginas - 3" class="reticencias">
-            ...
-          </span>
-
-          <!-- Última página -->
-          <button
-            *ngIf="paginaAtual < totalPaginas - 2"
-            (click)="irParaPagina(totalPaginas)"
-            class="btn-numero"
-          >
-            {{ totalPaginas }}
+            <span>Próxima</span>
+            <fa-icon [icon]="faChevronRight"></fa-icon>
           </button>
         </div>
 
-        <!-- Botão Próxima -->
-        <button
-          (click)="irParaProximaPagina()"
-          [disabled]="paginaAtual === totalPaginas"
-          class="btn-navegacao proximo"
-        >
-          <span>Próxima</span>
-          <fa-icon [icon]="faChevronRight"></fa-icon>
-        </button>
+        <!-- Informações da paginação -->
+        <div class="paginacao-info">
+          <span class="info-itens">
+            Mostrando {{ (paginaAtual - 1) * itensPorPagina + 1 }} -
+            {{ Math.min(paginaAtual * itensPorPagina, totalItens) }}
+            de {{ totalItens }} transações
+          </span>
+        </div>
       </div>
-
-      <!-- Informações da paginação -->
-      <div class="paginacao-info">
-        <span class="info-itens">
-          Mostrando {{ (paginaAtual - 1) * itensPorPagina + 1 }} -
-          {{ Math.min(paginaAtual * itensPorPagina, totalItens) }}
-          de {{ totalItens }} transações
-        </span>
-      </div>
-    </div>
   </section>
   } @else {
   <router-outlet></router-outlet>
   }
 </main>
 
+<!-- ✅ AI CHATBOT -->
 <app-ai-chatbot></app-ai-chatbot>

@@ -1,116 +1,220 @@
-<div #modalContainer class="modal-container">
-  <div class="modal-header">
-    <h2>Editar Conta</h2>
-    <button class="close-btn" (click)="closeModal()">×</button>
+<!-- editar-conta.html - REDESIGN COM FONTAWESOME -->
+
+<!-- ✅ BACKDROP MODERNO COM BLUR -->
+<div class="edit-backdrop">
+  
+  <!-- ✅ MODAL PRINCIPAL -->
+  <div #modalContainer class="edit-modal">
+    
+    <!-- ✅ HEADER COM GRADIENTE -->
+    <div class="edit-header">
+      <div class="header-icon">
+        <fa-icon [icon]="faEdit" class="icon"></fa-icon>
+      </div>
+      <div class="header-content">
+        <h2 class="header-title">Editar Conta</h2>
+        <p class="header-subtitle">Atualize suas informações pessoais</p>
+      </div>
+      <button class="close-btn" (click)="closeModal()">
+        <fa-icon [icon]="faTimes"></fa-icon>
+      </button>
+    </div>
+
+    <!-- ✅ CONTEÚDO DO FORM -->
+    <div class="edit-content">
+      <form
+        id="editUserForm"
+        [formGroup]="usuarioForm"
+        (ngSubmit)="atualizarUsuario()"
+      >
+        
+        <!-- ✅ SEÇÃO: DADOS DA CONTA -->
+        <div class="form-section">
+          <div class="section-header">
+            <h3 class="section-title">
+              <fa-icon [icon]="faBuilding" class="section-icon"></fa-icon>
+              Dados da Conta
+            </h3>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="idUsuario">
+                <fa-icon [icon]="faIdCard" class="label-icon"></fa-icon>
+                ID Usuário
+              </label>
+              <input 
+                type="text" 
+                id="idUsuario" 
+                formControlName="id"
+                class="form-input disabled"
+                readonly
+              />
+            </div>
+            <div class="form-group">
+              <label for="accountNumber">
+                <fa-icon [icon]="faCreditCard" class="label-icon"></fa-icon>
+                Número da Conta
+              </label>
+              <input 
+                type="text" 
+                id="accountNumber" 
+                formControlName="accountNumber"
+                class="form-input disabled"
+                readonly
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cpf">
+              <fa-icon [icon]="faAddressCard" class="label-icon"></fa-icon>
+              CPF
+            </label>
+            <input 
+              type="text" 
+              id="cpf" 
+              formControlName="cpf"
+              class="form-input disabled"
+              readonly
+            />
+          </div>
+        </div>
+
+        <!-- ✅ SEÇÃO: INFORMAÇÕES PESSOAIS -->
+        <div class="form-section">
+          <div class="section-header">
+            <h3 class="section-title">
+              <fa-icon [icon]="faUser" class="section-icon"></fa-icon>
+              Informações Pessoais
+            </h3>
+          </div>
+
+          <div class="form-group">
+            <label for="nome">
+              <fa-icon [icon]="faUserEdit" class="label-icon"></fa-icon>
+              Nome Completo
+            </label>
+            <input 
+              type="text" 
+              id="nome" 
+              formControlName="nome"
+              class="form-input"
+              placeholder="Digite seu nome completo"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email">
+              <fa-icon [icon]="faEnvelope" class="label-icon"></fa-icon>
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              autocomplete="off"
+              formControlName="email"
+              class="form-input"
+              placeholder="seu@email.com"
+            />
+          </div>
+        </div>
+
+        <!-- ✅ SEÇÃO: SEGURANÇA -->
+        <div class="form-section">
+          <div class="section-header">
+            <h3 class="section-title">
+              <fa-icon [icon]="faLock" class="section-icon"></fa-icon>
+              Alterar Senha
+            </h3>
+            <p class="section-description">Deixe em branco para manter a senha atual</p>
+          </div>
+
+          <div class="form-group">
+            <label for="senha-atual">
+              <fa-icon [icon]="faKey" class="label-icon"></fa-icon>
+              Senha Atual
+            </label>
+            <input
+              type="password"
+              id="senha-atual"
+              formControlName="senhaAtual"
+              autocomplete="off"
+              class="form-input"
+              placeholder="Digite sua senha atual"
+            />
+            <div 
+              *ngIf="usuarioForm.get('senhaAtual')?.hasError('senhaIncorreta')"
+              class="error-message"
+            >
+              <fa-icon [icon]="faExclamationTriangle" class="error-icon"></fa-icon>
+              Senha atual incorreta.
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nova-senha">
+                <fa-icon [icon]="faLockOpen" class="label-icon"></fa-icon>
+                Nova Senha
+              </label>
+              <input
+                type="password"
+                id="nova-senha"
+                formControlName="novaSenha"
+                autocomplete="off"
+                class="form-input"
+                placeholder="Digite a nova senha"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="confirmar-senha">
+                <fa-icon [icon]="faCheck" class="label-icon"></fa-icon>
+                Confirmar Nova Senha
+              </label>
+              <input
+                type="password"
+                id="confirmar-senha"
+                formControlName="confirmarNovaSenha"
+                autocomplete="off"
+                class="form-input"
+                placeholder="Confirme a nova senha"
+              />
+            </div>
+          </div>
+
+          <div 
+            *ngIf="usuarioForm.hasError('passwordMismatch') && usuarioForm.get('confirmarNovaSenha')?.touched"
+            class="error-message"
+          >
+            <fa-icon [icon]="faExclamationTriangle" class="error-icon"></fa-icon>
+            As senhas não coincidem.
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- ✅ FOOTER COM BOTÕES -->
+    <div class="edit-footer">
+      <button class="btn-action secondary" (click)="closeModal()">
+        <fa-icon [icon]="faArrowLeft" class="btn-icon"></fa-icon>
+        <span>Cancelar</span>
+      </button>
+      
+      <button
+        form="editUserForm"
+        type="submit"
+        class="btn-action primary"
+        [disabled]="usuarioForm.invalid"
+      >
+        <fa-icon [icon]="faSave" class="btn-icon"></fa-icon>
+        <span>Salvar Alterações</span>
+      </button>
+    </div>
+
   </div>
 
-  <div class="modal-content">
-    <form
-      id="editUserForm"
-      [formGroup]="usuarioForm"
-      (ngSubmit)="atualizarUsuario()"
-    >
-      <div class="form-group">
-        <label for="idUsuario">ID Usuário</label>
-        <input type="text" id="idUsuario" formControlName="id" />
-      </div>
-
-      <div class="form-group">
-        <label for="accountNumber">Número da conta</label>
-        <input type="text" id="accountNumber" formControlName="accountNumber" />
-      </div>
-
-      <div class="form-group">
-        <label for="cpf">CPF</label>
-        <input type="text" id="cpf" formControlName="cpf" />
-      </div>
-
-      <hr class="divider" />
-
-      <div class="form-group">
-        <label for="nome">Nome</label>
-        <input type="text" id="nome" formControlName="nome" />
-      </div>
-
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          autocomplete="off"
-          formControlName="email"
-        />
-      </div>
-
-      <hr class="divider" />
-
-      <div class="form-group">
-        <label for="senha-atual">Senha Atual</label>
-        <input
-          type="password"
-          id="senha-atual"
-          formControlName="senhaAtual"
-          autocomplete="off"
-        />
-        <small
-          *ngIf="usuarioForm.get('senhaAtual')?.hasError('senhaIncorreta')"
-          style="color: red; font-weight: 500"
-        >
-          Senha atual incorreta.
-        </small>
-      </div>
-
-      <div class="form-group">
-        <label for="nova-senha">Nova Senha</label>
-        <input
-          type="password"
-          id="nova-senha"
-          formControlName="novaSenha"
-          autocomplete="off"
-        />
-        <small
-          *ngIf="
-            usuarioForm.hasError('passwordMismatch') &&
-            usuarioForm.get('confirmarNovaSenha')?.touched
-          "
-          style="color: red; font-weight: 500"
-        >
-          As senhas não coincidem.
-        </small>
-      </div>
-
-      <div class="form-group">
-        <label for="confirmar-senha">Confirmar Nova Senha</label>
-        <input
-          type="password"
-          id="confirmar-senha"
-          formControlName="confirmarNovaSenha"
-          autocomplete="off"
-        />
-
-        <small
-          *ngIf="
-            usuarioForm.hasError('passwordMismatch') &&
-            usuarioForm.get('confirmarNovaSenha')?.touched
-          "
-          style="color: red; font-weight: 500"
-        >
-          As senhas não coincidem.
-        </small>
-      </div>
-    </form>
-  </div>
-
-  <div class="modal-footer">
-    <button class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
-    <button
-      form="editUserForm"
-      type="submit"
-      class="btn btn-primary"
-      [disabled]="usuarioForm.invalid"
-    >
-      Confirmar Alterações
-    </button>
-  </div>
 </div>

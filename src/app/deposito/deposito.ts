@@ -5,15 +5,46 @@ import { FormsModule } from '@angular/forms';
 import { ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AlertService } from '../services/alert.service';
+import {
+  faPiggyBank,
+  faTimes,
+  faCoins,
+  faMoneyBillAlt,
+  faInfoCircle,
+  faShieldAlt,
+  faReceipt,
+  faLock,
+  faExclamationTriangle,
+  faUserShield,
+  faArrowLeft,
+  faCheck,
+  faArrowRight
+} from '@fortawesome/free-solid-svg-icons';
+import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 
 @Component({
   selector: 'app-deposito',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FaIconComponent],
   templateUrl: './deposito.html',
   styleUrl: './deposito.scss',
 })
 export class Deposito {
+
+    faPiggyBank = faPiggyBank;
+  faTimes = faTimes;
+  faCoins = faCoins;
+  faMoneyBillAlt = faMoneyBillAlt;
+  faInfoCircle = faInfoCircle;
+  faShieldAlt = faShieldAlt;
+  faReceipt = faReceipt;
+  faLock = faLock;
+  faExclamationTriangle = faExclamationTriangle;
+  faUserShield = faUserShield;
+  faArrowLeft = faArrowLeft;
+  faCheck = faCheck;
+  faArrowRight = faArrowRight;
+
   @Input() deposito: any;
   @Input() onReloadTable?: () => void;
   valorDeposito: number = 0.00;

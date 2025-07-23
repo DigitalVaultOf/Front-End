@@ -1,53 +1,196 @@
-<!-- Modal for boleto payment -->
-<div class="modal-overlay">
-  <div class="modal">
-      <div class="modal-header">
-          <h2 class="modal-title">Saque</h2>
+<!-- withdraw.html - REDESIGN INSPIRADO NA HOME -->
+
+<!-- ✅ BACKDROP MODERNO COM BLUR -->
+<div class="withdraw-backdrop">
+  
+  <!-- ✅ MODAL PRINCIPAL -->
+  <div class="withdraw-modal">
+    
+    <!-- ✅ HEADER COM GRADIENTE -->
+    <div class="withdraw-header">
+      <div class="header-icon">
+        <fa-icon [icon]="faMoneyBillWave" class="icon"></fa-icon>
       </div>
+      <div class="header-content">
+        <h2 class="header-title">Saque</h2>
+        <p class="header-subtitle" *ngIf="!exibirSenha">Digite o valor que deseja sacar</p>
+        <p class="header-subtitle" *ngIf="exibirSenha">Confirme sua senha para continuar</p>
+      </div>
+      <button class="close-btn" (click)="closeModal()">
+        <fa-icon [icon]="faTimes"></fa-icon>
+      </button>
+    </div>
+
+    <!-- ✅ CONTEÚDO PRINCIPAL -->
+    <div class="withdraw-content">
       
-      <div class="modal-body">
-          <div class="form-group">
-              <label *ngIf="!exibirSenha" class="form-label">Digite o valor que deseja sacar</label>
-                <input
-                *ngIf="!exibirSenha"
-                type="number"
-                [(ngModel)]="valor"
-                [min] = '0'
-                [step]="0.10"
-                #valorInput = "ngModel" 
-                placeholder="Digite o valor"
-                class="form-input"
-                (keydown) = "preventNegativeInput($event)"
-                (paste) = "onPaste($event)"
-              />
-              
-            <div *ngIf="exibirSenha" class="flex flex-col space-y-2">
-              <div>Valor a sacar: <strong>R$ {{ valor | number:'1.2-2' }}</strong></div>
-        
-              <input
-                type="password"
-                placeholder="Digite sua senha"
-                [(ngModel)]="senha"
-                (input)="mensagemErro = null"
-                class="form-input"
-              />
-        
-              <div *ngIf="mensagemErro" class="text-red-600 font-semibold">{{ mensagemErro }}</div>
-            </div>
+      <!-- ✅ ETAPA 1: VALOR DO SAQUE -->
+      <div class="withdraw-section" *ngIf="!exibirSenha">
+        <div class="section-header">
+          <h3 class="section-title">
+            <fa-icon [icon]="faDollarSign" class="section-icon"></fa-icon>
+            Valor do Saque
+          </h3>
+          <p class="section-description">Informe o valor que deseja sacar</p>
+        </div>
 
-          <div class="action-buttons">
-            <button
-              [disabled]="!exibirSenha ? !valor : !senha"
-              (click)="sacar()"
-              class="btn btn-primary bg-indigo-600" id="payBtn"
+        <div class="form-group">
+          <label for="valor">
+            <fa-icon [icon]="faMoneyBillAlt" class="label-icon"></fa-icon>
+            Valor
+          </label>
+          <div class="money-input-container">
+            <span class="currency-symbol">R$</span>
+            <input
+              type="number"
+              id="valor"
+              [(ngModel)]="valor"
+              [min]="0"
+              [step]="0.10"
+              #valorInput="ngModel"
+              placeholder="0,00"
+              class="form-input money"
+              (keydown)="preventNegativeInput($event)"
+              (paste)="onPaste($event)"
+            />
+          </div>
+        </div>
+
+        <!-- ✅ VALORES SUGERIDOS -->
+        <div class="suggested-values">
+          <h4 class="suggestions-title">Valores sugeridos:</h4>
+          <div class="suggestions-grid">
+            <button 
+              class="suggestion-btn" 
+              (click)="valor = 50"
+              [class.active]="valor === 50"
             >
-              {{ exibirSenha ? 'Confirmar saque' : 'Confirmar valor' }}
+              R$ 50
             </button>
-
-            <button (click)="closeModal()" class="btn btn-secondary">
-              Cancelar
+            <button 
+              class="suggestion-btn" 
+              (click)="valor = 100"
+              [class.active]="valor === 100"
+            >
+              R$ 100
+            </button>
+            <button 
+              class="suggestion-btn" 
+              (click)="valor = 200"
+              [class.active]="valor === 200"
+            >
+              R$ 200
+            </button>
+            <button 
+              class="suggestion-btn" 
+              (click)="valor = 500"
+              [class.active]="valor === 500"
+            >
+              R$ 500
             </button>
           </div>
+        </div>
+
+        <!-- ✅ INFORMAÇÕES IMPORTANTES -->
+        <div class="info-card">
+          <div class="info-icon">
+            <fa-icon [icon]="faInfoCircle"></fa-icon>
+          </div>
+          <div class="info-content">
+            <h4>Informações do Saque</h4>
+            <ul>
+              <li>Valor mínimo: R$ 10,00</li>
+              <li>Processamento imediato</li>
+              <li>Sem taxas adicionais</li>
+            </ul>
+          </div>
+        </div>
       </div>
+
+      <!-- ✅ ETAPA 2: CONFIRMAÇÃO COM SENHA -->
+      <div class="withdraw-section" *ngIf="exibirSenha">
+        <div class="section-header">
+          <h3 class="section-title">
+            <fa-icon [icon]="faShieldAlt" class="section-icon"></fa-icon>
+            Confirmação do Saque
+          </h3>
+        </div>
+
+        <!-- ✅ RESUMO DO SAQUE -->
+        <div class="withdrawal-summary">
+          <div class="summary-card">
+            <div class="summary-header">
+              <fa-icon [icon]="faReceipt" class="summary-icon"></fa-icon>
+              <h4>Resumo do Saque</h4>
+            </div>
+            <div class="summary-content">
+              <div class="summary-row">
+                <span class="label">Valor solicitado:</span>
+                <span class="value highlight">R$ {{ valor | number:'1.2-2' }}</span>
+              </div>
+              <div class="summary-row">
+                <span class="label">Taxa:</span>
+                <span class="value">R$ 0,00</span>
+              </div>
+              <div class="summary-row total">
+                <span class="label">Total a receber:</span>
+                <span class="value">R$ {{ valor | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ CAMPO DE SENHA -->
+        <div class="form-group">
+          <label for="senha">
+            <fa-icon [icon]="faLock" class="label-icon"></fa-icon>
+            Senha de Confirmação
+          </label>
+          <input
+            type="password"
+            id="senha"
+            placeholder="Digite sua senha"
+            [(ngModel)]="senha"
+            (input)="mensagemErro = null"
+            class="form-input"
+          />
+          <div *ngIf="mensagemErro" class="error-message">
+            <fa-icon [icon]="faExclamationTriangle" class="error-icon"></fa-icon>
+            {{ mensagemErro }}
+          </div>
+        </div>
+
+        <!-- ✅ SEGURANÇA -->
+        <div class="security-card">
+          <div class="security-icon">
+            <fa-icon [icon]="faUserShield"></fa-icon>
+          </div>
+          <div class="security-content">
+            <h4>Transação Segura</h4>
+            <p>Seus dados estão protegidos com criptografia de ponta a ponta</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ✅ FOOTER COM BOTÕES -->
+    <div class="withdraw-footer">
+      <button class="btn-action secondary" (click)="closeModal()">
+        <fa-icon [icon]="faArrowLeft" class="btn-icon"></fa-icon>
+        <span>Cancelar</span>
+      </button>
+      
+      <button
+        class="btn-action primary"
+        [disabled]="!exibirSenha ? !valor || valor <= 0 : !senha"
+        (click)="sacar()"
+      >
+        <fa-icon [icon]="exibirSenha ? faCheck : faArrowRight" class="btn-icon"></fa-icon>
+        <span>{{ exibirSenha ? 'Confirmar Saque' : 'Continuar' }}</span>
+      </button>
+    </div>
+
   </div>
+
 </div>
