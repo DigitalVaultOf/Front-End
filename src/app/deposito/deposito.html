@@ -1,58 +1,201 @@
-<div class="modal-overlay">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 class="modal-title">Deposito</h2>
-        </div>
-        
-        <div class="modal-body">
-            <div class="form-group">
-                <label *ngIf="!exibirSenha" class="form-label">Quanto você quer depositar?</label>
-                <input
-                  *ngIf="!exibirSenha"
-                  type="number"
-                  placeholder="Digite o valor"
-                  [(ngModel)]="valorDeposito"
-                  [min]="0"
-                  #valorInput ="ngModel"
-                  [step]="0.10"
-                  class="form-input"
-                  (keydown) = "preventNegativeInput($event)"
-                  (paste) = "onPaste($event)"
-                />
-            </div>
+<!-- deposito.html - REDESIGN INSPIRADO NA HOME -->
 
-            <div *ngIf="exibirSenha" class="flex flex-col space-y-2">
-              <div>
-                Valor a depositar: <strong>R$ {{ valorDeposito | number:'1.2-2' }}</strong>
-              </div>
-        
-              <input
-                type="password"
-                placeholder="Digite sua senha"
-                [(ngModel)]="senha"
-                (input)="mensagemErro = null"
-                class="form-input"
-              />
-        
-              <div *ngIf="mensagemErro" class="text-red-600 font-semibold mt-2">
-                {{ mensagemErro }}
-              </div>
-            </div>
-            
-            <div class="action-buttons">
-              <button
-                [disabled]="!exibirSenha ? !valorDeposito : !senha"
-                class="btn btn-primary bg-indigo-600"
-                (click)="confirmarDeposito()"
-              >
-                {{ exibirSenha ? 'Depositar' : 'Confirmar valor' }}
-              </button>
-
-              <button (click)="closeModal()" class="btn btn-secondary">
-                Cancelar
-              </button>
-            </div>
-        </div>
+<!-- ✅ BACKDROP MODERNO COM BLUR -->
+<div class="deposit-backdrop">
+  
+  <!-- ✅ MODAL PRINCIPAL -->
+  <div class="deposit-modal">
+    
+    <!-- ✅ HEADER COM GRADIENTE -->
+    <div class="deposit-header">
+      <div class="header-icon">
+        <fa-icon [icon]="faPiggyBank" class="icon"></fa-icon>
+      </div>
+      <div class="header-content">
+        <h2 class="header-title">Depósito</h2>
+        <p class="header-subtitle" *ngIf="!exibirSenha">Quanto você quer depositar?</p>
+        <p class="header-subtitle" *ngIf="exibirSenha">Confirme sua senha para continuar</p>
+      </div>
+      <button class="close-btn" (click)="closeModal()">
+        <fa-icon [icon]="faTimes"></fa-icon>
+      </button>
     </div>
-</div>
 
+    <!-- ✅ CONTEÚDO PRINCIPAL -->
+    <div class="deposit-content">
+      
+      <!-- ✅ ETAPA 1: VALOR DO DEPÓSITO -->
+      <div class="deposit-section" *ngIf="!exibirSenha">
+        <div class="section-header">
+          <h3 class="section-title">
+            <fa-icon [icon]="faCoins" class="section-icon"></fa-icon>
+            Valor do Depósito
+          </h3>
+          <p class="section-description">Informe o valor que deseja depositar</p>
+        </div>
+
+        <div class="form-group">
+          <label for="valorDeposito">
+            <fa-icon [icon]="faMoneyBillAlt" class="label-icon"></fa-icon>
+            Valor
+          </label>
+          <div class="money-input-container">
+            <span class="currency-symbol">R$</span>
+            <input
+              type="number"
+              id="valorDeposito"
+              [(ngModel)]="valorDeposito"
+              [min]="0"
+              [step]="0.10"
+              #valorInput="ngModel"
+              placeholder="0,00"
+              class="form-input money"
+              (keydown)="preventNegativeInput($event)"
+              (paste)="onPaste($event)"
+            />
+          </div>
+        </div>
+
+        <!-- ✅ VALORES SUGERIDOS -->
+        <div class="suggested-values">
+          <h4 class="suggestions-title">Valores sugeridos:</h4>
+          <div class="suggestions-grid">
+            <button 
+              class="suggestion-btn" 
+              (click)="valorDeposito = 100"
+              [class.active]="valorDeposito === 100"
+            >
+              R$ 100
+            </button>
+            <button 
+              class="suggestion-btn" 
+              (click)="valorDeposito = 250"
+              [class.active]="valorDeposito === 250"
+            >
+              R$ 250
+            </button>
+            <button 
+              class="suggestion-btn" 
+              (click)="valorDeposito = 500"
+              [class.active]="valorDeposito === 500"
+            >
+              R$ 500
+            </button>
+            <button 
+              class="suggestion-btn" 
+              (click)="valorDeposito = 1000"
+              [class.active]="valorDeposito === 1000"
+            >
+              R$ 1.000
+            </button>
+          </div>
+        </div>
+
+        <!-- ✅ INFORMAÇÕES DO DEPÓSITO -->
+        <div class="info-card">
+          <div class="info-icon">
+            <fa-icon [icon]="faInfoCircle"></fa-icon>
+          </div>
+          <div class="info-content">
+            <h4>Informações do Depósito</h4>
+            <ul>
+              <li>Valor mínimo: R$ 1,00</li>
+              <li>Processamento instantâneo</li>
+              <li>Disponível 24h por dia</li>
+              <li>Sem taxas adicionais</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ ETAPA 2: CONFIRMAÇÃO COM SENHA -->
+      <div class="deposit-section" *ngIf="exibirSenha">
+        <div class="section-header">
+          <h3 class="section-title">
+            <fa-icon [icon]="faShieldAlt" class="section-icon"></fa-icon>
+            Confirmação do Depósito
+          </h3>
+        </div>
+
+        <!-- ✅ RESUMO DO DEPÓSITO -->
+        <div class="deposit-summary">
+          <div class="summary-card">
+            <div class="summary-header">
+              <fa-icon [icon]="faReceipt" class="summary-icon"></fa-icon>
+              <h4>Resumo do Depósito</h4>
+            </div>
+            <div class="summary-content">
+              <div class="summary-row">
+                <span class="label">Valor a depositar:</span>
+                <span class="value highlight">R$ {{ valorDeposito | number:'1.2-2' }}</span>
+              </div>
+              <div class="summary-row">
+                <span class="label">Taxa:</span>
+                <span class="value">R$ 0,00</span>
+              </div>
+              <div class="summary-row">
+                <span class="label">Processamento:</span>
+                <span class="value">Instantâneo</span>
+              </div>
+              <div class="summary-row total">
+                <span class="label">Total creditado:</span>
+                <span class="value">R$ {{ valorDeposito | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ CAMPO DE SENHA -->
+        <div class="form-group">
+          <label for="senha">
+            <fa-icon [icon]="faLock" class="label-icon"></fa-icon>
+            Senha de Confirmação
+          </label>
+          <input
+            type="password"
+            id="senha"
+            placeholder="Digite sua senha"
+            [(ngModel)]="senha"
+            (input)="mensagemErro = null"
+            class="form-input"
+          />
+          <div *ngIf="mensagemErro" class="error-message">
+            <fa-icon [icon]="faExclamationTriangle" class="error-icon"></fa-icon>
+            {{ mensagemErro }}
+          </div>
+        </div>
+
+        <!-- ✅ SEGURANÇA -->
+        <div class="security-card">
+          <div class="security-icon">
+            <fa-icon [icon]="faUserShield"></fa-icon>
+          </div>
+          <div class="security-content">
+            <h4>Transação Segura</h4>
+            <p>Seus dados estão protegidos com criptografia de ponta a ponta</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ✅ FOOTER COM BOTÕES -->
+    <div class="deposit-footer">
+      <button class="btn-action secondary" (click)="closeModal()">
+        <fa-icon [icon]="faArrowLeft" class="btn-icon"></fa-icon>
+        <span>Cancelar</span>
+      </button>
+      
+      <button
+        class="btn-action primary"
+        [disabled]="!exibirSenha ? !valorDeposito || valorDeposito <= 0 : !senha"
+        (click)="confirmarDeposito()"
+      >
+        <fa-icon [icon]="exibirSenha ? faCheck : faArrowRight" class="btn-icon"></fa-icon>
+        <span>{{ exibirSenha ? 'Depositar' : 'Continuar' }}</span>
+      </button>
+    </div>
+
+  </div>
+
+</div>

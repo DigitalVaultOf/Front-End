@@ -1,171 +1,613 @@
-// Importa a fonte da sua tela Home para manter a consistência
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+// login.scss - REDESIGN INSPIRADO NA HOME
 
-// Variáveis de cor para fácil manutenção, baseadas no seu design da Home
-$primary-purple: #8b5fbf;
-$secondary-purple: #6366f1;
+// ✅ IMPORT MONTSERRAT
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+
+// ✅ VARIÁVEIS DO TEMA
+$primary-gradient: linear-gradient(135deg, #8b5fbf 0%, #6366f1 100%);
+$primary-color: #8b5fbf;
+$primary-hover: #7c52a8;
+$secondary-color: #f8fafc;
+$border-color: #e2e8f0;
 $text-primary: #1a1a1a;
 $text-secondary: #64748b;
-$background-light: #fafbfc;
-$white: #ffffff;
-$border-light: #e2e8f0;
+$text-muted: #94a3b8;
+$success-color: #10b981;
+$warning-color: #f59e0b;
+$error-color: #ef4444;
+$info-color: #3b82f6;
+$border-radius-sm: 8px;
+$border-radius-md: 12px;
+$border-radius-lg: 16px;
+$border-radius-xl: 20px;
 
-// Estilo base do container da página de login
+// ✅ CONTAINER PRINCIPAL
 .login-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  background-color: $background-light;
+  padding: 2rem 1rem;
   font-family: "Montserrat", sans-serif;
-  padding: 1rem;
+  position: relative;
+
+  // Efeito de partículas de fundo
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+      radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 2px, transparent 2px);
+    background-size: 50px 50px;
+    animation: backgroundMove 20s linear infinite;
+  }
 }
 
-// O card principal, inspirado no .card-info da home
-.login-card {
-  background: $white;
-  padding: 2.5rem 2rem;
-  border-radius: 24px;
-  box-shadow: 0 8px 40px rgba($primary-purple, 0.12);
-  border: 1px solid rgba($primary-purple, 0.1);
+// ✅ WRAPPERS
+.login-wrapper,
+.account-selection-wrapper {
   width: 100%;
-  max-width: 420px;
-  text-align: center;
+  max-width: 480px;
+  position: relative;
+  z-index: 1;
 }
 
-// Cabeçalho do card
+// ✅ HEADER ELEGANTE
 .login-header {
+  text-align: center;
   margin-bottom: 2rem;
+  color: #ffffff;
 
-  h2 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: $secondary-purple;
-    margin: 0;
-  }
-
-  p {
-    margin-top: 0.5rem;
-    color: $text-secondary;
-    font-size: 1rem;
-  }
-}
-
-// Estilo para os grupos de formulário (label + input)
-.form-group {
-  margin-bottom: 1.5rem;
-  text-align: left;
-
-  label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    font-size: 0.875rem;
-    color: $text-primary;
-  }
-}
-
-// Inputs modernizados
-.form-control {
-  width: 100%;
-  padding: 0.875rem 1rem;
-  border: 1px solid $border-light;
-  border-radius: 12px;
-  background-color: $background-light;
-  font-size: 1rem;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-
-  &:focus {
-    outline: none;
-    border-color: $primary-purple;
-    box-shadow: 0 0 0 3px rgba($secondary-purple, 0.2);
-  }
-
-  &::placeholder {
-    color: #94a3b8;
-  }
-}
-
-// BOTÃO PRIMÁRIO - A MÁGICA ACONTECE AQUI!
-.btn-primary {
-  width: 100%;
-  padding: 0.875rem 1rem;
-  border: none;
-  border-radius: 12px;
-  color: $white;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative; // Para o spinner e os pontos
-  
-  // O degradê roxo da sua tela home
-  background: linear-gradient(135deg, $primary-purple 0%, $secondary-purple 100%);
-
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba($secondary-purple, 0.25);
-  }
-
-  &:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
-
-  // Estilo para o conteúdo do botão (spinner + texto)
-  .button-content {
+  .header-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    margin: 0 auto 1.5rem;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+
+    .icon {
+      font-size: 2rem;
+    }
+  }
+
+  .header-content {
+    .header-title {
+      margin: 0 0 0.5rem 0;
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .header-subtitle {
+      margin: 0;
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-weight: 400;
+      text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+    }
   }
 }
 
-// Botão secundário/perigo (para Sair)
-.btn-danger {
-  @extend .btn-primary; // Herda todos os estilos do btn-primary
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+// ✅ CARD PRINCIPAL
+.login-card {
+  background: #ffffff;
+  border-radius: $border-radius-xl;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-  &:hover:not(:disabled) {
-    box-shadow: 0 6px 20px rgba(#dc2626, 0.25);
+// ✅ SEÇÕES
+.login-section,
+.account-section {
+  padding: 2rem;
+
+  .section-header {
+    margin-bottom: 1.5rem;
+    text-align: center;
+
+    .section-title {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: $text-primary;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+
+      .section-icon {
+        font-size: 1.1rem;
+        color: $primary-color;
+      }
+    }
+
+    .section-description {
+      margin: 0;
+      font-size: 0.9rem;
+      color: $text-muted;
+      font-style: italic;
+    }
   }
 }
 
-// Rodapé do card (link para registro)
-.login-footer {
-  margin-top: 1.5rem;
-  font-size: 0.875rem;
-  color: $text-secondary;
+// ✅ FORMULÁRIOS
+.login-form {
+  .form-group {
+    margin-bottom: 1.5rem;
 
-  a {
-    color: $primary-purple;
-    font-weight: 600;
-    text-decoration: none;
-    transition: text-decoration 0.3s ease;
+    label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: $text-secondary;
+      font-size: 0.9rem;
+
+      .label-icon {
+        font-size: 0.85rem;
+        color: $primary-color;
+      }
+    }
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid $border-color;
+    border-radius: $border-radius-md;
+    font-size: 0.95rem;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 400;
+    box-sizing: border-box;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #ffffff;
+
+    &::placeholder {
+      color: $text-muted;
+      font-style: italic;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 4px rgba(139, 95, 191, 0.1);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// ✅ INPUT DE SENHA COM TOGGLE
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .form-input {
+    padding-right: 3rem;
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: $text-muted;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: $border-radius-sm;
+    transition: all 0.3s ease;
 
     &:hover {
+      color: $primary-color;
+      background: rgba(139, 95, 191, 0.1);
+    }
+  }
+}
+
+// ✅ BOTÕES
+.btn-primary,
+.btn-secondary {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  border: none;
+  border-radius: $border-radius-md;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.3px;
+
+  .btn-icon {
+    font-size: 0.9rem;
+
+    &.spinning {
+      animation: spin 1s linear infinite;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+}
+
+.btn-primary {
+  background: $primary-gradient;
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(139, 95, 191, 0.3);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 95, 191, 0.4);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: $text-secondary;
+  border: 2px solid $border-color;
+
+  &:hover:not(:disabled) {
+    border-color: $primary-color;
+    color: $primary-color;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(139, 95, 191, 0.2);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &.back-btn {
+    margin-top: 1.5rem;
+  }
+}
+
+// ✅ LINKS ÚTEIS
+.login-links {
+  text-align: center;
+  margin-top: 1.5rem;
+
+  .link-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: $text-secondary;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+
+    .link-icon {
+      font-size: 0.8rem;
+    }
+
+    &:hover {
+      color: $primary-color;
       text-decoration: underline;
     }
   }
 }
 
-// Animação dos pontos de carregamento
-.dots {
-  position: absolute;
-  display: inline-block;
-  left: 100%;
-  margin-left: 2px;
-  
-  &::after {
-    content: '';
-    animation: loadingDots 1.5s infinite;
+// ✅ SEÇÃO CADASTRO
+.signup-section {
+  background: $secondary-color;
+  padding: 2rem;
+  border-top: 1px solid $border-color;
+
+  .signup-card {
+    text-align: center;
+
+    .signup-icon {
+      width: 60px;
+      height: 60px;
+      background: $primary-gradient;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      color: #ffffff;
+      font-size: 1.5rem;
+    }
+
+    .signup-content {
+      h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: $text-primary;
+      }
+
+      p {
+        margin: 0 0 1.5rem 0;
+        font-size: 0.9rem;
+        color: $text-secondary;
+        line-height: 1.5;
+      }
+    }
   }
 }
 
-@keyframes loadingDots {
-  0% { content: ''; }
-  25% { content: '.'; }
-  50% { content: '..'; }
-  75% { content: '...'; }
-  100% { content: ''; }
+// ✅ LISTA DE CONTAS
+.accounts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+
+  .account-option {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 2px solid $border-color;
+    border-radius: $border-radius-lg;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: "Montserrat", sans-serif;
+    text-align: left;
+    width: 100%;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(139, 95, 191, 0.15);
+      border-color: rgba(139, 95, 191, 0.3);
+    }
+
+    &:active {
+      transform: translateY(-2px);
+    }
+
+    .account-icon {
+      width: 48px;
+      height: 48px;
+      background: $primary-gradient;
+      border-radius: $border-radius-md;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .account-info {
+      flex: 1;
+
+      h4 {
+        margin: 0 0 0.25rem 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: $text-primary;
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.875rem;
+        color: $text-secondary;
+        font-family: monospace;
+      }
+    }
+
+    .account-arrow {
+      color: $text-muted;
+      font-size: 0.875rem;
+      transition: all 0.3s ease;
+      transform: translateX(-5px);
+    }
+
+    &:hover .account-arrow {
+      color: $primary-color;
+      transform: translateX(0);
+    }
+  }
+}
+
+// ✅ INFORMAÇÕES DE SEGURANÇA
+.security-info {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: $border-radius-lg;
+  padding: 1.25rem;
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+
+  .security-icon {
+    font-size: 1.25rem;
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+    opacity: 0.9;
+  }
+
+  .security-content {
+    h4 {
+      margin: 0 0 0.25rem 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+  }
+}
+
+// ✅ ANIMAÇÕES
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes backgroundMove {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ✅ RESPONSIVIDADE
+@media (max-width: 768px) {
+  .login-container {
+    padding: 1rem 0.5rem;
+  }
+
+  .login-wrapper,
+  .account-selection-wrapper {
+    max-width: 100%;
+  }
+
+  .login-header {
+    margin-bottom: 1.5rem;
+
+    .header-icon {
+      width: 60px;
+      height: 60px;
+
+      .icon {
+        font-size: 1.5rem;
+      }
+    }
+
+    .header-content {
+      .header-title {
+        font-size: 2rem;
+      }
+
+      .header-subtitle {
+        font-size: 1rem;
+      }
+    }
+  }
+
+  .login-section,
+  .account-section {
+    padding: 1.5rem;
+  }
+
+  .signup-section {
+    padding: 1.5rem;
+  }
+
+  .account-option {
+    padding: 1.25rem;
+
+    .account-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 1rem;
+    }
+
+    .account-info {
+      h4 {
+        font-size: 0.9rem;
+      }
+
+      p {
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 0.5rem;
+  }
+
+  .login-header {
+    .header-content {
+      .header-title {
+        font-size: 1.75rem;
+      }
+
+      .header-subtitle {
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  .login-section,
+  .account-section,
+  .signup-section {
+    padding: 1.25rem;
+  }
+
+  .form-input {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .security-info {
+    flex-direction: column;
+    text-align: center;
+
+    .security-icon {
+      align-self: center;
+      margin-top: 0;
+    }
+  }
+}
+
+// ✅ ACESSIBILIDADE
+@media (prefers-reduced-motion: reduce) {
+  .login-card,
+  .form-input,
+  .btn-primary,
+  .btn-secondary,
+  .account-option {
+    animation: none;
+    transition: none;
+  }
+
+  .login-container::before {
+    animation: none;
+  }
 }

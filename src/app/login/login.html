@@ -1,91 +1,187 @@
+<!-- login.html - REDESIGN INSPIRADO NA HOME -->
+
+<!-- ✅ CONTAINER PRINCIPAL -->
 <div class="login-container">
-  <div *ngIf="!showAccountSelection && !loggedIn" class="login-card">
+  
+  <!-- ✅ TELA DE LOGIN -->
+  <div *ngIf="!showAccountSelection && !loggedIn" class="login-wrapper">
+    
+    <!-- ✅ HEADER COM GRADIENTE -->
     <div class="login-header">
-      <h2>Bem-vindo!</h2>
-      <p>Acesse sua conta para continuar</p>
+      <div class="header-icon">
+        <fa-icon [icon]="faUser" class="icon"></fa-icon>
+      </div>
+      <div class="header-content">
+        <h1 class="header-title">Bem-vindo!</h1>
+        <p class="header-subtitle">Acesse sua conta para continuar</p>
+      </div>
     </div>
 
-    <form (ngSubmit)="login()" novalidate>
-      <div class="form-group">
-        <label for="account">Conta, CPF ou E-mail</label>
-        <input
-          type="text"
-          id="account"
-          name="account"
-          [(ngModel)]="loginInput"
-          (input)="formatInput($event)"
-          class="form-control"
-          placeholder="Digite sua credencial"
-          required
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="senha">Senha</label>
-        <input
-          type="password"
-          id="senha"
-          name="senha"
-          [(ngModel)]="password"
-          class="form-control"
-          placeholder="•••••••••"
-          required
-        />
-      </div>
-
-      <button type="submit" [disabled]="isLoading" class="btn-primary">
-        <div class="button-content">
-          @if (isLoading) {
-          <svg
-            class="animate-spin h-5 w-5 text-white"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
-          }
-          <span class="relative">
-            {{ isLoading ? "Entrando" : "Entrar" }}
-            @if (isLoading) {
-            <span class="dots"></span>
-            }
-          </span>
+    <!-- ✅ CARD PRINCIPAL -->
+    <div class="login-card">
+      
+      <!-- ✅ SEÇÃO DE LOGIN -->
+      <div class="login-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <fa-icon [icon]="faSignInAlt" class="section-icon"></fa-icon>
+            Acesso à Conta
+          </h2>
+          <p class="section-description">Entre com suas credenciais</p>
         </div>
-      </button>
-    </form>
 
-    <p class="login-footer">
-      Não tem uma conta? <a href="/user-registration">Registre-se agora</a>
-    </p>
-  </div>
+        <form (ngSubmit)="login()" novalidate class="login-form">
+          
+          <!-- ✅ CAMPO CREDENCIAL -->
+          <div class="form-group">
+            <label for="account">
+              <fa-icon [icon]="faIdCard" class="label-icon"></fa-icon>
+              Conta, CPF ou E-mail
+            </label>
+            <input
+              type="text"
+              id="account"
+              name="account"
+              [(ngModel)]="loginInput"
+              (input)="formatInput($event)"
+              class="form-input"
+              placeholder="Digite sua credencial"
+              required
+            />
+          </div>
 
-  <div *ngIf="showAccountSelection" class="login-card">
-    <div class="login-header">
-      <h2>Escolha a Conta</h2>
-      <p>Encontramos múltiplas contas vinculadas.</p>
+          <!-- ✅ CAMPO SENHA -->
+          <div class="form-group">
+            <label for="senha">
+              <fa-icon [icon]="faLock" class="label-icon"></fa-icon>
+              Senha
+            </label>
+            <div class="password-input-container">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="senha"
+                name="senha"
+                [(ngModel)]="password"
+                class="form-input"
+                placeholder="Digite sua senha"
+                required
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="showPassword = !showPassword"
+              >
+                <fa-icon [icon]="showPassword ? faEyeSlash : faEye"></fa-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- ✅ BOTÃO LOGIN -->
+          <button type="submit" [disabled]="isLoading || !loginInput || !password" class="btn-primary">
+            <fa-icon [icon]="isLoading ? faSpinner : faSignInAlt" 
+                     class="btn-icon" 
+                     [class.spinning]="isLoading"></fa-icon>
+            <span>{{ isLoading ? "Entrando" : "Entrar" }}</span>
+          </button>
+
+        </form>
+
+        <!-- ✅ LINKS ÚTEIS -->
+        <div class="login-links">
+          <a href="/forgot-password" class="link-secondary">
+            <fa-icon [icon]="faQuestionCircle" class="link-icon"></fa-icon>
+            Esqueci minha senha
+          </a>
+        </div>
+
+      </div>
+
+      <!-- ✅ SEÇÃO CADASTRO -->
+      <div class="signup-section">
+        <div class="signup-card">
+          <div class="signup-icon">
+            <fa-icon [icon]="faUserPlus"></fa-icon>
+          </div>
+          <div class="signup-content">
+            <h3>Novo por aqui?</h3>
+            <p>Crie sua conta e desfrute de todos os nossos serviços bancários digitais</p>
+            <a href="/user-registration" class="btn-secondary">
+              <fa-icon [icon]="faUserPlus" class="btn-icon"></fa-icon>
+              <span>Criar Conta</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <div class="space-y-4">
-      <div *ngFor="let account of accountOptions">
-        <button (click)="selectAccount(account)" class="btn-primary">
-          Conta: {{ account }}
-        </button>
+    <!-- ✅ SEGURANÇA -->
+    <div class="security-info">
+      <fa-icon [icon]="faShieldAlt" class="security-icon"></fa-icon>
+      <div class="security-content">
+        <h4>Ambiente Seguro</h4>
+        <p>Seus dados estão protegidos com criptografia de ponta a ponta</p>
       </div>
     </div>
 
-    <button (click)="logout()" class="btn-danger mt-6">Voltar</button>
   </div>
+
+  <!-- ✅ TELA DE SELEÇÃO DE CONTA -->
+  <div *ngIf="showAccountSelection" class="account-selection-wrapper">
+    
+    <!-- ✅ HEADER SELEÇÃO -->
+    <div class="login-header">
+      <div class="header-icon">
+        <fa-icon [icon]="faUsers" class="icon"></fa-icon>
+      </div>
+      <div class="header-content">
+        <h1 class="header-title">Escolha a Conta</h1>
+        <p class="header-subtitle">Encontramos múltiplas contas vinculadas</p>
+      </div>
+    </div>
+
+    <!-- ✅ CARD SELEÇÃO -->
+    <div class="login-card">
+      
+      <div class="account-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <fa-icon [icon]="faListUl" class="section-icon"></fa-icon>
+            Suas Contas
+          </h2>
+          <p class="section-description">Selecione a conta que deseja acessar</p>
+        </div>
+
+        <!-- ✅ LISTA DE CONTAS -->
+        <div class="accounts-list">
+          <button 
+            *ngFor="let account of accountOptions; let i = index; trackBy: trackByAccount" 
+            (click)="selectAccount(account)" 
+            class="account-option"
+          >
+            <div class="account-icon">
+              <fa-icon [icon]="faCreditCard"></fa-icon>
+            </div>
+            <div class="account-info">
+              <h4>{{ getAccountType(i) }}</h4>
+              <p>{{ account }}</p>
+            </div>
+            <div class="account-arrow">
+              <fa-icon [icon]="faChevronRight"></fa-icon>
+            </div>
+          </button>
+        </div>
+
+        <!-- ✅ BOTÃO VOLTAR -->
+        <button (click)="logout()" class="btn-secondary back-btn">
+          <fa-icon [icon]="faArrowLeft" class="btn-icon"></fa-icon>
+          <span>Voltar ao Login</span>
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
 </div>

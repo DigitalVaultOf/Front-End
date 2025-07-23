@@ -7,15 +7,50 @@ import { HttpClient } from '@angular/common/http';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AlertService } from '../services/alert.service';
 import { UserService } from '../services/user.service';
+import {
+  faUser,
+  faSignInAlt,
+  faIdCard,
+  faLock,
+  faEye,
+  faEyeSlash,
+  faSpinner,
+  faQuestionCircle,
+  faUserPlus,
+  faShieldAlt,
+  faUsers,
+  faListUl,
+  faCreditCard,
+  faChevronRight,
+  faArrowLeft
+} from '@fortawesome/free-solid-svg-icons';
+import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FaIconComponent],
   templateUrl: './login.html',
   styleUrls: ['./login.scss'],
 })
 export class Login {
+    showPassword = false;
+
+    faUser = faUser;
+  faSignInAlt = faSignInAlt;
+  faIdCard = faIdCard;
+  faLock = faLock;
+  faEye = faEye;
+  faEyeSlash = faEyeSlash;
+  faSpinner = faSpinner;
+  faQuestionCircle = faQuestionCircle;
+  faUserPlus = faUserPlus;
+  faShieldAlt = faShieldAlt;
+  faUsers = faUsers;
+  faListUl = faListUl;
+  faCreditCard = faCreditCard;
+  faChevronRight = faChevronRight;
+  faArrowLeft = faArrowLeft;
   loginInput = '';
   password = '';
   loggedIn = false;
@@ -37,6 +72,13 @@ export class Login {
   formatCpf(cpf: string): string {
     return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
   }
+    trackByAccount(index: number, account: string): string {
+    return account;
+  }
+
+  getAccountType(index: number): string {
+  return index % 2 === 0 ? 'Conta Corrente' : 'Conta Poupança';
+}
 
   formatInput(event: any) {
     const value = event.target.value;

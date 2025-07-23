@@ -809,33 +809,42 @@ export class Home implements OnInit, OnDestroy {
       });
   }
 
-  openModal(component: Type<any>) {
-    this.overlayRef?.dispose();
-    this.overlayRef = this.overlay.create({
-      hasBackdrop: true,
-      positionStrategy: this.overlay
-        .position()
-        .global()
-        .centerHorizontally()
-        .centerVertically(),
-    });
+// home.ts - ATUALIZAR O MÉTODO openModal
+openModal(component: Type<any>) {
+  this.overlayRef?.dispose();
+  this.overlayRef = this.overlay.create({
+    hasBackdrop: true,
+    positionStrategy: this.overlay
+      .position()
+      .global()
+      .centerHorizontally()
+      .centerVertically(),
+  });
 
-    this.overlayManager.registerOverlay(this.overlayRef, component.name);
-    const injector = Injector.create({
-      providers: [{ provide: OverlayRef, useValue: this.overlayRef }],
-    });
+  this.overlayManager.registerOverlay(this.overlayRef, component.name);
+  
+  // ✅ CRIAR INJECTOR COM DADOS DAS MOVIMENTAÇÕES
+  const injector = Injector.create({
+    providers: [
+      { provide: OverlayRef, useValue: this.overlayRef },
+      // ✅ PASSAR DADOS PARA O EXPORT
+      ...(component.name === 'Export' ? [
+        { provide: 'movimentacoes', useValue: this.movimentacoes }
+      ] : [])
+    ],
+  });
 
-    const portal = new ComponentPortal(component, null, injector);
-    const componentRef = this.overlayRef.attach(portal);
+  const portal = new ComponentPortal(component, null, injector);
+  const componentRef = this.overlayRef.attach(portal);
 
-    (componentRef.instance as any).onReloadTable = () => {
-      this.onTransactionComplete();
-    };
+  (componentRef.instance as any).onReloadTable = () => {
+    this.onTransactionComplete();
+  };
 
-    this.overlayRef
-      .backdropClick()
-      .subscribe(() => componentRef.instance.closeModal());
-  }
+  this.overlayRef
+    .backdropClick()
+    .subscribe(() => componentRef.instance.closeModal());
+}
 
   closeModal() {
     this.overlayRef?.dispose();

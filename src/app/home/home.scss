@@ -26,7 +26,6 @@ html {
   background: linear-gradient(135deg, #8b5fbf 0%, #6366f1 100%);
   box-shadow: 0 4px 30px rgba(139, 95, 191, 0.15);
   position: relative;
-  z-index: 1000;
   width: 100%;
   overflow: hidden; // ✅ GARANTIR QUE SHIMMER NÃO VAZE
 
@@ -40,7 +39,6 @@ html {
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
     animation: shimmerControlled 3s infinite;
-    z-index: -1;
     pointer-events: none;
     transform: translateX(-100%); // ✅ COMEÇAR FORA DA TELA À ESQUERDA
   }
@@ -54,7 +52,6 @@ html {
     align-items: center;
     gap: 2rem;
     position: relative;
-    z-index: 1001;
     width: 100%; // ✅ GARANTIR 100% DE LARGURA
     box-sizing: border-box; // ✅ INCLUIR PADDING NA LARGURA
   }
@@ -731,7 +728,6 @@ main {
 .dropdown-container {
   position: relative;
   display: inline-block;
-  z-index: 1002;
 }
 
 .dropdown-menu {
@@ -743,7 +739,6 @@ main {
   background: linear-gradient(145deg, #1f2937 0%, #111827 100%);
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-  z-index: 99999;
   overflow: hidden;
   opacity: 0;
   visibility: hidden;
@@ -1207,7 +1202,7 @@ body {
 // ✅ CORREÇÕES PARA ELEMENTOS QUE PODEM INTERFERIR
 app-ai-chatbot {
   position: relative;
-  z-index: 100;
+  z-index: 9999;
   max-width: 100%;
   overflow: hidden;
 }
@@ -1220,7 +1215,6 @@ app-ai-chatbot {
 }
 
 .cdk-overlay-pane {
-  z-index: 1001;
   max-width: 90vw;
 }
 
@@ -1228,10 +1222,9 @@ app-ai-chatbot {
 .dropdown-container {
   position: relative;
   display: inline-block;
-  z-index: 10000;
 
   .dropdown-menu {
-    z-index: 10001;
+    z-index: 10;
     max-width: min(220px, 90vw); // ✅ RESPONSIVO
   }
 }

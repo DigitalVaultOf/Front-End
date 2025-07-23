@@ -5,14 +5,46 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Home } from '../home/home';
 
+import {
+  faMoneyBillWave,
+  faTimes,
+  faDollarSign,
+  faMoneyBillAlt,
+  faInfoCircle,
+  faShieldAlt,
+  faReceipt,
+  faLock,
+  faExclamationTriangle,
+  faUserShield,
+  faArrowLeft,
+  faCheck,
+  faArrowRight
+} from '@fortawesome/free-solid-svg-icons';
+import { FaIconComponent } from "@fortawesome/angular-fontawesome";
+
 @Component({
   selector: 'app-withdraw',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FaIconComponent],
   templateUrl: './withdraw.html',
   styleUrls: ['./withdraw.scss'],
 })
 export class Withdraw {
+
+ faMoneyBillWave = faMoneyBillWave;
+  faTimes = faTimes;
+  faDollarSign = faDollarSign;
+  faMoneyBillAlt = faMoneyBillAlt;
+  faInfoCircle = faInfoCircle;
+  faShieldAlt = faShieldAlt;
+  faReceipt = faReceipt;
+  faLock = faLock;
+  faExclamationTriangle = faExclamationTriangle;
+  faUserShield = faUserShield;
+  faArrowLeft = faArrowLeft;
+  faCheck = faCheck;
+  faArrowRight = faArrowRight;
+
   @Input() withdraw: any;
   @Input() onReloadTable?: () => void;
   valor: number = 0.00;

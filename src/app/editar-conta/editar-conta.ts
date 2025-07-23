@@ -21,6 +21,25 @@ import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../services/user.service';
 import { Observable, forkJoin } from 'rxjs';
 import { AlertService } from '../services/alert.service';
+import { FontAwesomeModule, FaIconComponent } from '@fortawesome/angular-fontawesome'; // ✅ ADICIONAR
+import {
+  faEdit,
+  faBuilding,
+  faIdCard,
+  faCreditCard,
+  faTimes,
+  faAddressCard,
+  faUser,
+  faUserEdit,
+  faLock,
+  faKey,
+  faExclamationTriangle,
+  faLockOpen,
+  faCheck,
+  faArrowLeft,
+  faSave,
+  faEnvelope,
+} from '@fortawesome/free-solid-svg-icons';
 
 export function passwordMatchValidator(
   control: AbstractControl
@@ -45,11 +64,28 @@ export function passwordMatchValidator(
 @Component({
   selector: 'app-editar-conta',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, FaIconComponent],
   templateUrl: './editar-conta.html',
   styleUrls: ['./editar-conta.scss'],
 })
 export class EditarConta implements OnInit, AfterViewInit {
+  faEdit = faEdit;
+  faBuilding = faBuilding;
+  faIdCard = faIdCard;
+  faCreditCard = faCreditCard;
+  faTimes = faTimes;
+  faAddressCard = faAddressCard;
+  faUser = faUser;
+  faUserEdit = faUserEdit;
+  faLock = faLock;
+  faKey = faKey;
+  faExclamationTriangle = faExclamationTriangle;
+  faLockOpen = faLockOpen;
+  faCheck = faCheck;
+  faArrowLeft = faArrowLeft;
+  faSave = faSave;
+  faEnvelope = faEnvelope;
+  
   usuarioForm!: FormGroup;
   isModalVisible = false; // Controla a visibilidade do modal
 

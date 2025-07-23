@@ -4,14 +4,51 @@ import { OverlayRef } from '@angular/cdk/overlay';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
+import {
+  faExchangeAlt,
+  faTimes,
+  faFileInvoiceDollar,
+  faMoneyBillAlt,
+  faCreditCard,
+  faComment,
+  faInfoCircle,
+  faShieldAlt,
+  faReceipt,
+  faLock,
+  faExclamationTriangle,
+  faUserShield,
+  faArrowLeft,
+  faCheck,
+  faArrowRight
+} from '@fortawesome/free-solid-svg-icons';
+import { FaIconComponent } from "@fortawesome/angular-fontawesome";
+
+
 @Component({
   selector: 'app-transferencia',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FaIconComponent],
   templateUrl: './transferencia.html',
   styleUrls: ['./transferencia.scss'],
 })
 export class Transferencia {
+
+  faExchangeAlt = faExchangeAlt;
+  faTimes = faTimes;
+  faFileInvoiceDollar = faFileInvoiceDollar;
+  faMoneyBillAlt = faMoneyBillAlt;
+  faCreditCard = faCreditCard;
+  faComment = faComment;
+  faInfoCircle = faInfoCircle;
+  faShieldAlt = faShieldAlt;
+  faReceipt = faReceipt;
+  faLock = faLock;
+  faExclamationTriangle = faExclamationTriangle;
+  faUserShield = faUserShield;
+  faArrowLeft = faArrowLeft;
+  faCheck = faCheck;
+  faArrowRight = faArrowRight;
+
   @Input() transferencia: any;
   @Input() onReloadTable?: () => void;
   accountNumberTo: string = '';

@@ -1,31 +1,70 @@
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40"></div>
+<!-- export.html - REDESIGN INSPIRADO NA HOME -->
 
-    <div class="fixed z-50 bg-white rounded-lg shadow-lg w-96 p-6 flex flex-col space-y-4">
-      <h2 class="text-xl font-semibold text-gray-800">Escolha a ação desejada:</h2>
+<!-- ✅ BACKDROP MODERNO COM BLUR -->
+<div class="export-backdrop">
   
-      <div class="flex flex-col space-y-4">
-        <button
-          class="bg-indigo-600 text-white rounded-md py-2 font-semibold hover:bg-indigo-700 transition w-full"
-          (click)="gerarPDF()"
-        >
-          Gerar PDF
-        </button>
-
-        <button
-          class="bg-green-600 text-white rounded-md py-2 font-semibold hover:bg-green-700 transition w-full"
-          (click)="gerarCSV()"
-        >
-          Gerar Excel
-        </button>
+  <!-- ✅ MODAL PRINCIPAL -->
+  <div class="export-modal">
+    
+    <!-- ✅ HEADER DO MODAL -->
+    <div class="export-header">
+      <div class="export-icon">
+        <fa-icon [icon]="faDownload" class="header-icon"></fa-icon>
       </div>
+      <h2 class="export-title">Exportar Histórico</h2>
+      <p class="export-subtitle">Escolha o formato para exportar suas transações</p>
+    </div>
 
+    <!-- ✅ OPÇÕES DE EXPORT -->
+    <div class="export-options">
+      
+      <!-- ✅ OPÇÃO PDF -->
+      <button
+        class="export-option pdf"
+        (click)="gerarPDF()"
+      >
+        <div class="option-icon">
+          <fa-icon [icon]="faFilePdf" class="pdf-icon"></fa-icon>
+        </div>
+        <div class="option-content">
+          <h3>Gerar PDF</h3>
+          <p>Relatório completo em formato PDF</p>
+        </div>
+        <div class="option-arrow">
+          <fa-icon [icon]="faChevronRight"></fa-icon>
+        </div>
+      </button>
+
+      <!-- ✅ OPÇÃO EXCEL -->
+      <button
+        class="export-option excel"
+        (click)="gerarCSV()"
+      >
+        <div class="option-icon">
+          <fa-icon [icon]="faFileExcel" class="excel-icon"></fa-icon>
+        </div>
+        <div class="option-content">
+          <h3>Gerar Excel</h3>
+          <p>Planilha para análise de dados</p>
+        </div>
+        <div class="option-arrow">
+          <fa-icon [icon]="faChevronRight"></fa-icon>
+        </div>
+      </button>
+
+    </div>
+
+    <!-- ✅ FOOTER COM BOTÃO FECHAR -->
+    <div class="export-footer">
       <button
         (click)="closeModal()"
-        class="mt-2 text-gray-600 hover:text-gray-900"
+        class="btn-close"
       >
-        Fechar
+        <fa-icon [icon]="faTimes" class="close-icon"></fa-icon>
+        <span>Cancelar</span>
       </button>
     </div>
-  </body>
-  
+
+  </div>
+
+</div>

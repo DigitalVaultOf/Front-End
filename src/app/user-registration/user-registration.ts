@@ -14,16 +14,59 @@ import { provideNgxMask, NgxMaskDirective } from 'ngx-mask';
 import { UserService, CreateAccountDto } from '../services/user.service';
 import { AlertService } from '../services/alert.service';
 import { finalize } from 'rxjs/operators';
+import {
+  faUserPlus,
+  faClipboardList,
+  faUser,
+  faEnvelope,
+  faIdCard,
+  faShieldAlt,
+  faLock,
+  faCheck,
+  faEye,
+  faEyeSlash,
+  faInfoCircle,
+  faTimes,
+  faUserShield,
+  faUserCheck,
+  faSpinner,
+  faSignInAlt,
+  faExclamationTriangle
+} from '@fortawesome/free-solid-svg-icons';
+import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 
 @Component({
   selector: 'app-user-registration',
   templateUrl: './user-registration.html',
   styleUrls: ['./user-registration.scss'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, NgxMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, NgxMaskDirective, FaIconComponent],
   providers: [provideNgxMask()],
 })
 export class UserRegistration implements OnInit {
+
+    faUserPlus = faUserPlus;
+  faClipboardList = faClipboardList;
+  faUser = faUser;
+  faEnvelope = faEnvelope;
+  faIdCard = faIdCard;
+  faShieldAlt = faShieldAlt;
+  faLock = faLock;
+  faCheck = faCheck;
+  faEye = faEye;
+  faEyeSlash = faEyeSlash;
+  faInfoCircle = faInfoCircle;
+  faTimes = faTimes;
+  faUserShield = faUserShield;
+  faUserCheck = faUserCheck;
+  faSpinner = faSpinner;
+  faSignInAlt = faSignInAlt;
+  faExclamationTriangle = faExclamationTriangle;
+
+  // ✅ CONTROLE DE VISIBILIDADE DAS SENHAS
+  showPassword = false;
+  showConfirmPassword = false;
+
   isLoading: boolean = false;
   protected registrationForm!: FormGroup;
   showErrorModal: boolean = false;
